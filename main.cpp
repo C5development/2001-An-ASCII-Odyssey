@@ -147,6 +147,8 @@ class Planet: public Star
         bool _magneticprotection;
         int _magneticfieldintensity;
         int _magneticfieldvsradiation;
+        int _distancefromstar; 
+        float _eccentricity;
         bool _habitable;
         int _rotationangle; //From 90 to 180
         std::string _planetname;
@@ -201,10 +203,14 @@ class Planet: public Star
         bool getbreathableatmosphere();
 
         int getstaphilloccocus();
+        
+        int getdistancefromstar();
 
         int getprotozoo();
 
         int getpseudomona();
+        
+        float geteccentricity();
 
         void turn_into_habitable();
 
@@ -269,6 +275,13 @@ int Planet::randRangep(int low, int high)
 
 int Planet::gethabitability(){
     return _habitable;
+}
+
+float Planet::geteccentricity(){
+    return _eccentricity;
+}
+int Planet::getplanetsdistancee(){
+    return _distancefromstar;
 }
 
 bool Planet::getbreathableatmosphere(){
@@ -483,7 +496,7 @@ void Planet::define_atmosphere_composition(){
 
 float Planet::determine_orbit_eccentricity(){
     float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-    return r;
+    _eccentricity = r; 
 }
 
 void Planet::determine_magnetic_field(){
@@ -579,7 +592,8 @@ void Planet::display_planets_data(std::string planetsname, int distancefromstar)
     else if(_planettype == 6){
         planettype = "Gas giant";
     }
-
+    _distancefromstar = distancefromstar; //This way we will be able to access the variable with a getter before inserting it in a database
+    determine_orbit_eccentricity(); //Same as above 
     std::cout<<"|--"<<planetsname<<"--|"<<std::endl;
     std::cout<<"Planet type: "<< planettype<<std::endl;
     std::cout<<"Average temperature: "<<_planetstemperature<<" Celcius"<<std::endl;
@@ -587,7 +601,7 @@ void Planet::display_planets_data(std::string planetsname, int distancefromstar)
     std::cout<<"Atmosphere's composition: "<<_atmospherecomposition<<std::endl;
     std::cout<<"Intensity of magnetic field: "<<_magneticfieldintensity<<std::endl;
     std::cout<<"Distance from its star: "<<distancefromstar<<" millions of kilometers"<<std::endl;
-    std::cout<<"Orbit's eccentricity: "<<determine_orbit_eccentricity()<<std::endl;
+    std::cout<<"Orbit's eccentricity: "<<_eccentricity<<std::endl;
     std::cout<<"Rotation angle: "<<randRange(90, 180)<<std::endl;
     if(_planettype == 1)
         std::cout<<"Amount of metal to be processed: "<<_metal<<" kg"<<std::endl;
@@ -685,7 +699,9 @@ class Spaceship
         void surrender_treaty(std::string, std::string);
         void assign_troops(int, int, int);
         void battle_mode(int, int, int, int);
-        void to_solar_system();
+        void to_solar_system(bool, std::string, std::vector<char>, std::vector<int>, std::vector<int>);
+        void display_planets_database(bool, std::string, std::vector<char>, std::vector<int>, std::vector<int>);
+        void generate_solar_data_base();
         void colonise_solar_system();
         void display_colonies();
         void read_story();
@@ -735,7 +751,11 @@ void Spaceship::stars_interaction(){
         }
 }
 
+void Spaceship::display_planets_database(bool planettype, std::string planetname, std::vector<char> planets_available, std::vector<int> distancesmap, std::vector<int> planetstemperatures){
+}
 
+void Spaceship::generate_solar_data_base(){
+}
 
 std::string Spaceship::define_planets_name(std::vector<std::string> planetnames, std::vector<std::string> planetnamesbuffer){
 
@@ -1021,8 +1041,9 @@ void Spaceship::planet_interaction(bool back_to_solar_system){
     std::cout<<std::endl;
     std::cout<<std::endl;
     if(back_to_solar_system){
-        to_solar_system(); //FUNCTION RETRIEVING INFORMATION FROM DATABASE AND STORING THE ENTITIES IN THE ABOVE-DEFINED VECTORS
-                                //OTHERWISE THE OTHER FUNCTIONS WON'T BE ABLE TO INTERACT
+        to_solar_system(planettype, planetname, planets_available, distancesmap, planetstemperatures); //FUNCTION RETRIEVING INFORMATION FROM DATABASE AND STORING THE ENTITIES IN THE ABOVE-DEFINED VECTORS
+                                //OTHERWISE THE OTHER FUNCTIONS WON'T BE ABLE TO INTERACT 
+                                //IT DOES NOT NEED TO GENERATE A NEW ARRAY OF OBJECTS SINCE THEY WILL ALREADY BE CONTAINED IN THE DATABASE
     }
     else if(!back_to_solar_system){
         for(int j = 0; j < planets_number; j++){
