@@ -999,7 +999,8 @@ void Spaceship::planet_destroyer(int desired_respect){
 
 void Spaceship::planet_interaction(bool back_to_solar_system){
     int choice;
-    bool potential_colony;
+    bool potential_colony = true; //We start by assuming the solar system can be colonised
+    bool dead_solar_system;
     std::string colony_approbation;
     unsigned int efficiency;
     int desired_respect;
@@ -1015,7 +1016,6 @@ void Spaceship::planet_interaction(bool back_to_solar_system){
     std::vector<std::string> planet_names = {"Lok", "Erinar", "Golrath", "Imrooso", "Maryx Minor", "Qat Chrystac", "RZ7-6113-23", "Taspir III", "55 Cancri e", "Zachayphus", "Iewhoutis", "Foclillon", "Weplov", "Reter", "Crevugan", "Obloethea", "Ethuetera", "Asnypso", "Ciocury", "Glabuwei", "Spiri 29N4", "Grypso Y1J", "Slequhiri", "Tasloaclite", "Dragatan", "Sethurilia", "Hadrion", "Geuliv","Celaris", "Adrara", "Upruna", "Fraxetis", "Cuprillon", "Woilara", "Stuzaria", "Xiotune", "Hafloth", "Pludaphus", "Glarvis 10", "Vespin", "Oclore", "Oaphus", "Clugonus", "Veskaiter", "Godriuturn"};
     std::vector<char> planets_available;
     int planets_number = rand() % 4 + 4;
-    efficiency = 17 - _slaveslevel;
     Planet planets[planets_number];
     std::cout<<"<<<PLANETS>>>"<<std::endl;
     std::cout<<std::endl;
@@ -1047,33 +1047,46 @@ void Spaceship::planet_interaction(bool back_to_solar_system){
     std::cout<<"Do you want to make this solar system a colony?"<<std::endl;
     std::cin>>colony_approbation;
     if(colony_approbation == "Yes" || colony_approbation == "yes" || colony_approbation == "y" || colony_approbation == "YES" || colony_approbation == "Y")
-        for(int i = 0; i < planets_available.size(); i++){
-            if(planets_available[i] == 4){
-                if(planets[i].gethabitability()){
-                    if(planets[i].getdefeat()){
-                        continue;
-                    }
-                    else
-                        potential_colony = false;
+        if(potential_colony){
+            for(int i = 0; i < planets_available.size(); i++){
+                if(planets_available[i] == 4){
+                    if(planets[i].gethabitability()){
+                        if(planets[i].getdefeat()){  //Important to use setdefeat for when a civilisation has been destroyed
+                            continue;
+                        }
+                        else
+                            potential_colony = false;
 
+                    }
+                    else if(potential_colony && !planets[i].gethabitability()){
+                        dead_solar_system = true;
+                    }
                 }
                 else
                     continue;
             }
         }
         if(potential_colony){
-            colonise_solar_system();
+            if(dead_solar_system){
+                std::cout<<"This solar system can be colonised"<<std::endl;
+                std::cout<<"Since all of its planets are dead"<<std::endl;
+                colonise_solar_system();
+            }
+            else if(!dead_solar_system)  //Planettype can still be four but potentially habitable
+                std::cout<<"There might be one or more potentially habitable planets in this solar system"<<std::endl;
+                colonise_solar_system();
         }
         else if(!potential_colony){
             std::cout<<"You still must conquer those planets that are habitable"<<std::endl;
-        }
 
+        }
     else if(colony_approbation == "No" || colony_approbation == "no" || colony_approbation == "n" || colony_approbation == "NO" || colony_approbation == "N")
         std::cout<<"Your wishes are our commands master, you will still be given the option of making it a colony when you are back in this system"<<std::endl;
-    std::cout<<std::endl;
-    std::cout<<std::endl;
-    std::cout<<"Type in the planet number you wish to visit "<<std::endl;
-    std::cin>>choice;
+        std::cout<<std::endl;
+        std::cout<<std::endl;
+        std::cout<<"Type in the planet number you wish to visit "<<std::endl;
+        std::cin>>choice;
+
     if(_fuelcapacity < 2*(distancesmap[planets_number - 1] - distancesmap[choice - 1])){
         std::cout<<"You have no fuel capacity to travel to this planet"<<std::endl;
         std::cout<<"Choose a closer planet, the last one will always be the closest"<<std::endl;
@@ -1083,6 +1096,7 @@ void Spaceship::planet_interaction(bool back_to_solar_system){
         _fuelcapacity -= 2*(distancesmap[planets_number - 1] - distancesmap[choice -1]); //Two megatons per million of km will be consumed
         if(planets[choice -1].getplanettype()== 1){
             int selection;
+            efficiency = std::pow(17 - _slaveslevel - 1, 17 -_slaveslevel) * (2*planets[choice-1].getmetal()); //This way when the level
             while(1){
                 std::cout<<"<<<LAVA PLANET>>"<<std::endl;
                 std::cout<<"1. Extract metal"<<std::endl;
@@ -1126,6 +1140,7 @@ void Spaceship::planet_interaction(bool back_to_solar_system){
 
         else if(planets[choice -1].getplanettype() == 2){
             int selection;
+            efficiency = std::pow(17 - _slaveslevel - 1, 17 -_slaveslevel) * (2*planets[choice-1].getmetal()); //This way when the level
             while(1){
                 std::cout<<"<<DIAMOND PLANET>>"<<std::endl;
                 std::cout<<"1. Extract diamonds"<<std::endl;
@@ -1140,12 +1155,13 @@ void Spaceship::planet_interaction(bool back_to_solar_system){
                         std::cout<<"Please, tell us the amount of diamonds that you want my lord"<<std::endl;
                         std::cin>>desired_amount;
                         if(desired_amount > planets[choice - 1].getdiamonds()){
-                            std::cout<<"There is not that much metal my lord"<<std::endl;
+                            std::cout<<"There is not that many diamonds my lord"<<std::endl;
                         }
                         else
                             break;
                     }
                     std::cout<<"Your wishes are our commands, my lord"<<std::endl; //WAIT FUNCTION INCLUDED HERE
+                    usleep(efficiency);
                     planets[choice - 1].setdiamonds(-desired_amount);
                     _diamondsamount += desired_amount;
                     std::cout<<"We have obtained "<<desired_amount<<" kg of diamonds to fill your archs my lord"<<std::endl;
@@ -1166,6 +1182,7 @@ void Spaceship::planet_interaction(bool back_to_solar_system){
 
         else if(planets[choice - 1].getplanettype() == 3){
             int selection;
+            efficiency = std::pow(17 - _slaveslevel - 1, 17 -_slaveslevel) * (2*planets[choice-1].getmetal()); //This way when the level
             while(1){
                 std::cout<<"<<MERCURY PLANET>>"<<std::endl;
                 std::cout<<"1. Extract mercury"<<std::endl;
@@ -1186,6 +1203,7 @@ void Spaceship::planet_interaction(bool back_to_solar_system){
                             break;
                     }
                     std::cout<<"Your wishes are our commands my lord!"<<std::endl;//wAIT FUNCTION INCLUDED HERE
+                    usleep(efficiency);
                     planets[choice - 1].setmercury(-desired_amount);
                     _fuelcapacity += desired_amount;
                     std::cout<<"We have obtained "<<desired_amount<<" megatons of fuel to propell our gigantic space ship my lord"<<std::endl;
@@ -1201,6 +1219,7 @@ void Spaceship::planet_interaction(bool back_to_solar_system){
         }
         else if(planets[choice -1].getplanettype() == 4){
             int selection;
+            efficiency = std::pow(17 - _slaveslevel - 1, 17 -_slaveslevel) * (2*planets[choice-1].getmetal()); //This way when the level is 17 the exponent will be zero!
             while(1){
                 std::cout<<"<<HABITABLE OR POTENTIALLY HABITABLE PLANET>>"<<std::endl;
                 std::cout<<"1. Interact with civilisation/make potentially habitable"<<std::endl;
@@ -1285,6 +1304,7 @@ void Spaceship::planet_interaction(bool back_to_solar_system){
                                             break;
                                         }
                                         else{
+                                            usleep(efficiency);
                                             _protozoolevels -= rand()%200 + 1;
                                             _staphilococcuslevels -= rand()%100 + 1;
                                             _pseudomonalevels -= rand()%100 + 1;
@@ -1337,6 +1357,7 @@ void Spaceship::planet_interaction(bool back_to_solar_system){
 
         else if(planets[choice - 1].getplanettype() == 5){
             int selection;
+            efficiency = std::pow(17 - _slaveslevel, 17 - _slaveslevel) *(planets[choice-1].getmetal());
             while(1){
                std::cout<<"<<FROZEN PLANET CONTAINING SIMPLE FORMS OF LIFE>>"<<std::endl;
                 std::cout<<"1. Extract bacteria"<<std::endl;
@@ -1374,6 +1395,7 @@ void Spaceship::planet_interaction(bool back_to_solar_system){
                         else
                             break;
                     }
+                    usleep(efficiency);
                     planets[choice - 1].setbacteriae(-desired_amount_protozoo, -desired_amount_staphillococcus, -desired_amount_pseudomona);
                     _protozoolevels += desired_amount_protozoo;
                     _staphilococcuslevels += desired_amount_staphillococcus;
@@ -1400,6 +1422,7 @@ void Spaceship::planet_interaction(bool back_to_solar_system){
         }
         else if(planets[choice -1].getplanettype() == 6){
             int selection;
+            efficiency = (17 - _slaveslevel) * (planets[choice-1].getmetal());
             while(1){
                 std::cout<<"<<GAS GIANT>>"<<std::endl;
                 std::cout<<"1. Extract WARP drive fuel"<<std::endl;
@@ -1417,6 +1440,7 @@ void Spaceship::planet_interaction(bool back_to_solar_system){
                             break;
                     }
                     planets[choice - 1].setgas(-desired_amount);
+                    usleep(efficiency);
                     _WARPdrive += desired_amount;
                     std::cout<<"We have obtained "<<desired_amount<<" megatons of antimatter to fill our WARP drive deposits my lord!"<<std::endl;
                     break;
@@ -1510,30 +1534,30 @@ void Spaceship::assign_points(int points, std::string specimen){
         _points -= points;
         if(specimen == "Robo-slaves"){
             if(points % 2 == 0){
-                _slavespoints += points/50;
+                _slavespoints += points/10;
             }
             else if(points % 2 != 0){
                 points = points + 1;
-                _slavespoints += points/50;
+                _slavespoints += points/10;
             }
         }
         else if(specimen == "Scientists"){
             if(points % 2 == 0){
-                _scientistspoints += points/50;
+                _scientistspoints += points/10;
             }
             else if(points % 2 != 0){
                 points = points + 1;
-                _scientistspoints += points/50;
+                _scientistspoints += points/10;
             }
 
         }
         else if(specimen == "Cyborg soldiers"){
               if(points % 2 == 0){
-                _soldierspoints += points/50;
+                _soldierspoints += points/10;
             }
             else if(points % 2 != 0){
                 points = points + 1;
-                _soldierspoints += points/50;
+                _soldierspoints += points/10;
             }
         }
     }
@@ -1607,10 +1631,10 @@ void Spaceship::setlevel(int currentlevel, std::string specimen, int increasenee
                     }
                 }
                  else if(specimen == "Robo-slaves"){
-                    for(int i = 0; i < prices.size(); i++){
+                    for(int i = _slaveslevel; i < prices.size(); i++){
                         if(prices[i] < _slavespoints){
                             levelup = true;
-                            factor = i + 1;
+                            factor += 1;
                             _slaveslevel += factor;
                             break;
                         }
@@ -1678,9 +1702,6 @@ void Spaceship::laboratory(){
                         increaseneeded = std::pow(i, 4);
                         std::cout<<"Level: "<<levels[i]<<std::endl;
                         std::cout<<"Points needed "<< increaseneeded<<std::endl;
-                    }
-                    for(int j = _soldierslevel; j < prices.size(); j++){
-                        std::cout<<prices[j]<<std::endl;
                     }
                     setlevel(_soldierslevel, specimen, increaseneeded, levelsleft, amount_desired, choice, factor, levelup, prices, levels);
                     break;
@@ -1856,7 +1877,8 @@ void Spaceship::cabin(){
         std::cout<<"5. Purchase points!"<<std::endl; //Yeah, we need revenue for our business XDDD
         std::cout<<"6. Save game"<<std::endl;
         std::cout<<"7. Colonies"<<std::endl;
-        std::cout<<"8. Exit"<<std::endl;
+        std::cout<<"8. Read story"<<std::endl;
+        std::cout<<"9. Exit"<<std::endl;
         std::cin>>choice;
 
         if(choice == 1){
@@ -1895,9 +1917,11 @@ void Spaceship::cabin(){
 }
 
 
+
 int main()
 {
     Spaceship s;
     s.cabin();
     return 0;
 }
+
