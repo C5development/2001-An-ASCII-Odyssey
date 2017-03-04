@@ -179,8 +179,6 @@ class Planet: public Star
 
         bool getpotentialhabitability();
 
-        float geteccentricity();
-
         char getplanettype();
 
         int getmetal();
@@ -674,9 +672,9 @@ class Spaceship
     public:
 
         void civilisation_interaction(int, int);
-        void planet_interaction(bool);
+        void planet_interaction();
         void stars_interaction();
-        void interstellar_travel(bool);
+        void interstellar_travel();
         int cabin();
         void classify_specimens();
         void assign_points(int, std::string);
@@ -694,11 +692,12 @@ class Spaceship
         void surrender_treaty(std::string, std::string);
         void assign_troops(int, int, int);
         void battle_mode(int, int, int, int);
-        void to_solar_system(std::string, std::string, std::vector<char>, std::vector<int>, std::vector<int>);
-        void display_planets_database(bool, std::string, std::vector<char>, std::vector<int>, std::vector<int>);
+        void to_solar_system();
+        void display_planets_database();
         void generate_solar_data_base();
         void colonise_solar_system();
         void display_colonies();
+        std::string show_title();
         void read_story();
         void save_game(); //DATABASE
         void game_over(); //DATABASE
@@ -709,13 +708,6 @@ int Spaceship::randRange(int low, int high)
 {
     return rand() % (high - low + 1) + low;
 }
-
-
-void Spaceship::to_solar_system(std::string planettype, std::string planetsname, std::vector<char> planets_available, std::vector<int> distancesmap, std::vector<int>planets_temperature){
-//EXTRACTS DATA FROM A TEMPORARY DATABASE DEFINED WHEN PLANETS ARE GENERATED(PLANETSINTERACTION) IT CAN ONLY BE MODIFIED BY THE PLANET_DESTROYER FUNCTION
-}
-
-
 
 
 std::string Spaceship::define_stars_name(std::vector<std::string> starnames, std::vector<std::string> starnamesbuffer){
@@ -746,11 +738,6 @@ void Spaceship::stars_interaction(){
         }
 }
 
-void Spaceship::display_planets_database(bool planettype, std::string planetname, std::vector<char> planets_available, std::vector<int> distancesmap, std::vector<int> planetstemperatures){
-}
-
-void Spaceship::generate_solar_data_base(){
-}
 
 std::string Spaceship::define_planets_name(std::vector<std::string> planetnames, std::vector<std::string> planetnamesbuffer){
 
@@ -878,8 +865,6 @@ void Spaceship::surrender_treaty(std::string social_structure, std::string civil
     }
 }
 
-void Spaceship::display_colonies(){
-}
 
 
 void Spaceship::assign_troops(int aliens, int drones, int cyborgs){
@@ -912,6 +897,21 @@ void Spaceship::battle_mode(int drones, int cyborgs, int enemies_drones, int ene
 
 void Spaceship::colonise_solar_system(){
 
+}
+
+void Spaceship::display_colonies(){
+
+}
+
+void Spaceship::display_planets_database(){
+}
+
+void Spaceship::generate_solar_data_base(){
+}
+
+void Spaceship::to_solar_system(){
+//EXTRACTS DATA FROM A TEMPORARY DATABASE DEFINED WHEN PLANETS ARE GENERATED(PLANETSINTERACTION) IT CAN ONLY BE MODIFIED BY THE PLANET_DESTROYER FUNCTION
+    std::cout<<"Puta"<<std::endl;
 }
 
 void Spaceship::civilisation_interaction(int desired_respect, int aliens){
@@ -1012,7 +1012,7 @@ void Spaceship::planet_destroyer(int desired_respect){
     desired_respect += 1; //THIS FUNCTION SHOULD DELETE THE CHOSEN ROW FROM THE DATABASE MORE SPECIFICALLY THE SOLAR SYSTEM DATABASE
 }
 
-void Spaceship::planet_interaction(bool back_to_solar_system){
+void Spaceship::planet_interaction(){
     int choice;
     bool potential_colony = true; //We start by assuming the solar system can be colonised
     bool dead_solar_system;
@@ -1035,30 +1035,24 @@ void Spaceship::planet_interaction(bool back_to_solar_system){
     std::cout<<"<<<PLANETS>>>"<<std::endl;
     std::cout<<std::endl;
     std::cout<<std::endl;
-    if(back_to_solar_system){
-        to_solar_system(planettype, planetname, planets_available, distancesmap, planetstemperatures); //FUNCTION RETRIEVING INFORMATION FROM DATABASE AND STORING THE ENTITIES IN THE ABOVE-DEFINED VECTORS
-                                //OTHERWISE THE OTHER FUNCTIONS WON'T BE ABLE TO INTERACT
-                                //IT DOES NOT NEED TO GENERATE A NEW ARRAY OF OBJECTS SINCE THEY WILL ALREADY BE CONTAINED IN THE DATABASE
+    for(int j = 0; j < planets_number; j++){
+        adjustment1 = adjustment + 2 * j;
+        adjustment2 = adjustment1 + 4 * j;
+        planetname = define_planets_name(planet_names, planet_names_buffer);
+        distancefromstar = randRange(adjustment1, adjustment2);
+        distancesmap.push_back(distancefromstar);
+        std::cout<<std::endl;
+        std::cout<<"Type "<<j + 1<<" to explore this planet"<<std::endl;
+        std::cout<<std::endl;
+        planets[j].display_planets_data(planetname, distancefromstar); //A TEMPORARY DATABASE SHOULD BE INITIALISED HERE
+        planets_available.push_back(planets[j].getplanettype());  //ROWS AND ENTITIES WILL BE ADDED THROUGH THE LOOP
+        planetstemperatures.push_back(planets[j].gettemperature());
+        std::cout<<std::endl;
+        std::cout<<std::endl;
+        adjustment += adjustment + randRange(150, 347);
+        adjustment1 += adjustment1 + randRange(150, 347);
     }
-    else if(!back_to_solar_system){
-        for(int j = 0; j < planets_number; j++){
-            adjustment1 = adjustment + 2 * j;
-            adjustment2 = adjustment1 + 4 * j;
-            planetname = define_planets_name(planet_names, planet_names_buffer);
-            distancefromstar = randRange(adjustment1, adjustment2);
-            distancesmap.push_back(distancefromstar);
-            std::cout<<std::endl;
-            std::cout<<"Type "<<j + 1<<" to explore this planet"<<std::endl;
-            std::cout<<std::endl;
-            planets[j].display_planets_data(planetname, distancefromstar); //A TEMPORARY DATABASE SHOULD BE INITIALISED HERE
-            planets_available.push_back(planets[j].getplanettype());  //ROWS AND ENTITIES WILL BE ADDED THROUGH THE LOOP
-            planetstemperatures.push_back(planets[j].gettemperature());
-            std::cout<<std::endl;
-            std::cout<<std::endl;
-            adjustment += adjustment + randRange(150, 347);
-            adjustment1 += adjustment1 + randRange(150, 347);
-        }
-    }
+
     std::cout<<std::endl;
     std::cout<<"Do you want to make this solar system a colony?"<<std::endl;
     std::cin>>colony_approbation;
@@ -1096,20 +1090,19 @@ void Spaceship::planet_interaction(bool back_to_solar_system){
             std::cout<<"You still must conquer those planets that are habitable"<<std::endl;
 
         }
-   }
-   else if(colony_approbation == "No" || colony_approbation == "no" || colony_approbation == "n" || colony_approbation == "NO" || colony_approbation == "N")
+    }
+    else if(colony_approbation == "No" || colony_approbation == "no" || colony_approbation == "n" || colony_approbation == "NO" || colony_approbation == "N"){
         std::cout<<"Your wishes are our commands master, you will still be given the option of making it a colony when you are back in this system"<<std::endl;
         std::cout<<std::endl;
         std::cout<<std::endl;
-        std::cout<<"Type in the planet number you wish to visit "<<std::endl;
-        std::cin>>choice;
-
+    }
     if(_fuelcapacity < 2*(distancesmap[planets_number - 1] - distancesmap[choice - 1])){
         std::cout<<"You have no fuel capacity to travel to this planet"<<std::endl;
         std::cout<<"Choose a closer planet, the last one will always be the closest"<<std::endl;
     }
     else{
-
+        std::cout<<"Type in the planet number you wish to visit "<<std::endl;
+        std::cin>>choice;
         _fuelcapacity -= 2*(distancesmap[planets_number - 1] - distancesmap[choice -1]); //Two megatons per million of km will be consumed
         if(planets[choice -1].getplanettype()== 1){
             int selection;
@@ -1482,8 +1475,9 @@ void Spaceship::planet_interaction(bool back_to_solar_system){
 
 }
 
-void Spaceship::interstellar_travel( bool back_to_solar_system)
+void Spaceship::interstellar_travel()
 {
+
     int starschoice;
     int solarsystemchoice;
     while(1){
@@ -1508,13 +1502,14 @@ void Spaceship::interstellar_travel( bool back_to_solar_system)
         else if(_WARPdrive >= 1000)
         {
             _WARPdrive -= 250;
-            planet_interaction(back_to_solar_system);
+            planet_interaction();
         }
         std::cout<<"1. Back to solar system"<<std::endl;
         std::cout<<"2. Back to cabin"<<std::endl;
         std::cin>>solarsystemchoice;
         if(solarsystemchoice == 1)
-            back_to_solar_system = true; //DATABASE EXTRACTING DATA TO DISPLAY PLANETS ON THE SCREEN
+            to_solar_system();
+            break;
         else if(solarsystemchoice ==2)
             break;
 
@@ -1879,7 +1874,17 @@ void Spaceship::read_story(){
 //Reads from a text-file the main story of the game
 }
 
+std::string Spaceship::show_title(){
+return "   ___   ____  ____ ___   ___             ___   _____ ______________   ____      __                           \n"
+       "  |__ \ / __ \/ __ <  /  /   |  ____     /   | / ___// ____/  _/  _/  / __ \____/ /_  _______________  __  __ \n"
+       "_      / / / /   / / /  / //   / | /\   / /| | \__ \/ /    / / / /   / / / / __  / / / / ___/ ___/ _ \/ / / / \n"
+       " / __// // /  /_/ / /  / ___ |/ / / /  / ___ |___/ / /____/ /_/ /   / /_/ / /_/ / /_/ (__  |__  )  __/ /_/ /  \n"
+       "/____/\____/\____/_/  /_/  |_/_/ /_/  /_/  |_/____/\____/___/___/   \____/\__,_/\__, /____/____/\___/\__, /   \n"
+       "                                                                         /____/                     /____/ ";
+}
+
 int Spaceship::cabin(){
+    std::cout<<show_title()<<std::endl;
     int choice;
     bool back_to_solar_system = false;
     while(1){
@@ -1897,7 +1902,7 @@ int Spaceship::cabin(){
         std::cin>>choice;
 
         if(choice == 1){
-            interstellar_travel(back_to_solar_system);
+            interstellar_travel();
         }
 
         else if(choice == 2){
