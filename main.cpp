@@ -918,26 +918,15 @@ void Spaceship::assign_troops(int aliens, int drones, int cyborgs){
     if(aliens % 2 == 0){
         warriors = aliens/2;
         aliens -= warriors;
-        int adjustment = warriors - warriors/4;
-        drones = std::abs(warriors/2 + randRange(warriors/2, adjustment));
-        warriors -= drones;
-        if(drones > warriors)
-            cyborgs = std::abs(drones - warriors);
-        else if(drones < warriors)
-            cyborgs = std::abs(warriors - drones);
-
+        drones = (warriors, warriors/2);
+        cyborgs = (warriors, warriors/2);
     }
     else if(aliens % 2 != 0){
         aliens += 1;
         warriors = aliens/2;
         aliens -= warriors;
-        int adjustment = warriors - warriors/4;
-        cyborgs = std::abs(warriors/2 + randRange(warriors/2, adjustment));
-        warriors -= cyborgs;
-        if(cyborgs > warriors)
-            drones = std::abs(cyborgs - warriors);
-        else if(cyborgs < warriors)
-            drones = std::abs(warriors - cyborgs);
+        drones = (warriors, warriors/2);
+        cyborgs = (warriors, warriors/2);
     }
 }
 
@@ -1018,14 +1007,17 @@ void Spaceship::civilisation_interaction(int desired_respect, int aliens){
             <<"<<WAR DECLARATION>>"<<"\n"
             <<"\n"
             <<"Type of civilisation: "<<social_structure<<"\n"
+            <<"\n"
             <<"Your current resources"<<"\n"
             <<"DRONES: "<<_drones<<"\n"
-            <<"CYBORG-ARMORS AND WEAPONS: "<<_armors<<"\n"
-            <<"\n"<<std::endl;
+            <<"CYBORG-ARMORS AND WEAPONS: "<<_armors<<"\n"<<std::endl;
             assign_troops(aliens, enemies_drones, enemies_cyborgs);
             std::cout<<"\n"
+            <<"Enemy's resources"<<"\n"
+            <<"\n"
             <<"ENEMIES DRONES: "<<enemies_drones<<"\n"
             <<"ENEMIES CYBORGS: "<<enemies_cyborgs<<"\n"
+            <<"\n"
             <<"The confidential reports must be read in order to find out the enemy's level"<<"\n"
             <<"1. Start battle"<<"\n"
             <<"2. Confidential reports from intelligence agency"<<std::endl;
@@ -1035,7 +1027,6 @@ void Spaceship::civilisation_interaction(int desired_respect, int aliens){
                             done = true;
 
                     case 2: civilisation_history(social_structure, civilisationsnames[rand() % civilisationsnames.size()], enemies_level);
-                            done = true;
 
             }
         }
@@ -1729,6 +1720,7 @@ void Spaceship::setlevel(int currentlevel, std::string specimen, int increasenee
 void Spaceship::laboratory(){
     std::string specimen;
     int choice;
+    while(1){
     std::cout<<"<<LABORATORY>>"<<"\n"
     <<"\n"
     <<"1. Cyborg army"<<"\n"
@@ -1841,10 +1833,11 @@ void Spaceship::laboratory(){
             else if(choice == 2)
                 break;
         }
-    }
 
-    else if(choice == 4)
-        cabin();
+    }
+   else if(choice == 4)
+        break;
+  }
 }
 
 void Spaceship::methalurgy(){
@@ -1854,31 +1847,54 @@ void Spaceship::methalurgy(){
         <<"\n"
         <<"Metal: "<<_metalamount<<"\n"
         <<"\n"
+        <<"Specimens: "<<_specimens<<"\n"
         <<"1. Drones factory"<<"\n"
         <<"2. Cyborg's armors and weapons"<<"\n"
         <<"3. Exit"<<std::endl;
         std::cin>>choice;
         switch(choice){
 
-            case 1: std::cout<<"Tell us how many drones you want to create my lord!"<<std::endl;
+            case 1: std::cout<<"Tell us how many drones you want to create my lord!"<<"\n"
+                    <<"Drone's price: 17"<<"\n"
+                    <<"Metal: "<<_metalamount<<std::endl;
                     std::cin>>choice;
                     if(_metalamount == 0){
                         std::cout<<"Lord! our metal reserves are fully empty we must extract minerals from a nearby planet"<<std::endl;
                         break;
                     }
-                    else if(_metalamount < choice){
-                        std::cout<<"Lord! you don't have that much metal yet"<<"\n"
-                        <<"Type in a smaller amount!"<<std::endl;
-                    }
-                    else if(choice == 0)
-                        break;
-                    else if(_metalamount > choice){
-                        _metalamount -= choice * 17;
+                    else if(_metalamount < 25 * choice){
+                        while(1){
+                            if(_metalamount > choice * 25)
+                                break;
+                            std::cout<<"Lord! you don't have that much metal yet"<<"\n"
+                            <<"Type in a smaller amount!"<<std::endl;
+                            std::cin>>choice;
+                        }
+                        _metalamount -= choice * 25;
                         _drones += choice;
                         if(_specimens < _drones){
                             std::cout<<"Unfortunately my lord, you still don't have enough specimens to be armed with so many weapons"<<std::endl;
+                            _drones -= choice;
+                            break;
                         }
-                        else if(_specimens >_drones){
+                        else if(_specimens >= _drones){
+                            _specimens -= _drones;
+                            std::cout<<"Our drones will fly the enemy's sky and cause the greatest fear in its soul.."<<std::endl;
+                            break;
+                        }
+
+                    }
+                    else if(choice == 0)
+                        break;
+                    else if(_metalamount > choice * 25){
+                        _metalamount -= choice * 25;
+                        _drones += choice;
+                        if(_specimens < _drones){
+                            std::cout<<"Unfortunately my lord, you still don't have enough specimens to be armed with so many weapons"<<std::endl;
+                            _drones -= choice;
+                            break;
+                        }
+                        else if(_specimens >= _drones){
                             _specimens -= _drones;
                             std::cout<<"Our drones will fly the enemy's sky and cause the greatest fear in its soul.."<<std::endl;
                             break;
@@ -1887,35 +1903,58 @@ void Spaceship::methalurgy(){
 
                     }
 
-            case 2: std::cout<<"How many armors and weapons?"<<std::endl;
+            case 2: std::cout<<"Metal: "<<_metalamount<<"\n"
+                    <<"Armor's price: "<<"17"<<"\n"
+                    <<"\n"<<std::endl;
+                    std::cout<<"How many armors and weapons?"<<std::endl;
                     std::cin>>choice;
                     if(_metalamount == 0){
                         std::cout<<"Lord! our metal reserves are fully empty we must extract minerals from a nearby planet"<<std::endl;
                         break;
                     }
-                    else if(_metalamount < choice){
-                        std::cout<<"Lord! you don't have that much metal yet"<<"\n"
-                        <<"Type in a smaller amount!"<<std::endl;
-                    }
-                    else if(choice == 0)
-                        break;
-                    else if(_metalamount > choice){
-                        _metalamount -= choice * 25;
+                    else if(_metalamount < choice * 17){
+                        while(1){
+                            if(_metalamount < choice * 17)
+                                break;
+                            std::cout<<"Lord! you don't have that much metal yet"<<"\n"
+                            <<"Type in a smaller amount!"<<std::endl;
+                            std::cin>>choice;
+                        }
+                        _metalamount -= choice * 17;
                         _armors += choice;
                         if(_specimens < _armors){
                             std::cout<<"Unfortunately my lord, you still don't have enough specimens to be armed with so many weapons"<<std::endl;
-
+                            _armors -= choice;
+                            break;
                         }
-                        else if(_specimens < _armors){
+                        else if(_specimens >= _armors){
+                            _specimens -= _armors;
+                            std::cout<<"Oh yes my lord, this new armors are worth dying for!"<<std::endl;
+                            break;
+                        }
+
+                    }
+                    else if(choice == 0)
+                        break;
+                    else if(_metalamount > choice * 17){
+                        _metalamount -= choice * 17;
+                        _armors += choice;
+                        if(_specimens < _armors){
+                            std::cout<<"Unfortunately my lord, you still don't have enough specimens to be armed with so many weapons"<<std::endl;
+                            _armors -= choice;
+                            break;
+                        }
+                        else if(_specimens >= _armors){
                             _specimens -= _armors;
                             std::cout<<"Oh yes my lord, this new armors are worth dying for!"<<std::endl;
                             break;
                         }
                     }
 
-            case 3: cabin();
+            case 3: break;
 
         }
+        break;
     }
 
 }
@@ -1942,7 +1981,7 @@ int Spaceship::cabin(){
         std::cout<<"<<<CABIN OF THE INTERSTELLAR FALCON IV WELCOME ON BOARD MY MASTER>>>"<<"\n"
         <<"I)nterstellar travel"<<"\n"
         <<"A)ccess laboratory"<<"\n"
-        <<"A)ccess deposits and WARP initialiser"<<"\n"
+        <<"D)eposits and WARP initialiser"<<"\n"
         <<"M)ethallurgy"<<"\n"
         <<"P)urchase points!"<<"\n" //Yeah, we need revenue for our business XDDD
         <<"S)ave game"<<"\n"
@@ -1951,34 +1990,35 @@ int Spaceship::cabin(){
         <<"E)xit"<<std::endl;
         std::cin>>choice;
 
-        if(choice == "I"){
+        if(choice == "I" || choice == "i"){
             interstellar_travel();
         }
 
-        else if(choice == "A"){
+        else if(choice == "A" || choice == "a"){
             laboratory();
         }
-        else if(choice == "A"){
+        else if(choice == "D" || choice == "d"){
             std::cout<<"<<DEPOSITS>>"<<"\n"
             <<"Fuel tank capacity for interplanetary travel: "<<_fuelcapacity<<"\n"
-            <<"Antimatter deposit to power WARP drive and planet destroyer: "<<_WARPdrive<<std::endl;
+            <<"Antimatter deposit to power WARP drive and planet destroyer: "<<_WARPdrive<<"\n"
+            <<
         }
-        else if(choice == "M"){
+        else if(choice == "M" || choice == "m"){
             methalurgy();
         }
-        else if(choice == "P"){
+        else if(choice == "P" || choice == "p"){
             purchasepoints(_diamondsamount);
         }
-        else if(choice == "S"){
+        else if(choice == "S" || choice == "s"){
             save_game(); //DATABASE WITH ALL VARIABLES OF THE USER
         }
-        else if(choice == "C"){
+        else if(choice == "C" || choice == "c"){
             display_colonies(); //DATABASE TO DISPLAY COLONIES
         }
-        else if(choice == "R"){
+        else if(choice == "R" || choice == "r"){
             read_story();
         }
-        else if(choice == "E"){
+        else if(choice == "E" || choice == "e"){
             std::cout<<"Lord, the tripulants will get in hibernation mode"<<std::endl;
             std::cout<<"Always willing to serve you my master!"<<std::endl;
             return 0;
