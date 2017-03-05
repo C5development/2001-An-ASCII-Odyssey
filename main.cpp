@@ -6,6 +6,7 @@
 #include<ctime>
 #include<cmath>
 #include<algorithm>
+#include<fstream>
 #include<unistd.h> //Import the sleep function (only works with linux compiler)
 class Star
 {
@@ -688,7 +689,7 @@ class Spaceship
         std::string define_stars_name(std::vector<std::string>, std::vector<std::string>);
         std::string define_planets_name(std::vector<std::string>, std::vector<std::string>);
         void planet_destroyer(int);
-        void civilisation_history(std::string, std::string);
+        void civilisation_history(std::string, std::string, int);
         void surrender_treaty(std::string, std::string);
         void assign_troops(int, int, int);
         void battle_mode(int, int, int, int);
@@ -833,19 +834,63 @@ void Spaceship::genetical_modification(int choice, std::vector<char> planetsavai
 
 }
 
-void Spaceship::civilisation_history(std::string social_structure, std::string civilisationname){
+void Spaceship::civilisation_history(std::string social_structure, std::string civilisationname, int enemies_level){
 //Reads the civilisations' stories from text files
     if(social_structure == "Techno fascist regime"){
-        ;
+        std::cout<<"Level: "<<enemies_level<<"\n"
+        <<civilisationname<<std::endl;
+        std::ifstream Technofascist;
+        std::string line;
+        Technofascist.open("Technofascistregime.txt");
+        if( !Technofascist.is_open() ){
+            std::cout<<"Could not open file"<<"\n";
+        }
+        while(getline(Technofascist, line)){
+            std::cout<<line<<std::endl;
+        }
+        Technofascist.close();
     }
     else if(social_structure == "Liberal democracy"){
-        ;
+        std::cout<<"Level: "<<enemies_level<<"\n"
+        <<civilisationname<<std::endl;
+        std::ifstream Liberaldemocracy;
+        std::string line;
+        Liberaldemocracy.open("Liberaldemocraticregime.txt");
+        if( !Liberaldemocracy.is_open()){
+            std::cout<<"Could not open file"<<"\n";
+        }
+        while(getline(Liberaldemocracy, line)){
+            std::cout<<line<<std::endl;
+        }
+        Liberaldemocracy.close();
     }
     else if(social_structure == "Techno utopian anarchy"){
-        ;
+        std::cout<<"Level: "<<enemies_level<<"\n"
+        <<civilisationname<<std::endl;
+        std::ifstream Technoutopian;
+        std::string line;
+        Technoutopian.open("Technoutopiananarchistregime.txt");
+        if( !Technoutopian.is_open()){
+            std::cout<<"Could not open file"<<std::endl;
+        }
+        while(getline(Technoutopian, line)){
+            std::cout<<line<<std::endl;
+        }
+        Technoutopian.close();
     }
     else if(social_structure == "AI-ruled planetary nation"){
-        ;
+        std::cout<<"Level: "<<enemies_level<<"\n"
+        <<civilisationname<<std::endl;
+        std::ifstream AIruled;
+        std::string line;
+        AIruled.open("AI-ruledregime.txt");
+        if(! AIruled.is_open()){
+            std::cout<<"Could not open file"<<std::endl;
+        }
+        while(getline(AIruled, line)){
+            std::cout<<line<<std::endl;
+        }
+        AIruled.close();
     }
 }
 
@@ -868,27 +913,32 @@ void Spaceship::surrender_treaty(std::string social_structure, std::string civil
 
 
 void Spaceship::assign_troops(int aliens, int drones, int cyborgs){
+    int warriors;
+
     if(aliens % 2 == 0){
-        int adjustment = aliens - aliens/4;
-        drones = aliens/2 + randRange(aliens/2, adjustment);
-        aliens -= drones;
-        if(drones > aliens)
-            cyborgs = drones - aliens;
-        else if(drones < aliens)
-            cyborgs = aliens - drones;
+        warriors = aliens/2;
+        aliens -= warriors;
+        int adjustment = warriors - warriors/4;
+        drones = std::abs(warriors/2 + randRange(warriors/2, adjustment));
+        warriors -= drones;
+        if(drones > warriors)
+            cyborgs = std::abs(drones - warriors);
+        else if(drones < warriors)
+            cyborgs = std::abs(warriors - drones);
 
     }
     else if(aliens % 2 != 0){
         aliens += 1;
-        int adjustment = aliens - aliens/4;
-        cyborgs = aliens/2 + randRange(aliens/2, adjustment);
-        aliens -= cyborgs;
-        if(cyborgs > aliens)
-            drones= cyborgs - aliens;
-        else if(cyborgs < aliens)
-            drones = aliens - cyborgs;
+        warriors = aliens/2;
+        aliens -= warriors;
+        int adjustment = warriors - warriors/4;
+        cyborgs = std::abs(warriors/2 + randRange(warriors/2, adjustment));
+        warriors -= cyborgs;
+        if(cyborgs > warriors)
+            drones = std::abs(cyborgs - warriors);
+        else if(cyborgs < warriors)
+            drones = std::abs(warriors - cyborgs);
     }
-
 }
 
 void Spaceship::battle_mode(int drones, int cyborgs, int enemies_drones, int enemies_cyborgs){
@@ -935,7 +985,7 @@ void Spaceship::civilisation_interaction(int desired_respect, int aliens){
                 if(surrender_calculation <= 0)
                     surrender = true;
                 else{
-
+                    surrender = false;
                 }
         case 2: social_structure = "Liberal democracy";  //Still not very advanced
                 earned_respect = 2;
@@ -981,17 +1031,15 @@ void Spaceship::civilisation_interaction(int desired_respect, int aliens){
             <<"2. Confidential reports from intelligence agency"<<std::endl;
             std::cin>>choice;
             switch(choice){
-                    case 1: civilisation_history(social_structure, civilisationsnames[rand() % civilisationsnames.size()]);
+                    case 1: battle_mode(_drones, _armors, enemies_drones, enemies_cyborgs);
                             done = true;
 
-                    case 2: battle_mode(_drones, _armors, enemies_drones, enemies_cyborgs);
+                    case 2: civilisation_history(social_structure, civilisationsnames[rand() % civilisationsnames.size()], enemies_level);
                             done = true;
 
             }
         }
     }
-
-
 }
 
 void Spaceship::save_game(){
@@ -1018,7 +1066,7 @@ void Spaceship::planet_interaction(){
     bool dead_solar_system;
     std::string colony_approbation;
     unsigned int efficiency;
-    int desired_respect;
+    int desired_respect = 0;
     int distancefromstar;
     int adjustment = 50;
     int adjustment1;
