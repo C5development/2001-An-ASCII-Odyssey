@@ -151,6 +151,7 @@ class Planet: public Star
         int _magneticfieldvsradiation;
         int _distancefromstar;
         bool _habitable;
+        bool _potentiallyhabitable = false;
         int _rotationangle; //From 90 to 180
         std::string _planetname;
         int _diamonds; //Diamonds is given as a currency automatically
@@ -474,6 +475,10 @@ char Planet::getplanettype(){
     return _planettype;
 }
 
+bool Planet::getpotentialhabitability(){
+    return _potentiallyhabitable;
+}
+
 void Planet::define_atmosphere_composition(){
     if(_planettype == 1)
         _atmospherecomposition = "Carbon dioxide";
@@ -529,6 +534,7 @@ void Planet::determine_habitability(){
 
         else if(_breathableatmosphere){
             _habitable = false;
+            _potentiallyhabitable = true;
             }
         else
             _habitable = false;
@@ -543,9 +549,9 @@ void Planet::determine_amount_of_resources(){
 
         case 1: _metal = randRange(1000, 10000); //measured in kg
 
-        case 2: _diamonds = randRange(10000, 100000); //measured in kg
+        case 2: _diamonds = randRange(1000, 10000); //measured in kg
 
-        case 3: _mercury = randRange(1, 10000); //Given in megatons
+        case 3: _mercury = randRange(1000, 10000); //Given in megatons
 
         case 5: _protozoo = randRange(10000, 60000);
                 _staphillococcus = randRange(10000, 60000);
@@ -636,6 +642,10 @@ Planet::Planet(){
 
     determine_magnetic_field();
 
+    if(_magneticfieldintensity > 10){
+        _magneticfieldintensity = randRange(1, 10);
+    }
+
     determine_amount_of_resources();
 
     determine_habitability();
@@ -687,7 +697,7 @@ class Spaceship
         void classify_specimens();
         void assign_points(int, std::string);
         void laboratory();
-        void genetical_modification(int, std::vector<char>, std::vector<int>);
+        int genetical_modification(int, std::vector<char>, std::vector<int>);
         void methalurgy();
         void setlevel(int, std::string, int, int, int, int, int, bool, std::vector<int>, std::vector<int>);
         void purchasepoints(int);
@@ -699,10 +709,12 @@ class Spaceship
         void civilisation_history(std::string, std::string, int);
         void surrender_treaty(std::string, std::string);
         void assign_troops(int, int, int);
-        void battle_mode(int, int, int, int);
+        void battle_mode(int, int, int, int, int);
         void refill_vector(std::string);
         void to_solar_system();
         void display_planets_database();
+        int efficiency_calculation(int, int);
+        void generate_stars_data_base(std::vector<Star>);
         void generate_solar_data_base(std::vector<Planet>, std::string, std::vector<int>, std::vector<int>, std::vector<char>);
         void colonise_solar_system();
         void display_colonies();
@@ -742,7 +754,8 @@ void Spaceship::stars_interaction(){
         }
         std::string starsname;
         int stars_number = rand() % 20 + 5;
-        Star stars[stars_number];
+        std::vector<Star> stars(stars_number);
+        generate_stars_data_base(stars);
         std::cout<<"\n"
         <<"\n"
         <<"<<<STARS>>>"<<"\n"
@@ -782,7 +795,7 @@ std::vector<int> ORgate(bool protozoo, bool staphilloccocus, bool pseudomona){
     return missingindeces;
 }
 
-void Spaceship::genetical_modification(int choice, std::vector<char> planetsavailable, std::vector<int> planetstemperatures){
+int Spaceship::genetical_modification(int choice, std::vector<char> planetsavailable, std::vector<int> planetstemperatures){
     int desired_amount;
     std::string atmosphere;
     std::string desired_atmosphere;
@@ -854,6 +867,7 @@ void Spaceship::genetical_modification(int choice, std::vector<char> planetsavai
         slaves_temperature_resistance = 0;
 
     }
+    return slaves_number;
 
 }
 
@@ -953,12 +967,103 @@ void Spaceship::assign_troops(int aliens, int drones, int cyborgs){
     }
 }
 
-void Spaceship::battle_mode(int drones, int cyborgs, int enemies_drones, int enemies_cyborgs){
+void Spaceship::battle_mode(int drones, int cyborgs, int enemies_drones, int enemies_cyborgs, int level){
+
+
 
 }
 
 void Spaceship::colonise_solar_system(){
 
+}
+
+void Spaceship::generate_stars_data_base(std::vector<Star> stars){
+
+}
+
+int Spaceship::efficiency_calculation(int resources, int slaves){
+    int efficiency;
+    int time;
+    if(_slaveslevel > 0 && _slaveslevel <= 5){
+        if(resources < 5000){
+            slaves % 2 ? slaves = randRange(10, 15) : slaves = randRange(1, 5);
+            efficiency = 20* 2 - slaves;
+            if(efficiency > 30){
+                time = 3;
+            }
+            else
+                time = 4;
+
+        }
+        else if(resources > 5000){
+            slaves % 2 ? slaves = randRange(10, 12) : slaves = randRange(1, 2);
+            efficiency = 20 * 2 - slaves;
+            if(efficiency > 30){
+                time = 4;
+            }
+            else
+                time = 5;
+        }
+    }
+    else if(_slaveslevel > 5 && _slaveslevel <= 10){
+        if(resources < 5000){
+            slaves % 2 ? slaves = randRange(10, 15) : slaves = randRange(1, 5);
+            efficiency = randRange(10, 15) * 2 - slaves;
+            if(efficiency >= 15){
+                time = 2;
+            }
+            else
+                time = 3;
+
+        }
+        else if(resources > 5000){
+            slaves % 2 ? slaves = randRange(10, 12) : slaves = randRange(1, 2);
+            efficiency = randRange(10, 15) * 2 - slaves;
+            if(efficiency >= 15){
+                time = 3;
+            }
+            else
+                time = 4;
+        }
+    }
+    else if(_slaveslevel > 10 && _slaveslevel <= 15){
+        if(resources < 5000){
+            slaves % 2 ? slaves = randRange(10, 15) : slaves = randRange(1, 5);
+            efficiency = randRange(5, 10) * 2 - slaves;
+            if(efficiency > 15)
+                time = 1;
+            else
+                time = 2;
+        }
+        else if(resources > 5000){
+            slaves % 2 ? slaves = randRange(10, 12) : slaves = randRange(1, 2);
+            efficiency = randRange(5, 10) * 2 - slaves;
+            if(efficiency > 10)
+                time = 2;
+            else
+                time = 3;
+        }
+    }
+    else if(_slaveslevel > 15){
+        if(resources < 5000){
+            slaves % 2 ? slaves = randRange(10, 15) : slaves = randRange(1, 5);
+            efficiency = randRange(1, 5) * 2 - slaves;
+            if(efficiency > 5)
+                time = 0;
+            else
+                time = 1;
+
+        }
+        else if(resources > 5000){
+            slaves % 2 ? slaves = randRange(10, 12) : slaves = randRange(1, 2);
+            efficiency = randRange(1, 5) * 2 - slaves;
+            if(efficiency > 5)
+                time = 1;
+            else
+                time = 2;
+        }
+    }
+    return time;
 }
 
 void Spaceship::display_colonies(){
@@ -1052,7 +1157,7 @@ void Spaceship::civilisation_interaction(int desired_respect, int aliens){
             <<"2. Confidential reports from intelligence agency"<<std::endl;
             std::cin>>choice;
             switch(choice){
-                    case 1: battle_mode(_drones, _armors, enemies_drones, enemies_cyborgs);
+                    case 1: battle_mode(_drones, _armors, enemies_drones, enemies_cyborgs, enemies_level);
                             done = true;
 
                     case 2: civilisation_history(social_structure, civilisationsnames[rand() % civilisationsnames.size()], enemies_level);
@@ -1096,13 +1201,13 @@ void Spaceship::refill_vector(std::string vectortype){
 }
 
 void Spaceship::planet_interaction(){
-    std::cout<<"DBG: "<<planetnames.size()<<std::endl;
     if(planetnames.size() <= 8){
         refill_vector("Planets");
     }
     int choice;
     bool potential_colony = true; //We start by assuming the solar system can be colonised
-    bool dead_solar_system;
+    bool dead_solar_system = true;
+    int slaves;
     std::string colony_approbation;
     unsigned int efficiency;
     int desired_respect = 0;
@@ -1158,6 +1263,9 @@ void Spaceship::planet_interaction(){
                     else if(potential_colony && !planets[i].gethabitability()){
                         dead_solar_system = true;
                     }
+                    else if(planets[i].getpotentialhabitability()){
+                        dead_solar_system = false;
+                    }
                 }
                 else
                     continue;
@@ -1190,8 +1298,7 @@ void Spaceship::planet_interaction(){
     else{
         _fuelcapacity -= 2*(distancesmap[planets_number - 1] - distancesmap[choice -1]); //Two megatons per million of km will be consumed
         if(planets[choice -1].getplanettype()== 1){
-            int selection;
-            efficiency = 2 * std::pow(17 - _slaveslevel - 1, 17 -_slaveslevel) * (2*planets[choice-1].getmetal()); //This way when the level
+            int selection;//This way when the level
             while(1){
                 std::cout<<"\n"
                 <<"<<LAVA PLANET>>"<<"\n"
@@ -1202,12 +1309,13 @@ void Spaceship::planet_interaction(){
                     break;
                 else if(selection == 1){
                     int desired_amount;
-                    genetical_modification(choice , planets_available, planetstemperatures);
+                    slaves = genetical_modification(choice , planets_available, planetstemperatures);
                     std::cout<<"\n"
                     <<"\n"<<std::endl;
                     while(1){
                         std::cout<<"Tell us the amount of metal that you want my lord"<<std::endl;
                         std::cin>>desired_amount;
+                        efficiency = efficiency_calculation(slaves, planets[choice-1].getmetal());
                         if(desired_amount > planets[choice - 1].getmetal()){
                             std::cout<<"Try typing in the amount again"<<std::endl;
                         }
@@ -1215,7 +1323,7 @@ void Spaceship::planet_interaction(){
                             break;
                     }
                     std::cout<<"Your wishes are our commands, my lord!"<<std::endl; //WAIT FUNCTION INCLUDED HERE
-                    usleep(efficiency);
+                    sleep(efficiency);
                     planets[choice - 1].setmetal(-desired_amount);
                     _metalamount += desired_amount;
                     std::cout<<"We have obtained "<<desired_amount<<" kg of metal my lord"<<std::endl;
@@ -1236,7 +1344,6 @@ void Spaceship::planet_interaction(){
 
         else if(planets[choice -1].getplanettype() == 2){
             int selection;
-            efficiency = 2 * std::pow(17 - _slaveslevel - 1, 17 -_slaveslevel) * (2*planets[choice-1].getmetal()); //This way when the level
             while(1){
                 std::cout<<"\n"
                 <<"<<DIAMOND PLANET>>"<<"\n"
@@ -1245,12 +1352,13 @@ void Spaceship::planet_interaction(){
                 std::cin>>selection;
                 if(selection == 1){
                     int desired_amount;
-                    genetical_modification(choice, planets_available, planetstemperatures);
+                    slaves = genetical_modification(choice, planets_available, planetstemperatures);
                     std::cout<<"\n"
                     <<"\n"<<std::endl;
                     while(1){
                         std::cout<<"Please, tell us the amount of diamonds that you want my lord"<<std::endl;
                         std::cin>>desired_amount;
+                        efficiency = efficiency_calculation(slaves, planets[choice -1].getdiamonds());
                         if(desired_amount > planets[choice - 1].getdiamonds()){
                             std::cout<<"There is not that many diamonds my lord"<<std::endl;
                         }
@@ -1258,7 +1366,7 @@ void Spaceship::planet_interaction(){
                             break;
                     }
                     std::cout<<"Your wishes are our commands, my lord"<<std::endl; //WAIT FUNCTION INCLUDED HERE
-                    usleep(efficiency);
+                    sleep(efficiency);
                     planets[choice - 1].setdiamonds(-desired_amount);
                     _diamondsamount += desired_amount;
                     std::cout<<"We have obtained "<<desired_amount<<" kg of diamonds to fill your archs my lord"<<std::endl;
@@ -1279,7 +1387,6 @@ void Spaceship::planet_interaction(){
 
         else if(planets[choice - 1].getplanettype() == 3){
             int selection;
-            efficiency = 2 * std::pow(17 - _slaveslevel - 1, 17 -_slaveslevel) * (2*planets[choice-1].getmetal()); //This way when the level
             while(1){
                 std::cout<<"\n"
                 <<"<<MERCURY PLANET>>"<<"\n"
@@ -1288,12 +1395,13 @@ void Spaceship::planet_interaction(){
                 std::cin>>selection;
                 if(selection== 1){
                     int desired_amount;
-                    genetical_modification(choice, planets_available, planetstemperatures);
+                    slaves = genetical_modification(choice, planets_available, planetstemperatures);
                     std::cout<<"\n"
                     <<"\n"<<std::endl;
                     while(1){
                         std::cout<<"Let us know how many megatons you want my lord"<<std::endl;
                         std::cin>>desired_amount;
+                        efficiency = efficiency_calculation(slaves, planets[choice -1].getmercury());
                         if(desired_amount > planets[choice - 1].getmercury()){
                             std::cout<<"There is not that much mercury my lord"<<std::endl;
                         }
@@ -1301,7 +1409,7 @@ void Spaceship::planet_interaction(){
                             break;
                     }
                     std::cout<<"Your wishes are our commands my lord!"<<std::endl;//wAIT FUNCTION INCLUDED HERE
-                    usleep(efficiency);
+                    sleep(efficiency);
                     planets[choice - 1].setmercury(-desired_amount);
                     _fuelcapacity += desired_amount;
                     std::cout<<"We have obtained "<<desired_amount<<" megatons of fuel to propell our gigantic space ship my lord"<<std::endl;
@@ -1317,7 +1425,7 @@ void Spaceship::planet_interaction(){
         }
         else if(planets[choice -1].getplanettype() == 4){
             int selection;
-            efficiency = 2 * std::pow(17 - _slaveslevel - 1, 17 -_slaveslevel) * (2*planets[choice-1].getmetal()); //This way when the level is 17 the exponent will be zero!
+            efficiency = std::pow(17 - _slaveslevel - 1, 17 -_slaveslevel) * (2*planets[choice-1].getmetal()); //This way when the level is 17 the exponent will be zero!
             while(1){
                 std::cout<<"\n"
                 <<"<<HABITABLE OR POTENTIALLY HABITABLE PLANET>>"<<"\n"
@@ -1360,7 +1468,8 @@ void Spaceship::planet_interaction(){
                                         bool protozoo = false;
                                         bool staphilloccocus = false;
                                         bool pseudomona = false;
-                                        std::cout<<"<<--LABORATORY-->>"<<"\n"
+                                        std::cout<<"\n"
+                                        <<"<<--LABORATORY-->>"<<"\n"
                                         <<"\n"
                                         <<"Welcome to the laboratory my lord, we will process the evolutionexpressaccelerator combining the necessary bacteriae"<<std::endl;
                                         if(_protozoolevels == 0 && _staphilococcuslevels == 0 && _pseudomonalevels == 0){
@@ -1393,9 +1502,11 @@ void Spaceship::planet_interaction(){
                                                 }
                                             }
                                             std::cout<<"We are out of "<<"\n"
+                                            <<"\n"
                                             <<missingelement1<<"\n"
                                             <<missingelement2<<"\n"
                                             <<missingelement3<<"\n"
+                                            <<"\n"
                                             <<"Slightly increasing the chimpancee's inteligence up to the ironically named homo-sapiens"<<"\n"
                                             <<"will take longer than we thought..."<<"\n"
                                             <<"Time to keep on exploring the universe!"<<std::endl;
@@ -1456,7 +1567,6 @@ void Spaceship::planet_interaction(){
 
         else if(planets[choice - 1].getplanettype() == 5){
             int selection;
-            efficiency = 2 * std::pow(17 - _slaveslevel, 17 - _slaveslevel) *(planets[choice-1].getmetal());
             while(1){
                std::cout<<"\n"
                <<"<<FROZEN PLANET CONTAINING SIMPLE FORMS OF LIFE>>"<<"\n"
@@ -1470,6 +1580,12 @@ void Spaceship::planet_interaction(){
                     while(1){
                         std::cout<<"Type in the amount of protozoo that you want my lord"<<std::endl;
                         std::cin>>desired_amount_protozoo;
+                        if(_slaveslevel >= 0 && _slaveslevel <= 10)
+                            efficiency = 4;
+                        else if(_slaveslevel >= 10 && _slaveslevel <= 15)
+                            efficiency = 3;
+                        else if(_slaveslevel > 15)
+                            efficiency = 2;
                         if(desired_amount_protozoo > planets[choice -1].getprotozoo()){
                             std::cout<<"There is not so much protozoo my lord"<<std::endl;
                         }
@@ -1495,7 +1611,7 @@ void Spaceship::planet_interaction(){
                         else
                             break;
                     }
-                    usleep(efficiency);
+                    sleep(efficiency);
                     planets[choice - 1].setbacteriae(-desired_amount_protozoo, -desired_amount_staphillococcus, -desired_amount_pseudomona);
                     _protozoolevels += desired_amount_protozoo;
                     _staphilococcuslevels += desired_amount_staphillococcus;
@@ -1522,7 +1638,6 @@ void Spaceship::planet_interaction(){
         }
         else if(planets[choice -1].getplanettype() == 6){
             int selection;
-            efficiency = 2 * std::pow(17 - _slaveslevel, 17 - _slaveslevel) * (planets[choice-1].getmetal());
             while(1){
                 std::cout<<"\n"
                 <<"<<GAS GIANT>>"<<"\n"
@@ -1531,6 +1646,12 @@ void Spaceship::planet_interaction(){
                 std::cin>>selection;
                 if(selection == 1){
                     int desired_amount;
+                    if(_slaveslevel >= 0 && _slaveslevel <= 10)
+                            efficiency = 4;
+                        else if(_slaveslevel >= 10 && _slaveslevel <= 15)
+                            efficiency = 3;
+                        else if(_slaveslevel > 15)
+                            efficiency = 2;
                     while(1){
                         std::cout<<"Please my lord, let us know how much gas you will need"<<std::endl;
                         std::cin>>desired_amount;
@@ -1541,7 +1662,7 @@ void Spaceship::planet_interaction(){
                             break;
                     }
                     planets[choice - 1].setgas(-desired_amount);
-                    usleep(efficiency);
+                    sleep(efficiency);
                     _WARPdrive += desired_amount;
                     std::cout<<"We have obtained "<<desired_amount<<" megatons of antimatter to fill our WARP drive deposits my lord!"<<std::endl;
                     break;
@@ -1669,7 +1790,8 @@ void Spaceship::assign_points(int points, std::string specimen){
 void Spaceship::setlevel(int currentlevel, std::string specimen, int increaseneeded, int levelsleft, int amount_desired, int choice, int factor, bool levelup,  std::vector<int> prices, std::vector<int> levels){
     while(1){
 
-            std::cout<<"Type in your amount of points"<<std::endl;
+            std::cout<<"\n"
+            <<"Type in your amount of points"<<std::endl;
             std::cin>>amount_desired;
             if(amount_desired == 0)
                 break;
@@ -2127,12 +2249,13 @@ int Spaceship::cabin(){
 }
 
 
-
 int main()
 {
     Spaceship s;
     s.cabin();
 }
+
+
 
 
 
