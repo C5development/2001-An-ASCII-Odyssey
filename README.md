@@ -4,4 +4,5 @@
 It was thought of as an open-source project consisting of a universe full of civilisations and stories all displayed in ASCII
 characters. Creative writers passional about distant fictional words are welcome to it, as well as avid programmers who want to sharpen their logic skills and put into practice what they learnt in introductory C++ courses. 
 We can all make this universe more enriching and complex and that possibility is a few commits away from becoming a reality. 
+
 Please, feel free to contribute. 
