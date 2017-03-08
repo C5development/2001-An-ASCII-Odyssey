@@ -703,7 +703,7 @@ class Spaceship
         void refill_vector(std::string);
         void to_solar_system();
         void display_planets_database();
-        void generate_solar_data_base(std::string, std::vector<int>, std::vector<int>, std::vector<char>);
+        void generate_solar_data_base(std::vector<Planet>, std::string, std::vector<int>, std::vector<int>, std::vector<char>);
         void colonise_solar_system();
         void display_colonies();
         void print();
@@ -968,7 +968,7 @@ void Spaceship::display_colonies(){
 void Spaceship::display_planets_database(){
 }
 
-void Spaceship::generate_solar_data_base(std::string planetname, std::vector<int> distancesmap, std::vector<int> planetstemperatures, std::vector<char> planets_available){
+void Spaceship::generate_solar_data_base(std::vector<Planet> planets, std::string planetname, std::vector<int> distancesmap, std::vector<int> planetstemperatures, std::vector<char> planets_available){
 }
 
 void Spaceship::to_solar_system(){
@@ -1116,7 +1116,7 @@ void Spaceship::planet_interaction(){
     std::vector<int> planetstemperatures;
     std::vector<char> planets_available;
     int planets_number = rand() % 4 + 4;
-    Planet planets[planets_number];
+    std::vector<Planet> planets(planets_number);
     std::cout<<"\n"
     <<"<<<PLANETS>>>"<<"\n"
     <<"\n"
@@ -1139,7 +1139,7 @@ void Spaceship::planet_interaction(){
         adjustment += adjustment + randRange(150, 347);
         adjustment1 += adjustment1 + randRange(150, 347);
     }
-    generate_solar_data_base(planetname, distancesmap, planetstemperatures, planets_available);
+    generate_solar_data_base(planets, planetname, distancesmap, planetstemperatures, planets_available);
     std::cout<<std::endl;
     std::cout<<"Do you want to make this solar system a colony?"<<std::endl;
     std::cin>>colony_approbation;
