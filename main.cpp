@@ -659,6 +659,7 @@ class Spaceship
     static std::vector<std::string> starnames;
     static std::vector<std::string> planetnamesbuffer;
     static std::vector<std::string> starnamesbuffer;
+    static int starsnumber;
 
     private:
 
@@ -714,9 +715,9 @@ class Spaceship
         void to_solar_system();
         void display_planets_database();
         int efficiency_calculation(int, int);
-        void generate_stars_data_base(std::vector<Star>);
-        void generate_solar_data_base(std::vector<Planet>, std::string, std::vector<int>, std::vector<int>, std::vector<char>);
-        void colonise_solar_system();
+        void generate_stars_data_base(int, std::vector<Star>);
+        void generate_solar_data_base(std::vector<Planet>);
+        void colonise_solar_system(std::vector<Planet>);
         void display_colonies();
         void print();
         std::string show_title();
@@ -733,6 +734,9 @@ std::vector<std::string> Spaceship::planetnamesbuffer;
 std::vector<std::string> Spaceship::starnames = {"Acamar", "Adhafera", "Kornephoros", "Hoedus II", "Miaplacidus", "Procyon", "Pleione", "Rastaban", "Rotanev", "Sarir", "Cassiopeia", "Sterope", "Tabit", "Veritate", "Zaurak", "Sceptrum", "Sadachbia", "Rukbat", "Cygnus", "Capricorni", "Rotanev", "Ceasar 43", "Zeus", "Colossus", "Dranicus", "Rimbokhan", "Tiranuslae", "Criptilocus"};
 
 std::vector<std::string> Spaceship::starnamesbuffer;
+
+int Spaceship::starsnumber; //IMPORTANT We might need to create a function that updates the value using the database
+//The reason for this is that once the program is initialised again the variable will also be initialised and set to zero!
 
 int Spaceship::randRange(int low, int high)
 {
@@ -755,7 +759,6 @@ void Spaceship::stars_interaction(){
         std::string starsname;
         int stars_number = rand() % 20 + 5;
         std::vector<Star> stars(stars_number);
-        generate_stars_data_base(stars);
         std::cout<<"\n"
         <<"\n"
         <<"<<<STARS>>>"<<"\n"
@@ -769,6 +772,9 @@ void Spaceship::stars_interaction(){
             stars[i].display_stars_data(starsname);
             std::cout<<std::endl;
         }
+        _WARPdrive -= 1000;
+        std::cin>>starschoice;
+        generate_stars_data_base(starschoice, stars);
 }
 
 std::string Spaceship::define_planets_name(){
@@ -973,36 +979,99 @@ void Spaceship::battle_mode(int drones, int cyborgs, int enemies_drones, int ene
 
 }
 
-void Spaceship::colonise_solar_system(){
+void Spaceship::colonise_solar_system(std::vector<Planet> planets){
+//std::string colonysname;
+//This function will interact with TWO DATABASES namely colonies and planets (for reference check the function beloW)
+//In this function we are going to use a for loop to insert each element within the database
+//This method is way trickier than it seems!
+//The reason for this is that planetsbuffer is a static attribute, meaning that each time a solar system is generated if others have been generated previously
+//the indexing method to find our planetsname won't work in accordance to the user's preference, we will need to use
+//a variable counting the name of elements that there is in planetsbuffer everytime a planetary system is generated
+//when planetsname has been reduced down to the maximum number of planets that can be generated (8)
+//This variable will be reset to zero(an if-statement within the planet_interaction method will do that for us
+//then subtracting planets.size() to planetsbuffer-size() will do the job for us, regarding the indexing problem, the last elements will be the most recently created
+//and so when accessing the names we will just have to do code the following
+//planetnamesbuffer[choice + (planetsbuffer.size() - planets.size()]
+//a minus one may need to be added we will check it later
+//This will be used for the first element to be inserted and for the sake of simplicity
+//I just typed i. I will type in capital letters the databases that will be modified
+//FIRST THE COLONIES DATABASE
+//we tell the user to give a name to its colony
+//an if-statement must be added again to check if the name already exists
+//Now insert colonies name along with the STARSNUMBER variable(our primary key for the star database and foreign key for the colonies database)
+//Just two columns, starsname and colonies name(the latter will be our Primary key for the colonies database and the foreign key!
+//for the planets database
+//it is VERY IMPORTANT to include that if-statement otherwise the foreign and primary key of the colonies database won't work
+//leading to HORRIBLE BUGS
+//SECONDLY THE PLANETS DATABASE
+//next we just insert the elements within the planets database
+//NOTE1: read line 994, for the sake of simplicity I typed i as the index to planetnamesbuffer, this MUST NOT be done
+//there will be HORRIBLE BUGS otherwise XDDDD
+//for(int i = 0; i < planets.size(); i++){
+//  insert(planetnamesbuffer[i](text), planets[i].getplanetstemperature(integer), planets[i].getplanetsurface(real), planets[i].getatmospherecomposition(text), planets[i].getmagneticfieldsintensity(integer), planets[i].geteccentricity(real), planets[i].getdistancefromstar(integer))
+}//}
+//NOTE:  It is key that we include the starsnumber variable! (read line 1001)
+//This will also be tricky, since, if more colonies have been previously generated, we will need to access a specific star
+//The stars name itself CANNOT be our primary key(value used to access all the entity's data(an entity is just an object in the database)
+//It will be good if we stick to a technical jargon to communicate more effectively
+//The reason for this is that the stars' names will repeat themselves after a given number of iterations
+//The only solution to this, is to create a static variable storing the number of stars,
+//This variable will also be in the stars database and it will also be the PRIMARY KEY of this database
+//as well as the FOREIGN KEY
 
+void Spaceship::generate_stars_data_base(int choice, std::vector<Star> stars){
+//This function is called in the line 773!
+//The starsnumber must be extracted from the last row of the database in order to update the value
+//an if statement will do this for us i.e (if database empty nothing is done if not extract starsnumber from the last row or entity)
+//If we don't do this a HORRIBLE BUG will make our lives very unbearable XDD
+//starsnumber += 1 the static variable will be increased by one
+//insert(starsnumber(PRIMARY KEY and FOREIGN KEY), stars[choice - 1].getstarsname(text), stars[choice - 1].getstartype(text), stars[choice - 1].getstarsurface(real), stars[choice - 1].getstarstemperature(integer),stars[choice - 1].getstarsradiation(integer))
+//A foreign key is the identifier for the colonies database both colonies and stars share this key so they are connected
+//That means two things
+//First: Before generating the colonies database the star database MUST have been defined
+//Second: The foreign key must be added as a column to the colonies database, each colony will have its corresponding star
+//Only two columns are needed for the colonies(the other column will be the colony name IMPORTED by the user (important to use a place holder here)
+//That will give us EXTRA MARKS!!
+//The colony's name is going to be our foreign key to access the planetary system
+//In total three data bases interact
+//Stars>>Colonies>>Planets
+//This is the order in which they must be created for this to be possible
+//NOTE: When the user decides to delete a data base (from the colonies function contained in the CABIN function!)
+//Elements must be deleted in the opposite order, this will make it look even simpler
+//CREATE DATABASE
+//Stars>>Colonies>>Planets
+//DELETE DATABASE
+//Planets>>Colonies>>Stars
+//With their corresponding methods(functions) defined i.e delete_stars, delete_planets, delete_Colonies.
+//Check line 1254! If the users decides to create a colony, the colonies_solar_system function will be called
+//Lines 1299 and 1303 is where we are calling the function
 }
 
-void Spaceship::generate_stars_data_base(std::vector<Star> stars){
-
-}
+//This are the most challenging parts of the database interaction, foreign and primary keys must be defined using sqlitestudio
+//It is a piece of cake tho we might need some assistance(on friday we will ask)
 
 int Spaceship::efficiency_calculation(int resources, int slaves){
     int efficiency;
-    int seconds;
+    int time;
     if(_slaveslevel > 0 && _slaveslevel <= 5){
         if(resources < 5000){
             slaves % 2 ? slaves = randRange(10, 15) : slaves = randRange(1, 5);
             efficiency = 20* 2 - slaves;
             if(efficiency > 30){
-                seconds = 3;
+                time = 3;
             }
             else
-                seconds = 4;
+                time = 4;
 
         }
         else if(resources > 5000){
             slaves % 2 ? slaves = randRange(10, 12) : slaves = randRange(1, 2);
             efficiency = 20 * 2 - slaves;
             if(efficiency > 30){
-                seconds = 4;
+                time = 4;
             }
             else
-                seconds = 5;
+                time = 5;
         }
     }
     else if(_slaveslevel > 5 && _slaveslevel <= 10){
@@ -1010,20 +1079,20 @@ int Spaceship::efficiency_calculation(int resources, int slaves){
             slaves % 2 ? slaves = randRange(10, 15) : slaves = randRange(1, 5);
             efficiency = randRange(10, 15) * 2 - slaves;
             if(efficiency >= 15){
-                seconds = 2;
+                time = 2;
             }
             else
-                seconds = 3;
+                time = 3;
 
         }
         else if(resources > 5000){
             slaves % 2 ? slaves = randRange(10, 12) : slaves = randRange(1, 2);
             efficiency = randRange(10, 15) * 2 - slaves;
             if(efficiency >= 15){
-                seconds = 3;
+                time = 3;
             }
             else
-                seconds = 4;
+                time = 4;
         }
     }
     else if(_slaveslevel > 10 && _slaveslevel <= 15){
@@ -1031,17 +1100,17 @@ int Spaceship::efficiency_calculation(int resources, int slaves){
             slaves % 2 ? slaves = randRange(10, 15) : slaves = randRange(1, 5);
             efficiency = randRange(5, 10) * 2 - slaves;
             if(efficiency > 15)
-                seconds = 1;
+                time = 1;
             else
-                seconds = 2;
+                time = 2;
         }
         else if(resources > 5000){
             slaves % 2 ? slaves = randRange(10, 12) : slaves = randRange(1, 2);
             efficiency = randRange(5, 10) * 2 - slaves;
             if(efficiency > 10)
-                seconds = 2;
+                time = 2;
             else
-                seconds = 3;
+                time = 3;
         }
     }
     else if(_slaveslevel > 15){
@@ -1049,36 +1118,73 @@ int Spaceship::efficiency_calculation(int resources, int slaves){
             slaves % 2 ? slaves = randRange(10, 15) : slaves = randRange(1, 5);
             efficiency = randRange(1, 5) * 2 - slaves;
             if(efficiency > 5)
-                seconds = 0;
+                time = 0;
             else
-                seconds = 1;
+                time = 1;
 
         }
         else if(resources > 5000){
             slaves % 2 ? slaves = randRange(10, 12) : slaves = randRange(1, 2);
             efficiency = randRange(1, 5) * 2 - slaves;
             if(efficiency > 5)
-                seconds = 1;
+                time = 1;
             else
-                seconds = 2;
+                time = 2;
         }
     }
-    return seconds;
+    return time;
 }
 
 void Spaceship::display_colonies(){
-
+//Simply display the data from the colonies database, let the user choose what colony he wants to visit (PLACEHOLDERS) and then
+//display its corresponding planetary system's data,
+//HINT: insert whatever where whatever is equal to whatever (foreign key)
+//NOTE: This is going to be tricky as FUCK but the purpose of owning a colony is that you can extract resources from it without
+//wasting fuel (captain Kurg creates a blackhole or whatever)
+//It is interesting for the game since it will give the player a second chance if he runs out of fuel
+//However, and to make it more interesting (otherwise the game would be too easy) a colony must be deleted whenever it is visited
+//We will cout the explanation (artificial worm holes dilate space-time and cannot be overused without causing a terrible vaccuum that destroys
+//the universe) anything XDD
+//You could add a time function that calculates the difference in hours between the last moment the user displayed a colony
+//and when he displays it so that according to the time it passed more or less resources will be available
+//It sounds easy, but it is trickier than it seems
 }
 
 void Spaceship::display_planets_database(){
+//I don't know what the fuck this is, we can get rid of it
 }
 
-void Spaceship::generate_solar_data_base(std::vector<Planet> planets, std::string planetname, std::vector<int> distancesmap, std::vector<int> planetstemperatures, std::vector<char> planets_available){
+void Spaceship::generate_solar_data_base(std::vector<Planet>){
+//Okay this is the easiest database, it will be a temporary database meaning that everytime the user chooses
+//to get back to the cabin (line , all of its elements will be deleted!
+//The planet_destroyer function (go to line 1269)
+//will simply delete the corresponding row from the database
+//NOTE: The player cannot colonise a solar system that contains a civilisation that has not been defeated!!
+//Therefore from the battlemode function, a variable within this databas will have to be modified
+//Such variable will be a boolean (True if defeated False if not)
+//HINT: Use an if-statement with planets[i].getplanethabitability() to check for habitability
+//then use planets[i].getdefeat() to insert the boolean in the database
+//Colonies don't need to include this variable since they can only be created, once it has been set to true
+//NOTE: The fact that a for loop will be needed is too obvious for it to be mentioned
+//A totally new planet_interaction function must be created here, since the data is not coming from an object's getters
+//This is a LOT of code and can make your contribution very RELEVANT
+//If the planet is habitable the civilisation contained in that planet must also be included
+//We will have to create ANOTHER DATABASE with civilisations contained in this solar system, it will be
+//a temporary database, which hopefully will also make things easier for us
+//For the sake of consistency, read the planet interaction database (The most important one)
+//NOTE: That is A LOT of work, but that way you will get extra marks there is a week before the deadline we can get this shit done
+//and call it a day
+//Luckily, we already have a planet_interaction function, use that as a reference!! it is VITAL for the program to be consistent
+
 }
 
 void Spaceship::to_solar_system(){
 //EXTRACTS DATA FROM A TEMPORARY DATABASE DEFINED WHEN PLANETS ARE GENERATED(PLANETSINTERACTION) IT CAN ONLY BE MODIFIED BY THE PLANET_DESTROYER FUNCTION
+//We will work on this once the most fundamental databases have been created
+//It simply displays the data from the generate_solar_data_base
+
     std::cout<<"Puta"<<std::endl;
+
 }
 
 void Spaceship::civilisation_interaction(int desired_respect, int aliens){
@@ -1168,7 +1274,11 @@ void Spaceship::civilisation_interaction(int desired_respect, int aliens){
 }
 
 void Spaceship::save_game(){
-
+//This will save the amount of each resource that has been accumulated(fuel, WARPdrive, diamonds, metal, protozoo, pseudomona, staphilloccocus)
+//Number of colonies
+//Number of civilisations that have been dominated
+//Player's level!! (including soldierslevel, slaveslevel and scientistslevel)
+//
 }
 
 void Spaceship::game_over(){
@@ -1244,7 +1354,7 @@ void Spaceship::planet_interaction(){
         adjustment += adjustment + randRange(150, 347);
         adjustment1 += adjustment1 + randRange(150, 347);
     }
-    generate_solar_data_base(planets, planetname, distancesmap, planetstemperatures, planets_available);
+    generate_solar_data_base(planets);
     std::cout<<std::endl;
     std::cout<<"Do you want to make this solar system a colony?"<<std::endl;
     std::cin>>colony_approbation;
@@ -1702,8 +1812,6 @@ void Spaceship::interstellar_travel()
             //and the current solar system where our character is
         }
         stars_interaction();
-        _WARPdrive -= 1000;
-        std::cin>>starschoice;
         if(_fuelcapacity == 0){
             std::cout<<"My lord, we have no fuel left, it is time for us to face death like brothers!"<<"\n"
             <<"I must confess it's always been a pleasure for us to serve you"<<std::endl;
