@@ -123,7 +123,7 @@ void Star::stars_generator()
 }
 Star::Star(){
 
-    _starsradiation = randRange(0, 10);
+    _starsradiation = randRange(1, 10);
 
     define_type_of_star();
 
@@ -523,7 +523,7 @@ void Planet::determine_habitability(){
     if(_planettype == 4){
         if(_magneticprotection && _breathableatmosphere){
         _habitable = true;
-        _humans = randRange(10000000, 70000000);
+        _humans = randRange(1000000, 7000000);
         }
 
         else if(_breathableatmosphere){
@@ -594,7 +594,7 @@ void Planet::display_planets_data(std::string planetsname, int distancefromstar)
     <<"Surface in square km: "<<_planetssurface<<"\n"
     <<"Atmosphere's composition: "<<_atmospherecomposition<<"\n"
     <<"Intensity of magnetic field: "<<_magneticfieldintensity<<"\n"
-    <<"Distance from its star: "<<distancefromstar<<" millions of kilometers"<<"\n"
+    <<"Distance from its star: "<<distancefromstar<<" million kilometers"<<"\n"
     <<"Orbit's eccentricity: "<<determine_orbit_eccentricity()<<"\n"
     <<"Rotation angle: "<<randRange(90, 180)<<std::endl;
     if(_planettype == 1)
@@ -643,6 +643,13 @@ Planet::Planet(){
 
 class Spaceship
 {
+
+
+    static std::vector<std::string> planetnames;
+    static std::vector<std::string> starnames;
+    static std::vector<std::string> planetnamesbuffer;
+    static std::vector<std::string> starnamesbuffer;
+
     private:
 
         int _diamondsamount = 1234257463; //This is the amount that will be spent on manufacturing processes
@@ -686,16 +693,17 @@ class Spaceship
         void purchasepoints(int);
         void pointstransaction(int);
         int randRange(int, int);
-        std::string define_stars_name(std::vector<std::string>, std::vector<std::string>);
-        std::string define_planets_name(std::vector<std::string>, std::vector<std::string>);
+        std::string define_stars_name();
+        std::string define_planets_name();
         void planet_destroyer(int);
         void civilisation_history(std::string, std::string, int);
         void surrender_treaty(std::string, std::string);
         void assign_troops(int, int, int);
         void battle_mode(int, int, int, int);
+        void refill_vector(std::string);
         void to_solar_system();
         void display_planets_database();
-        void generate_solar_data_base();
+        void generate_solar_data_base(std::string, std::vector<int>, std::vector<int>, std::vector<char>);
         void colonise_solar_system();
         void display_colonies();
         std::string show_title();
@@ -705,13 +713,21 @@ class Spaceship
 
 };
 
+std::vector<std::string> Spaceship::planetnames = {"Lok", "Erinar", "Golrath", "Imrooso", "Maryx Minor", "Qat Chrystac", "RZ7-6113-23", "Taspir III", "55 Cancri e", "Zachayphus", "Iewhoutis", "Foclillon", "Weplov", "Reter", "Crevugan", "Obloethea", "Ethuetera", "Asnypso", "Ciocury", "Glabuwei", "Spiri 29N4", "Grypso Y1J", "Slequhiri", "Tasloaclite", "Dragatan", "Sethurilia", "Hadrion", "Geuliv","Celaris", "Adrara", "Upruna", "Fraxetis", "Cuprillon", "Woilara", "Stuzaria", "Xiotune", "Hafloth", "Pludaphus", "Glarvis 10", "Vespin", "Oclore", "Oaphus", "Clugonus", "Veskaiter", "Godriuturn"};
+
+std::vector<std::string> Spaceship::planetnamesbuffer;
+
+std::vector<std::string> Spaceship::starnames = {"Acamar", "Adhafera", "Kornephoros", "Hoedus II", "Miaplacidus", "Procyon", "Pleione", "Rastaban", "Rotanev", "Sarir", "Cassiopeia", "Sterope", "Tabit", "Veritate", "Zaurak", "Sceptrum", "Sadachbia", "Rukbat", "Cygnus", "Capricorni", "Rotanev", "Ceasar 43", "Zeus", "Colossus", "Dranicus", "Rimbokhan", "Tiranuslae", "Criptilocus"};
+
+std::vector<std::string> Spaceship::starnamesbuffer;
+
 int Spaceship::randRange(int low, int high)
 {
     return rand() % (high - low + 1) + low;
 }
 
 
-std::string Spaceship::define_stars_name(std::vector<std::string> starnames, std::vector<std::string> starnamesbuffer){
+std::string Spaceship::define_stars_name(){
     auto name = starnames.begin() + (rand()%starnames.size());
     starnamesbuffer.emplace_back(*name);
     starnames.erase(name);
@@ -720,8 +736,10 @@ std::string Spaceship::define_stars_name(std::vector<std::string> starnames, std
 
 
 void Spaceship::stars_interaction(){
-        std::vector<std::string> starnamesbuffer;
-        std::vector<std::string> starnames = {"Acamar", "Adhafera", "Kornephoros", "Hoedus II", "Miaplacidus", "Procyon", "Pleione", "Rastaban", "Rotanev", "Sarir", "Cassiopeia", "Sterope", "Tabit", "Veritate", "Zaurak", "Sceptrum", "Sadachbia", "Rukbat", "Cygnus", "Capricorni", "Rotanev", "Ceasar 43", "Zeus", "Colossus", "Dranicus", "Rimbokhan", "Tiranuslae", "Criptilocus"};    std::string starsname;
+        if(starnames.size() == 25){
+            refill_vector("Stars");
+        }
+        std::string starsname;
         int stars_number = rand() % 20 + 5;
         Star stars[stars_number];
         std::cout<<"\n"
@@ -730,7 +748,7 @@ void Spaceship::stars_interaction(){
         <<"\n"
         <<"\n"<<std::endl;
         for(int i = 0; i < stars_number; i++){
-            starsname = define_stars_name(starnames, starnamesbuffer);
+            starsname = define_stars_name();
             std::cout<<"\n"
             <<"Type "<<i + 1<<" to explore this solar system"<<"\n"
             <<"\n"<<std::endl;
@@ -739,11 +757,12 @@ void Spaceship::stars_interaction(){
         }
 }
 
+std::string Spaceship::define_planets_name(){
 
-std::string Spaceship::define_planets_name(std::vector<std::string> planetnames, std::vector<std::string> planetnamesbuffer){
-
-    int random_constant = rand() % planetnames.size();
-    return planetnames[random_constant];
+    auto it = planetnames.begin() + (rand()%planetnames.size());
+    planetnamesbuffer.emplace_back(*it);
+    planetnames.erase(it);
+    return *it;
 }
 
 std::vector<int> ORgate(bool protozoo, bool staphilloccocus, bool pseudomona){
@@ -799,6 +818,7 @@ void Spaceship::genetical_modification(int choice, std::vector<char> planetsavai
     <<"Atmosphere: "<<atmosphere<<"\n"
     <<"Radiation: "<<radiation<<"\n"
     <<"Let's go to the laboratory to modify our specimens accordingly"<<"\n"
+    <<"\n"
     <<"<<<LABORATORY>>>"<<"\n"
     <<"\n"
     <<"This is how many specimens we could obtain in our expeditions my lord"<<"\n"
@@ -816,6 +836,7 @@ void Spaceship::genetical_modification(int choice, std::vector<char> planetsavai
         <<"What is the temperature level your slaves will have to resist?"<<std::endl;
         std::cin>>desired_amount;
         slaves_temperature_resistance += desired_amount;
+        std::cout<<std::endl;
         std::cout<<"Perfect my lord, now just give us the level of radiation they will be exposed to"<<std::endl;
         std::cin>>desired_amount;
         slaves_radiation_resistance = desired_amount;
@@ -826,6 +847,7 @@ void Spaceship::genetical_modification(int choice, std::vector<char> planetsavai
         <<"2. Temperature resistance: "<<slaves_temperature_resistance<<"\n"
         <<"3. Radiation resistance: "<<slaves_radiation_resistance<<"\n"
         <<"4. Atmosphere resistance: "<<atmosphere<<"\n"
+        <<"\n"
         <<"We are ready to send our slaves and extract the minerals my lord!"<<std::endl;
         slaves_radiation_resistance = 0;
         slaves_temperature_resistance = 0;
@@ -864,7 +886,7 @@ void Spaceship::civilisation_history(std::string social_structure, std::string c
         }
         Liberaldemocracy.close();
     }
-    else if(social_structure == "Techno utopian anarchy"){
+    else if(social_structure == "Techno-utopian anarchy"){
         std::cout<<"Level: "<<enemies_level<<"\n"
         <<civilisationname<<std::endl;
         std::ifstream Technoutopian;
@@ -918,15 +940,15 @@ void Spaceship::assign_troops(int aliens, int drones, int cyborgs){
     if(aliens % 2 == 0){
         warriors = aliens/2;
         aliens -= warriors;
-        drones = (warriors, warriors/2);
-        cyborgs = (warriors, warriors/2);
+        drones = std::abs(randRange(warriors, warriors/2));
+        cyborgs = std::abs(randRange(warriors, warriors/2));
     }
     else if(aliens % 2 != 0){
         aliens += 1;
         warriors = aliens/2;
         aliens -= warriors;
-        drones = (warriors, warriors/2);
-        cyborgs = (warriors, warriors/2);
+        drones = std::abs(randRange(warriors, warriors/2));
+        cyborgs = std::abs(randRange(warriors, warriors/2));
     }
 }
 
@@ -945,7 +967,7 @@ void Spaceship::display_colonies(){
 void Spaceship::display_planets_database(){
 }
 
-void Spaceship::generate_solar_data_base(){
+void Spaceship::generate_solar_data_base(std::string planetname, std::vector<int> distancesmap, std::vector<int> planetstemperatures, std::vector<char> planets_available){
 }
 
 void Spaceship::to_solar_system(){
@@ -962,42 +984,47 @@ void Spaceship::civilisation_interaction(int desired_respect, int aliens){
     int enemies_drones;
     int enemies_cyborgs;
     int choice;
-    bool surrender;
+    bool surrender = false;
     bool done = false;
     std::string social_structure;
-    switch(random_constant){
-
-        case 1: social_structure = "Techno fascist regime";
-                earned_respect = 3; //Fascist regimes are inferior but more corageous than democracies
-                surrender_calculation = earned_respect - desired_respect;
-                enemies_level = randRange(1, 4);
-                if(surrender_calculation <= 0)
-                    surrender = true;
-                else{
-                    surrender = false;
-                }
-        case 2: social_structure = "Liberal democracy";  //Still not very advanced
-                earned_respect = 2;
-                surrender_calculation = earned_respect - desired_respect;
-                enemies_level = randRange(5, 7);
-                if(surrender_calculation <= 0)
-                    surrender = true;
-                else
-                   surrender = false;
-
-        case 3: social_structure = "Techno-utopian anarchy";
-                earned_respect = 5; //These guys are tough cookies
-                surrender_calculation = earned_respect - desired_respect; //They share their wives!! XDD
-                enemies_level = randRange(8, 13);
-                if(surrender_calculation <= 0)
-                    surrender = true;
-                else
-                    surrender = false;
-
-        case 4: social_structure = "AI-ruled planetary nation"; //Run away motherfucker
-                enemies_level = randRange(13, 17); //No surrender option
+    if(random_constant == 1)
+    {
+        social_structure = "Techno fascist regime";
+        earned_respect = 3; //Fascist regimes are inferior but more corageous than democracies
+        surrender_calculation = earned_respect - desired_respect;
+        enemies_level = randRange(1, 4);
+        if(surrender_calculation <= 0)
+            surrender = true;
+        else{
+            surrender = false;
+        }
+    }
+    else if(random_constant == 2){
+        social_structure = "Liberal democracy";  //Still not very advanced
+        earned_respect = 2;
+        surrender_calculation = earned_respect - desired_respect;
+        enemies_level = randRange(5, 7);
+        if(surrender_calculation <= 0)
+            surrender = true;
+        else
+            surrender = false;
 
     }
+    else if(random_constant == 3){
+        social_structure = "Techno-utopian anarchy";
+        earned_respect = 5; //These guys are tough cookies
+        surrender_calculation = earned_respect - desired_respect; //They share their wives!! XDD
+        enemies_level = randRange(8, 13);
+        if(surrender_calculation <= 0)
+            surrender = true;
+        else
+            surrender = false;
+    }
+    else if(random_constant == 4){
+        social_structure = "AI-ruled planetary nation"; //Run away motherfucker
+        enemies_level = randRange(13, 17); //No surrender option
+    }
+
     if(surrender){
         surrender_treaty(social_structure, civilisationsnames[rand() % civilisationsnames.size()]);
     }
@@ -1009,6 +1036,7 @@ void Spaceship::civilisation_interaction(int desired_respect, int aliens){
             <<"Type of civilisation: "<<social_structure<<"\n"
             <<"\n"
             <<"Your current resources"<<"\n"
+            <<"\n"
             <<"DRONES: "<<_drones<<"\n"
             <<"CYBORG-ARMORS AND WEAPONS: "<<_armors<<"\n"<<std::endl;
             assign_troops(aliens, enemies_drones, enemies_cyborgs);
@@ -1051,7 +1079,23 @@ void Spaceship::planet_destroyer(int desired_respect){
     desired_respect += 1; //THIS FUNCTION SHOULD DELETE THE CHOSEN ROW FROM THE DATABASE MORE SPECIFICALLY THE SOLAR SYSTEM DATABASE
 }
 
+void Spaceship::refill_vector(std::string vectortype){
+    if(vectortype == "Planets"){
+        for(int i = 0; i < planetnamesbuffer.size(); i++){
+            planetnames.push_back(planetnamesbuffer[i]);
+        }
+    }
+    else if(vectortype == "Stars"){
+        for(int i = 0; i < starnamesbuffer.size(); i++){
+            starnames.push_back(starnamesbuffer[i]);
+        }
+    }
+}
+
 void Spaceship::planet_interaction(){
+    if(planetnames.size() == 8){
+        refill_vector("Planets");
+    }
     int choice;
     bool potential_colony = true; //We start by assuming the solar system can be colonised
     bool dead_solar_system;
@@ -1066,18 +1110,17 @@ void Spaceship::planet_interaction(){
     std::string planetname;
     std::vector<int> distancesmap;
     std::vector<int> planetstemperatures;
-    std::vector<std::string> planet_names_buffer;
-    std::vector<std::string> planet_names = {"Lok", "Erinar", "Golrath", "Imrooso", "Maryx Minor", "Qat Chrystac", "RZ7-6113-23", "Taspir III", "55 Cancri e", "Zachayphus", "Iewhoutis", "Foclillon", "Weplov", "Reter", "Crevugan", "Obloethea", "Ethuetera", "Asnypso", "Ciocury", "Glabuwei", "Spiri 29N4", "Grypso Y1J", "Slequhiri", "Tasloaclite", "Dragatan", "Sethurilia", "Hadrion", "Geuliv","Celaris", "Adrara", "Upruna", "Fraxetis", "Cuprillon", "Woilara", "Stuzaria", "Xiotune", "Hafloth", "Pludaphus", "Glarvis 10", "Vespin", "Oclore", "Oaphus", "Clugonus", "Veskaiter", "Godriuturn"};
     std::vector<char> planets_available;
     int planets_number = rand() % 4 + 4;
     Planet planets[planets_number];
-    std::cout<<"<<<PLANETS>>>"<<std::endl;
-    std::cout<<std::endl;
-    std::cout<<std::endl;
+    std::cout<<"\n"
+    <<"<<<PLANETS>>>"<<"\n"
+    <<"\n"
+    "\n"<<std::endl;
     for(int j = 0; j < planets_number; j++){
         adjustment1 = adjustment + 2 * j;
         adjustment2 = adjustment1 + 4 * j;
-        planetname = define_planets_name(planet_names, planet_names_buffer);
+        planetname = define_planets_name();
         distancefromstar = randRange(adjustment1, adjustment2);
         distancesmap.push_back(distancefromstar);
         std::cout<<std::endl;
@@ -1086,12 +1129,13 @@ void Spaceship::planet_interaction(){
         planets[j].display_planets_data(planetname, distancefromstar); //A TEMPORARY DATABASE SHOULD BE INITIALISED HERE
         planets_available.push_back(planets[j].getplanettype());  //ROWS AND ENTITIES WILL BE ADDED THROUGH THE LOOP
         planetstemperatures.push_back(planets[j].gettemperature());
-        std::cout<<std::endl;
-        std::cout<<std::endl;
+        std::cout<<"\n"
+        <<"\n"
+        <<std::endl;
         adjustment += adjustment + randRange(150, 347);
         adjustment1 += adjustment1 + randRange(150, 347);
     }
-    generate_solar_data_base();
+    generate_solar_data_base(planetname, distancesmap, planetstemperatures, planets_available);
     std::cout<<std::endl;
     std::cout<<"Do you want to make this solar system a colony?"<<std::endl;
     std::cin>>colony_approbation;
@@ -1148,7 +1192,8 @@ void Spaceship::planet_interaction(){
             int selection;
             efficiency = 5* std::pow(17 - _slaveslevel - 1, 17 -_slaveslevel) * (2*planets[choice-1].getmetal()); //This way when the level
             while(1){
-                std::cout<<"<<<LAVA PLANET>>"<<"\n"
+                std::cout<<"\n"
+                <<"<<LAVA PLANET>>"<<"\n"
                 <<"1. Extract metal"<<"\n"
                 <<"2. Destroy planet"<<std::endl;
                 std::cin>>selection;
@@ -1192,7 +1237,8 @@ void Spaceship::planet_interaction(){
             int selection;
             efficiency = 5* std::pow(17 - _slaveslevel - 1, 17 -_slaveslevel) * (2*planets[choice-1].getmetal()); //This way when the level
             while(1){
-                std::cout<<"<<DIAMOND PLANET>>"<<"\n"
+                std::cout<<"\n"
+                <<"<<DIAMOND PLANET>>"<<"\n"
                 <<"\n"<<"1. Extract diamonds"<<"\n"
                 <<"2. Destroy planet"<<std::endl;
                 std::cin>>selection;
@@ -1234,7 +1280,8 @@ void Spaceship::planet_interaction(){
             int selection;
             efficiency = 5* std::pow(17 - _slaveslevel - 1, 17 -_slaveslevel) * (2*planets[choice-1].getmetal()); //This way when the level
             while(1){
-                std::cout<<"<<MERCURY PLANET>>"<<"\n"
+                std::cout<<"\n"
+                <<"<<MERCURY PLANET>>"<<"\n"
                 <<"1. Extract mercury"<<"\n"
                 <<"2. Destroy planet"<<std::endl;
                 std::cin>>selection;
@@ -1271,9 +1318,10 @@ void Spaceship::planet_interaction(){
             int selection;
             efficiency = 5 * std::pow(17 - _slaveslevel - 1, 17 -_slaveslevel) * (2*planets[choice-1].getmetal()); //This way when the level is 17 the exponent will be zero!
             while(1){
-                std::cout<<"<<HABITABLE OR POTENTIALLY HABITABLE PLANET>>"<<std::endl;
-                std::cout<<"1. Interact with civilisation/make potentially habitable"<<std::endl;
-                std::cout<<"2. Destroy planet"<<std::endl;
+                std::cout<<"\n"
+                <<"<<HABITABLE OR POTENTIALLY HABITABLE PLANET>>"<<"\n"
+                <<"1. Interact with civilisation/make potentially habitable"<<"\n"
+                <<"2. Destroy planet"<<std::endl;
                 std::cin>>selection;
                 if(selection == 1){
                     int variableadjustment;
@@ -1281,7 +1329,7 @@ void Spaceship::planet_interaction(){
                     std::string missingelement1;
                     std::string missingelement2;
                     std::string missingelement3;
-                    int aliens = randRange(1000000, 7000000);
+                    int aliens = randRange(1000000, 5000000);
                     if(planets[choice - 1].gethabitability() == false){
                         if(planets[choice - 1].getbreathableatmosphere() == true){
                              while(1){
@@ -1409,7 +1457,8 @@ void Spaceship::planet_interaction(){
             int selection;
             efficiency = 5 * std::pow(17 - _slaveslevel, 17 - _slaveslevel) *(planets[choice-1].getmetal());
             while(1){
-               std::cout<<"<<FROZEN PLANET CONTAINING SIMPLE FORMS OF LIFE>>"<<"\n"
+               std::cout<<"\n"
+               <<"<<FROZEN PLANET CONTAINING SIMPLE FORMS OF LIFE>>"<<"\n"
                 <<"1. Extract bacteria"<<"\n"
                 <<"2. Destroy planet"<<std::endl;
                 std::cin>>selection;
@@ -1474,7 +1523,8 @@ void Spaceship::planet_interaction(){
             int selection;
             efficiency = 5 * std::pow(17 - _slaveslevel, 17 - _slaveslevel) * (planets[choice-1].getmetal());
             while(1){
-                std::cout<<"<<GAS GIANT>>"<<"\n"
+                std::cout<<"\n"
+                <<"<<GAS GIANT>>"<<"\n"
                 <<"1. Extract WARP drive fuel"<<"\n"
                 <<"2. Destroy planet"<<std::endl;
                 std::cin>>selection;
@@ -1721,7 +1771,8 @@ void Spaceship::laboratory(){
     std::string specimen;
     int choice;
     while(1){
-    std::cout<<"<<LABORATORY>>"<<"\n"
+    std::cout<<"\n"
+    <<"<<LABORATORY>>"<<"\n"
     <<"\n"
     <<"1. Cyborg army"<<"\n"
     <<"2. Scientists"<<"\n"
@@ -1766,7 +1817,8 @@ void Spaceship::laboratory(){
     else if(choice == 2){
         specimen = "Scientists";
         while(1){
-            std::cout<<"1. Make your scientists smarter"<<"\n"
+            std::cout<<"\n"
+            <<"1. Make your scientists smarter"<<"\n"
             <<"2. Exit"<<std::endl;
             std::cin>>choice;
             if(choice == 1){
@@ -1809,7 +1861,8 @@ void Spaceship::laboratory(){
                 if(choice == 2)
                     break;
                 else if(choice == 1){
-                    std::cout<<"Current slaves level: "<<_slaveslevel<<std::endl;
+                    std::cout<<"\n"
+                    <<"Current slaves level: "<<_slaveslevel<<std::endl;
                     int increaseneeded;
                     int levelsleft;
                     int amount_desired;
@@ -1843,7 +1896,9 @@ void Spaceship::laboratory(){
 void Spaceship::methalurgy(){
     int choice;
     while(1){
-        std::cout<<"<--METHALLURGY LABORATORY-->"<<"\n"
+        std::cout<<"\n"
+        <<"\n"
+        <<"<--METHALLURGY LABORATORY-->"<<"\n"
         <<"\n"
         <<"Metal: "<<_metalamount<<"\n"
         <<"\n"
@@ -1854,7 +1909,8 @@ void Spaceship::methalurgy(){
         std::cin>>choice;
         switch(choice){
 
-            case 1: std::cout<<"Tell us how many drones you want to create my lord!"<<"\n"
+            case 1: std::cout<<std::endl;
+                    std::cout<<"Tell us how many drones you want to create my lord!"<<"\n"
                     <<"Drone's price: 17"<<"\n"
                     <<"Metal: "<<_metalamount<<std::endl;
                     std::cin>>choice;
@@ -1903,7 +1959,8 @@ void Spaceship::methalurgy(){
 
                     }
 
-            case 2: std::cout<<"Metal: "<<_metalamount<<"\n"
+            case 2: std::cout<<std::endl;
+                    std::cout<<"Metal: "<<_metalamount<<"\n"
                     <<"Armor's price: "<<"17"<<"\n"
                     <<"\n"<<std::endl;
                     std::cout<<"How many armors and weapons?"<<std::endl;
@@ -1961,6 +2018,17 @@ void Spaceship::methalurgy(){
 
 void Spaceship::read_story(){
 //Reads from a text-file the main story of the game
+
+    std::ifstream readstory;
+    std::string line;
+    readstory.open("readstory.txt");
+    if(! readstory.is_open()){
+        std::cout<<"Sorry, could not open file"<<std::endl;
+    }
+    while(std::getline(readstory, line)){
+        std::cout<<line<<std::endl;
+    }
+    readstory.close();
 }
 
 std::string Spaceship::show_title(){
@@ -1998,10 +2066,40 @@ int Spaceship::cabin(){
             laboratory();
         }
         else if(choice == "D" || choice == "d"){
-            std::cout<<"<<DEPOSITS>>"<<"\n"
-            <<"Fuel tank capacity for interplanetary travel: "<<_fuelcapacity<<"\n"
-            <<"Antimatter deposit to power WARP drive and planet destroyer: "<<_WARPdrive<<"\n"
-            <<
+            std::string input;
+            int desired_amount;
+            while(1){
+                std::cout<<"\n"
+                <<"<<DEPOSITS>>"<<"\n"
+                <<"Fuel tank capacity for interplanetary travel: "<<_fuelcapacity<<"\n"
+                <<"Antimatter deposit to power WARP drive and planet destroyer: "<<_WARPdrive<<"\n"<<
+                "Do you want to charge the antimatter weapon"<<std::endl;
+                std::cin>>input;
+                if(input == "Yes" || input == "yes" || input == "YES" || input == "y" || input == "Y"){
+                    while(1){
+                        std::cout<<"\n"
+                        <<"Type in by how much you want to charge it"<<"\n"
+                        <<"each shot will consume 3000 units of WARPdrive fuel"<<std::endl;
+                        std::cin>>desired_amount;
+                        if(desired_amount > _WARPdrive){
+                            std::cout<<"Sorry but you don't have enough WARPdrive fuel yet"<<std::endl;
+                            std::cout<<std::endl;
+                        }
+                        _WARPdrive -= desired_amount;
+                        _antimatterweapon += desired_amount;
+                        std::cout<<"Lord, you just loaded the anti-matter weapon by "<<desired_amount<<" units"<<"\n"
+                        <<"Anti-matter weapon: "<<_antimatterweapon<<"\n"
+                        <<std::endl;
+                        break;
+                        }
+                }
+                else if(input == "no" || input == "No" || input == "NO" || input == "n" || input == "N"){
+                    std::cout<<"Wise decision my lord, that amount of WARPdrive fuel will be needed for our interplanetary expeditions!"<<std::endl;
+                }
+                else if(input == "exit" || input == "EXIT" || input == "Exit"){
+                    break;
+                }
+           }
         }
         else if(choice == "M" || choice == "m"){
             methalurgy();
@@ -2033,5 +2131,6 @@ int main()
     Spaceship s;
     s.cabin();
 }
+
 
 
