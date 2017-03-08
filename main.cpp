@@ -8,6 +8,7 @@
 #include<algorithm>
 #include<fstream>
 #include<unistd.h> //Import the sleep function (only works with linux compiler)
+#include<printf.h>
 class Star
 {
 
@@ -644,7 +645,6 @@ Planet::Planet(){
 class Spaceship
 {
 
-
     static std::vector<std::string> planetnames;
     static std::vector<std::string> starnames;
     static std::vector<std::string> planetnamesbuffer;
@@ -706,6 +706,7 @@ class Spaceship
         void generate_solar_data_base(std::string, std::vector<int>, std::vector<int>, std::vector<char>);
         void colonise_solar_system();
         void display_colonies();
+        void print();
         std::string show_title();
         void read_story();
         void save_game(); //DATABASE
@@ -736,7 +737,7 @@ std::string Spaceship::define_stars_name(){
 
 
 void Spaceship::stars_interaction(){
-        if(starnames.size() == 25){
+        if(starnames.size() <= 25){
             refill_vector("Stars");
         }
         std::string starsname;
@@ -1075,6 +1076,8 @@ void Spaceship::game_over(){
 //Level reached
 }
 
+
+
 void Spaceship::planet_destroyer(int desired_respect){
     desired_respect += 1; //THIS FUNCTION SHOULD DELETE THE CHOSEN ROW FROM THE DATABASE MORE SPECIFICALLY THE SOLAR SYSTEM DATABASE
 }
@@ -1082,18 +1085,19 @@ void Spaceship::planet_destroyer(int desired_respect){
 void Spaceship::refill_vector(std::string vectortype){
     if(vectortype == "Planets"){
         for(int i = 0; i < planetnamesbuffer.size(); i++){
-            planetnames.push_back(planetnamesbuffer[i]);
+            planetnames.emplace_back(planetnamesbuffer[i]);
         }
     }
     else if(vectortype == "Stars"){
         for(int i = 0; i < starnamesbuffer.size(); i++){
-            starnames.push_back(starnamesbuffer[i]);
+            starnames.emplace_back(starnamesbuffer[i]);
         }
     }
 }
 
 void Spaceship::planet_interaction(){
-    if(planetnames.size() == 8){
+    std::cout<<"DBG: "<<planetnames.size()<<std::endl;
+    if(planetnames.size() <= 8){
         refill_vector("Planets");
     }
     int choice;
@@ -1175,22 +1179,19 @@ void Spaceship::planet_interaction(){
         }
     }
     else if(colony_approbation == "No" || colony_approbation == "no" || colony_approbation == "n" || colony_approbation == "NO" || colony_approbation == "N"){
-        std::cout<<"Your wishes are our commands master, you will still be given the option of making it a colony when you are back in this system"<<"\n"
-        <<"\n"
-        <<"\n"
-        <<std::endl;
+        std::cout<<"Your wishes are our commands master, you will still be given the option of making it a colony when you are back in this system"<<std::endl;
     }
+    std::cout<<"Type in the planet number you wish to visit "<<std::endl;
+    std::cin>>choice;
     if(_fuelcapacity < 2*(distancesmap[planets_number - 1] - distancesmap[choice - 1])){
         std::cout<<"You have no fuel capacity to travel to this planet"<<"\n"
         <<"Choose a closer planet, the last one will always be the closest"<<std::endl;
     }
     else{
-        std::cout<<"Type in the planet number you wish to visit "<<std::endl;
-        std::cin>>choice;
         _fuelcapacity -= 2*(distancesmap[planets_number - 1] - distancesmap[choice -1]); //Two megatons per million of km will be consumed
         if(planets[choice -1].getplanettype()== 1){
             int selection;
-            efficiency = 5* std::pow(17 - _slaveslevel - 1, 17 -_slaveslevel) * (2*planets[choice-1].getmetal()); //This way when the level
+            efficiency = 2 * std::pow(17 - _slaveslevel - 1, 17 -_slaveslevel) * (2*planets[choice-1].getmetal()); //This way when the level
             while(1){
                 std::cout<<"\n"
                 <<"<<LAVA PLANET>>"<<"\n"
@@ -1235,7 +1236,7 @@ void Spaceship::planet_interaction(){
 
         else if(planets[choice -1].getplanettype() == 2){
             int selection;
-            efficiency = 5* std::pow(17 - _slaveslevel - 1, 17 -_slaveslevel) * (2*planets[choice-1].getmetal()); //This way when the level
+            efficiency = 2 * std::pow(17 - _slaveslevel - 1, 17 -_slaveslevel) * (2*planets[choice-1].getmetal()); //This way when the level
             while(1){
                 std::cout<<"\n"
                 <<"<<DIAMOND PLANET>>"<<"\n"
@@ -1278,7 +1279,7 @@ void Spaceship::planet_interaction(){
 
         else if(planets[choice - 1].getplanettype() == 3){
             int selection;
-            efficiency = 5* std::pow(17 - _slaveslevel - 1, 17 -_slaveslevel) * (2*planets[choice-1].getmetal()); //This way when the level
+            efficiency = 2 * std::pow(17 - _slaveslevel - 1, 17 -_slaveslevel) * (2*planets[choice-1].getmetal()); //This way when the level
             while(1){
                 std::cout<<"\n"
                 <<"<<MERCURY PLANET>>"<<"\n"
@@ -1316,7 +1317,7 @@ void Spaceship::planet_interaction(){
         }
         else if(planets[choice -1].getplanettype() == 4){
             int selection;
-            efficiency = 5 * std::pow(17 - _slaveslevel - 1, 17 -_slaveslevel) * (2*planets[choice-1].getmetal()); //This way when the level is 17 the exponent will be zero!
+            efficiency = 2 * std::pow(17 - _slaveslevel - 1, 17 -_slaveslevel) * (2*planets[choice-1].getmetal()); //This way when the level is 17 the exponent will be zero!
             while(1){
                 std::cout<<"\n"
                 <<"<<HABITABLE OR POTENTIALLY HABITABLE PLANET>>"<<"\n"
@@ -1455,7 +1456,7 @@ void Spaceship::planet_interaction(){
 
         else if(planets[choice - 1].getplanettype() == 5){
             int selection;
-            efficiency = 5 * std::pow(17 - _slaveslevel, 17 - _slaveslevel) *(planets[choice-1].getmetal());
+            efficiency = 2 * std::pow(17 - _slaveslevel, 17 - _slaveslevel) *(planets[choice-1].getmetal());
             while(1){
                std::cout<<"\n"
                <<"<<FROZEN PLANET CONTAINING SIMPLE FORMS OF LIFE>>"<<"\n"
@@ -1521,7 +1522,7 @@ void Spaceship::planet_interaction(){
         }
         else if(planets[choice -1].getplanettype() == 6){
             int selection;
-            efficiency = 5 * std::pow(17 - _slaveslevel, 17 - _slaveslevel) * (planets[choice-1].getmetal());
+            efficiency = 2 * std::pow(17 - _slaveslevel, 17 - _slaveslevel) * (planets[choice-1].getmetal());
             while(1){
                 std::cout<<"\n"
                 <<"<<GAS GIANT>>"<<"\n"
@@ -2033,10 +2034,10 @@ void Spaceship::read_story(){
 
 std::string Spaceship::show_title(){
 return "   ___   ____  ____ ___   ___             ___   _____ ______________   ____      __                           \n"
-       "  |__ \ / __ \/ __ <  /  /   |  ____     /   | / ___// ____/  _/  _/  / __ \____/ /_  _______________  __  __ \n"
-       "      _/ / / / / / / /  / // | / | /\   / /| | \__ \/ /    / / / /   / / / / __  / / / / ___/ ___/ _ \/ / / / \n"
+       "  |__ \\ / __ \\/ __ <  /  /   |  ____     /   | / ___// ____/  _/  _/  / __ \\____/ /_  _______________  __  __ \n"
+       "      _/ / / / / / / /  / // | / | /\\   / /| | \\__ \\/ /    / / / /   / / / / __  / / / / ___/ ___/ _ \\/ / / / \n"
        " / __// / / / /_/_/ /  / /  _|/ / / /  / /   | __/ / /____/ /_/ /   / /_/ / /_/ / /_/ (__  |__  )  __/ /_/ /  \n"
-       "/____/\____/\____/_/  /_/  |_/_/ /_/  /_/  |_/____/\____/___/___/   \____/\__,_/\__, /____/____/\___/\__, /   \n"
+       "/____/\\____/\\____/_/  /_/  |_/_/ /_/  /_/  |_/____/\\____/___/___/   \\____/\\__,_/\\__, /____/____/\\___/\\__, /   \n"
        "                                                                               /____/               /____/ ";
 }
 
@@ -2073,7 +2074,7 @@ int Spaceship::cabin(){
                 <<"<<DEPOSITS>>"<<"\n"
                 <<"Fuel tank capacity for interplanetary travel: "<<_fuelcapacity<<"\n"
                 <<"Antimatter deposit to power WARP drive and planet destroyer: "<<_WARPdrive<<"\n"<<
-                "Do you want to charge the antimatter weapon"<<std::endl;
+                "Do you want to charge the antimatter weapon?"<<std::endl;
                 std::cin>>input;
                 if(input == "Yes" || input == "yes" || input == "YES" || input == "y" || input == "Y"){
                     while(1){
@@ -2095,6 +2096,7 @@ int Spaceship::cabin(){
                 }
                 else if(input == "no" || input == "No" || input == "NO" || input == "n" || input == "N"){
                     std::cout<<"Wise decision my lord, that amount of WARPdrive fuel will be needed for our interplanetary expeditions!"<<std::endl;
+                    break;
                 }
                 else if(input == "exit" || input == "EXIT" || input == "Exit"){
                     break;
@@ -2131,6 +2133,7 @@ int main()
     Spaceship s;
     s.cabin();
 }
+
 
 
 
