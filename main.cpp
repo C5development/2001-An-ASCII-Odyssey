@@ -983,26 +983,26 @@ void Spaceship::generate_stars_data_base(std::vector<Star> stars){
 
 int Spaceship::efficiency_calculation(int resources, int slaves){
     int efficiency;
-    int time;
+    int seconds;
     if(_slaveslevel > 0 && _slaveslevel <= 5){
         if(resources < 5000){
             slaves % 2 ? slaves = randRange(10, 15) : slaves = randRange(1, 5);
             efficiency = 20* 2 - slaves;
             if(efficiency > 30){
-                time = 3;
+                seconds = 3;
             }
             else
-                time = 4;
+                seconds = 4;
 
         }
         else if(resources > 5000){
             slaves % 2 ? slaves = randRange(10, 12) : slaves = randRange(1, 2);
             efficiency = 20 * 2 - slaves;
             if(efficiency > 30){
-                time = 4;
+                seconds = 4;
             }
             else
-                time = 5;
+                seconds = 5;
         }
     }
     else if(_slaveslevel > 5 && _slaveslevel <= 10){
@@ -1010,20 +1010,20 @@ int Spaceship::efficiency_calculation(int resources, int slaves){
             slaves % 2 ? slaves = randRange(10, 15) : slaves = randRange(1, 5);
             efficiency = randRange(10, 15) * 2 - slaves;
             if(efficiency >= 15){
-                time = 2;
+                seconds = 2;
             }
             else
-                time = 3;
+                seconds = 3;
 
         }
         else if(resources > 5000){
             slaves % 2 ? slaves = randRange(10, 12) : slaves = randRange(1, 2);
             efficiency = randRange(10, 15) * 2 - slaves;
             if(efficiency >= 15){
-                time = 3;
+                seconds = 3;
             }
             else
-                time = 4;
+                seconds = 4;
         }
     }
     else if(_slaveslevel > 10 && _slaveslevel <= 15){
@@ -1031,17 +1031,17 @@ int Spaceship::efficiency_calculation(int resources, int slaves){
             slaves % 2 ? slaves = randRange(10, 15) : slaves = randRange(1, 5);
             efficiency = randRange(5, 10) * 2 - slaves;
             if(efficiency > 15)
-                time = 1;
+                seconds = 1;
             else
-                time = 2;
+                seconds = 2;
         }
         else if(resources > 5000){
             slaves % 2 ? slaves = randRange(10, 12) : slaves = randRange(1, 2);
             efficiency = randRange(5, 10) * 2 - slaves;
             if(efficiency > 10)
-                time = 2;
+                seconds = 2;
             else
-                time = 3;
+                seconds = 3;
         }
     }
     else if(_slaveslevel > 15){
@@ -1049,21 +1049,21 @@ int Spaceship::efficiency_calculation(int resources, int slaves){
             slaves % 2 ? slaves = randRange(10, 15) : slaves = randRange(1, 5);
             efficiency = randRange(1, 5) * 2 - slaves;
             if(efficiency > 5)
-                time = 0;
+                seconds = 0;
             else
-                time = 1;
+                seconds = 1;
 
         }
         else if(resources > 5000){
             slaves % 2 ? slaves = randRange(10, 12) : slaves = randRange(1, 2);
             efficiency = randRange(1, 5) * 2 - slaves;
             if(efficiency > 5)
-                time = 1;
+                seconds = 1;
             else
-                time = 2;
+                seconds = 2;
         }
     }
-    return time;
+    return seconds;
 }
 
 void Spaceship::display_colonies(){
