@@ -692,7 +692,7 @@ class Spaceship
 
         void civilisation_interaction(int, int);
         void planet_interaction();
-        void stars_interaction();
+        std::vector<Star> stars_interaction();
         void interstellar_travel();
         int cabin();
         void classify_specimens();
@@ -752,12 +752,11 @@ std::string Spaceship::define_stars_name(){
 }
 
 
-void Spaceship::stars_interaction(){
+std::vector<Star> Spaceship::stars_interaction(){
         if(starnames.size() <= 25){
             refill_vector("Stars");
         }
         std::string starsname;
-        int starschoice;
         int stars_number = rand() % 20 + 5;
         std::vector<Star> stars(stars_number);
         std::cout<<"\n"
@@ -773,9 +772,7 @@ void Spaceship::stars_interaction(){
             stars[i].display_stars_data(starsname);
             std::cout<<std::endl;
         }
-        _WARPdrive -= 1000;
-        std::cin>>starschoice;
-        generate_stars_data_base(starschoice, stars);
+        return stars;
 }
 
 std::string Spaceship::define_planets_name(){
@@ -1054,9 +1051,9 @@ void Spaceship::generate_stars_data_base(int choice, std::vector<Star> stars){
 int Spaceship::efficiency_calculation(int resources, int slaves){
     int efficiency;
     int time;
-    if(_slaveslevel > 0 && _slaveslevel <= 5){
+    if(_slaveslevel >= 0 && _slaveslevel <= 5){
         if(resources < 5000){
-            slaves % 2 ? slaves = randRange(10, 15) : slaves = randRange(1, 5);
+            slaves % 2 == 0 ? slaves = randRange(10, 15) : slaves = randRange(1, 5);
             efficiency = 20* 2 - slaves;
             if(efficiency > 30){
                 time = 3;
@@ -1066,7 +1063,7 @@ int Spaceship::efficiency_calculation(int resources, int slaves){
 
         }
         else if(resources > 5000){
-            slaves % 2 ? slaves = randRange(10, 12) : slaves = randRange(1, 2);
+            slaves % 2 == 0 ? slaves = randRange(10, 12) : slaves = randRange(1, 2);
             efficiency = 20 * 2 - slaves;
             if(efficiency > 30){
                 time = 4;
@@ -1075,9 +1072,9 @@ int Spaceship::efficiency_calculation(int resources, int slaves){
                 time = 5;
         }
     }
-    else if(_slaveslevel > 5 && _slaveslevel <= 10){
+    else if(_slaveslevel >= 5 && _slaveslevel <= 10){
         if(resources < 5000){
-            slaves % 2 ? slaves = randRange(10, 15) : slaves = randRange(1, 5);
+            slaves % 2 == 0 ? slaves = randRange(10, 15) : slaves = randRange(1, 5);
             efficiency = randRange(10, 15) * 2 - slaves;
             if(efficiency >= 15){
                 time = 2;
@@ -1087,7 +1084,7 @@ int Spaceship::efficiency_calculation(int resources, int slaves){
 
         }
         else if(resources > 5000){
-            slaves % 2 ? slaves = randRange(10, 12) : slaves = randRange(1, 2);
+            slaves % 2  == 0 ? slaves = randRange(10, 12) : slaves = randRange(1, 2);
             efficiency = randRange(10, 15) * 2 - slaves;
             if(efficiency >= 15){
                 time = 3;
@@ -1098,7 +1095,7 @@ int Spaceship::efficiency_calculation(int resources, int slaves){
     }
     else if(_slaveslevel > 10 && _slaveslevel <= 15){
         if(resources < 5000){
-            slaves % 2 ? slaves = randRange(10, 15) : slaves = randRange(1, 5);
+            slaves % 2 == 0 ? slaves = randRange(10, 15) : slaves = randRange(1, 5);
             efficiency = randRange(5, 10) * 2 - slaves;
             if(efficiency > 15)
                 time = 1;
@@ -1106,7 +1103,7 @@ int Spaceship::efficiency_calculation(int resources, int slaves){
                 time = 2;
         }
         else if(resources > 5000){
-            slaves % 2 ? slaves = randRange(10, 12) : slaves = randRange(1, 2);
+            slaves % 2 == 0 ? slaves = randRange(10, 12) : slaves = randRange(1, 2);
             efficiency = randRange(5, 10) * 2 - slaves;
             if(efficiency > 10)
                 time = 2;
@@ -1114,9 +1111,9 @@ int Spaceship::efficiency_calculation(int resources, int slaves){
                 time = 3;
         }
     }
-    else if(_slaveslevel > 15){
+    else if(_slaveslevel >= 15){
         if(resources < 5000){
-            slaves % 2 ? slaves = randRange(10, 15) : slaves = randRange(1, 5);
+            slaves % 2 == 0 ? slaves = randRange(10, 15) : slaves = randRange(1, 5);
             efficiency = randRange(1, 5) * 2 - slaves;
             if(efficiency > 5)
                 time = 0;
@@ -1124,8 +1121,8 @@ int Spaceship::efficiency_calculation(int resources, int slaves){
                 time = 1;
 
         }
-        else if(resources > 5000){
-            slaves % 2 ? slaves = randRange(10, 12) : slaves = randRange(1, 2);
+        else if(resources >= 5000){
+            slaves % 2 == 0 ? slaves = randRange(10, 12) : slaves = randRange(1, 2);
             efficiency = randRange(1, 5) * 2 - slaves;
             if(efficiency > 5)
                 time = 1;
@@ -1175,7 +1172,7 @@ void Spaceship::generate_solar_data_base(std::vector<Planet>){
 //For the sake of consistency, read the planet interaction database (The most important one)
 //NOTE: That is A LOT of work, but that way you will get extra marks there is a week before the deadline we can get this shit done
 //and call it a day
-//Luckily, we already have a planet_interaction function, use that as a reference!! it is VITAL for the program to be consistent
+//Luckily, we already have a planet_interaction function, use that as a reference
 
 }
 
@@ -1426,7 +1423,8 @@ void Spaceship::planet_interaction(){
                     while(1){
                         std::cout<<"Tell us the amount of metal that you want my lord"<<std::endl;
                         std::cin>>desired_amount;
-                        efficiency = efficiency_calculation(slaves, planets[choice-1].getmetal());
+                        efficiency = efficiency_calculation(planets[choice - 1].getmetal(), slaves);
+                        std::cout<<efficiency<<std::endl;
                         if(desired_amount > planets[choice - 1].getmetal()){
                             std::cout<<"Try typing in the amount again"<<std::endl;
                         }
@@ -1803,6 +1801,7 @@ void Spaceship::interstellar_travel()
 
     int starschoice;
     int solarsystemchoice;
+    std::vector<Star> Stars;
     while(1){
         if(_WARPdrive <= 1000){
             std::cout<<"My lord, we have no fuel left, it is time for us to face death like brothers!"<<"\n"
@@ -1812,7 +1811,9 @@ void Spaceship::interstellar_travel()
             //The data base should be used here to display data from the user's colonies
             //and the current solar system where our character is
         }
-        stars_interaction();
+        Stars = stars_interaction();
+        std::cin>>starschoice;
+        generate_stars_data_base(starschoice, Stars);
         if(_fuelcapacity == 0){
             std::cout<<"My lord, we have no fuel left, it is time for us to face death like brothers!"<<"\n"
             <<"I must confess it's always been a pleasure for us to serve you"<<std::endl;
