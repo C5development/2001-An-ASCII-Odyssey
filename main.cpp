@@ -972,6 +972,8 @@ void Spaceship::assign_troops(int aliens, int drones, int cyborgs){
 }
 
 void Spaceship::battle_mode(int drones, int cyborgs, int enemies_drones, int enemies_cyborgs, int level){
+    int random_int = randRange(1000, 10000);
+
 
 
 
