@@ -757,6 +757,7 @@ void Spaceship::stars_interaction(){
             refill_vector("Stars");
         }
         std::string starsname;
+        int starschoice;
         int stars_number = rand() % 20 + 5;
         std::vector<Star> stars(stars_number);
         std::cout<<"\n"
@@ -1385,11 +1386,11 @@ void Spaceship::planet_interaction(){
             if(dead_solar_system){
                 std::cout<<"This solar system can be colonised"<<"\n"
                 <<"Since all of its planets are dead"<<std::endl;
-                colonise_solar_system();
+                colonise_solar_system(planets);
             }
             else if(!dead_solar_system)  //Planettype can still be four but potentially habitable
                 std::cout<<"There might be one or more potentially habitable planets in this solar system"<<std::endl;
-                colonise_solar_system();
+                colonise_solar_system(planets);
         }
         else if(!potential_colony){
             std::cout<<"You still must conquer those planets that are habitable"<<std::endl;
