@@ -11,6 +11,7 @@
 #include<thread>
 #include<chrono>
 #include<functional>
+#include<libsqlite.hpp>
 using namespace std::chrono;
 
 class Star
