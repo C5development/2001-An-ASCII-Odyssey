@@ -11,6 +11,7 @@
 #include<thread>
 #include<chrono>
 #include<functional>
+#include<libsqlite.hpp>
 using namespace std::chrono;
 
 class Star
@@ -1196,6 +1197,11 @@ void Spaceship::to_solar_system(){
 
     std::cout<<"Puta"<<std::endl;
 
+}
+
+void Spaceship::assign_troops(long aliens, int enemies_drones, int enemies_cyborgs){
+    
+    
 }
 
 void Spaceship::civilisation_interaction(int desired_respect, int aliens){

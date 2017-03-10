@@ -1,0 +1,67 @@
+CREATE TABLE users
+(
+    Username TEXT PRIMARY KEY, 
+    password VARCHAR,
+);
+
+CREATE TABLE users_data
+(
+    Username TEXT PRIMARY KEY,
+    Level INTEGER,
+    Soldierslevel INTEGER,
+    Scientistslevel INTEGER,
+    Slaveslevel INTEGER,
+    Diamonds INTEGER,
+    Fuel INTEGER,
+    WARPdrive INTEGER,
+    Protozoo  INTEGER,
+    Pseudomona INTEGER,
+    Staphilloccocus INTEGER,
+    Metal INTEGER,
+    Drones INTEGER,
+    Cyborgs INTEGER,
+    Points INTEGER,
+    Defeats INTEGER,
+    Victories INTEGER,
+    Colonies INTEGER,
+    FOREIGN KEY Username REFERENCES users(Username)
+);
+
+CREATE TABLE colonies
+(
+    Username TEXT PRIMARY KEY,
+    Realm TEXT,
+    number INTEGER,
+    FOREIGN KEY Username REFERENCES users(Username)
+);
+
+CREATE planets
+(
+    Realm TEXT PRIMARY KEY,
+    Number INTEGER,
+    Letter TEXT,
+    Name TEXT,
+    Type TEXT,
+    Temperature INTEGER,
+    Surface REAL,
+    Magneticfield INTEGER,
+    Resources INTEGER,
+    Distance INTEGER,
+    Eccentricity REAL,
+    Rotation INTEGER,
+    FOREIGN KEY Number REFERENCES planets(number)
+);
+
+CREATE resources 
+(
+    Letter TEXT PRIMARY KEY,
+    Protozoo INTEGER,
+    Pseudomona INTEGER,
+    Staphilloccocus INTEGER,
+    Metal INTEGER,
+    Mercury INTEGER,
+    Gas INTEGER,
+    Diamonds INTEGER,
+    Specimens INTEGER,
+    FOREIGN KEY Letter REFERENCES planets(Letter)
+);
