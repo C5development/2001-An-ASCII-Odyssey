@@ -1,0 +1,83 @@
+CREATE TABLE users
+(
+    Username TEXT PRIMARY KEY, 
+    password VARCHAR,
+);
+
+CREATE TABLE users_data
+(
+    Username TEXT PRIMARY KEY,
+    Level INTEGER,
+    Soldierslevel INTEGER,
+    Scientistslevel INTEGER,
+    Slaveslevel INTEGER,
+    Diamonds INTEGER,
+    Fuel INTEGER,
+    WARPdrive INTEGER,
+    Protozoo  INTEGER,
+    Pseudomona INTEGER,
+    Staphilloccocus INTEGER,
+    Metal INTEGER,
+    Drones INTEGER,
+    Cyborgs INTEGER,
+    Points INTEGER,
+    Defeats INTEGER,
+    Victories INTEGER,
+    Colonies INTEGER,
+    FOREIGN KEY Username REFERENCES users(Username)
+);
+
+CREATE TABLE colonies
+(
+    Username TEXT PRIMARY KEY,
+    Realm TEXT,
+    number INTEGER,
+    FOREIGN KEY Username REFERENCES users(Username)
+);
+
+CREATE TABLE planets
+(
+    Realm TEXT PRIMARY KEY,
+    Number INTEGER,
+    Letter TEXT,
+    Name TEXT,
+    Type TEXT,
+    Temperature INTEGER,
+    Surface REAL,
+    Magneticfield INTEGER,
+    Resources INTEGER,
+    Distance INTEGER,
+    Eccentricity REAL,
+    Rotation INTEGER,
+    FOREIGN KEY Number REFERENCES planets(number)
+); //ID must be generated in C++ by extracting the number of the colony and inserting it along with the planet's letter into the resources database 
+
+CREATE TABLE resources 
+(
+    _id TEXT PRIMARY KEY,
+    Resources INTEGER,
+    Protozoo INTEGER,
+    Pseudomona INTEGER,
+    Staphilloccocus INTEGER,
+    Metal INTEGER,
+    Mercury INTEGER,
+    Gas INTEGER,
+    Diamonds INTEGER,
+    Specimens INTEGER,
+    FOREIGN KEY Resources REFERENCES planets(Resources)
+);
+
+CREATE TABLE solarsystem
+(   
+    Number INTEGER,
+    Letter TEXT,
+    Name TEXT,
+    Type TEXT,
+    Temperature INTEGER,
+    Surface REAL,
+    Magneticfield INTEGER,
+    Resources INTEGER,
+    Distance INTEGER,
+    Eccentricity REAL,
+    Rotation INTEGER,
+);
