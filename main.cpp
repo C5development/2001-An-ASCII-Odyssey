@@ -11,6 +11,8 @@
 #include<thread>
 #include<chrono>
 #include<functional>
+#include<libsqlite.hpp>
+
 using namespace std::chrono;
 
 class Star
@@ -1198,6 +1200,12 @@ void Spaceship::to_solar_system(){
 
 }
 
+void Spaceship::assign_troops(long aliens, int enemies_drones, int enemies_cyborgs){
+    enemies_drones = randRange(std::round(aliens/2), aliens);
+    enemies_cyborgs = randRange(100000, std::round(aliens/2));
+    
+}
+
 void Spaceship::civilisation_interaction(int desired_respect, int aliens){
     std::vector<std::string> civilisationsnames = {"Epthot", "Quni", "Gowan", "Geeceind", "Srekloa", "Smorthue", "Absu", "Oimnere", "Lizul", "Thelzahue", "Qolush", "Vlesruom", "Twakten", "Vantoh", "Qefill", "Druzguo"};
     int enemies_level;
@@ -2379,6 +2387,7 @@ int main()
     Spaceship s;
     s.cabin();
 }
+
 
 
 
