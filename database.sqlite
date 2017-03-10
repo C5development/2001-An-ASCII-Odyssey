@@ -50,11 +50,12 @@ CREATE planets
     Eccentricity REAL,
     Rotation INTEGER,
     FOREIGN KEY Number REFERENCES planets(number)
-);
+); //ID must be generated in C++ by extracting the number of the colony and inserting it along with the planet's letter into the resources database 
 
 CREATE resources 
 (
-    Letter TEXT PRIMARY KEY,
+    _id TEXT PRIMARY KEY,
+    Resources INTEGER,
     Protozoo INTEGER,
     Pseudomona INTEGER,
     Staphilloccocus INTEGER,
@@ -63,5 +64,5 @@ CREATE resources
     Gas INTEGER,
     Diamonds INTEGER,
     Specimens INTEGER,
-    FOREIGN KEY Letter REFERENCES planets(Letter)
+    FOREIGN KEY Resources REFERENCES planets(Resources)
 );
