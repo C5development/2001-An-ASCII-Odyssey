@@ -8,7 +8,11 @@
 #include<algorithm>
 #include<fstream>
 #include<unistd.h> //Import the sleep function (only works with linux compiler)
-#include<printf.h>
+#include<thread>
+#include<chrono>
+#include<functional>
+using namespace std::chrono;
+
 class Star
 {
 
@@ -660,6 +664,8 @@ class Spaceship
     static std::vector<std::string> planetnamesbuffer;
     static std::vector<std::string> starnamesbuffer;
     static int starsnumber;
+    static void casualties(long, int);
+    static void battle_mode(int, int, int, int, int);
 
     private:
 
@@ -676,12 +682,12 @@ class Spaceship
         int _staphilococcuslevels = 200;
         int _pseudomonalevels = 0;
         int _evolutionexpressaccelerator = 0;
-        int _drones = 0;
-        int _armors = 0;
+        int _drones = 1000000;
+        int _armors = 10000;
         int _soldierspoints = 0;
         int _scientistspoints = 0;
         int _slavespoints = 5;
-        int _soldierslevel = 0;
+        static int _soldierslevel;
         int _scientistslevel = 5;
         int _slaveslevel = 0;
         int _points;
@@ -709,8 +715,7 @@ class Spaceship
         void planet_destroyer(int);
         void civilisation_history(std::string, std::string, int);
         void surrender_treaty(std::string, std::string);
-        void assign_troops(int, int, int);
-        void battle_mode(int, int, int, int, int);
+        void assign_troops(long, int, int);
         void refill_vector(std::string);
         void to_solar_system();
         void display_planets_database();
@@ -737,6 +742,7 @@ std::vector<std::string> Spaceship::starnamesbuffer;
 
 int Spaceship::starsnumber; //IMPORTANT We might need to create a function that updates the value using the database
 //The reason for this is that once the program is initialised again the variable will also be initialised and set to zero!
+int Spaceship::_soldierslevel;
 
 int Spaceship::randRange(int low, int high)
 {
@@ -935,6 +941,7 @@ void Spaceship::civilisation_history(std::string social_structure, std::string c
     }
 }
 
+
 void Spaceship::surrender_treaty(std::string social_structure, std::string civilisationname){
 //Reads the surrender treaties from text files
     if(social_structure == "Techno fascist regime"){
@@ -953,30 +960,34 @@ void Spaceship::surrender_treaty(std::string social_structure, std::string civil
 
 
 
-void Spaceship::assign_troops(int aliens, int drones, int cyborgs){
-    int warriors;
-
-    if(aliens % 2 == 0){
-        warriors = aliens/2;
-        aliens -= warriors;
-        drones = std::abs(randRange(warriors, warriors/2));
-        cyborgs = std::abs(randRange(warriors, warriors/2));
-    }
-    else if(aliens % 2 != 0){
-        aliens += 1;
-        warriors = aliens/2;
-        aliens -= warriors;
-        drones = std::abs(randRange(warriors, warriors/2));
-        cyborgs = std::abs(randRange(warriors, warriors/2));
+void Spaceship::casualties(long warriors, int level){
+    int nanoseconds = 17 - level;
+    int surrender_limit = 100000;
+    while(warriors < surrender_limit){
+        usleep(nanoseconds);
+        warriors -= 1;
     }
 }
 
 void Spaceship::battle_mode(int drones, int cyborgs, int enemies_drones, int enemies_cyborgs, int level){
-    int random_int = randRange(1000, 10000);
-
-
-
-
+    //One processor to rule them all, One processor to find them,
+    //One processor to bring them all and in the darkness bind them
+    int player_warriors = drones + cyborgs;
+    int enemy_warriors = enemies_drones + enemies_cyborgs;
+    high_resolution_clock::time_point s1 = high_resolution_clock::now();
+    std::thread t1(casualties, player_warriors, level);
+    t1.join();
+    high_resolution_clock::time_point s2 = high_resolution_clock::now();
+    high_resolution_clock::time_point p1 = high_resolution_clock::now();
+    std::thread t2(casualties, enemy_warriors, _soldierslevel);
+    t2.join();
+    high_resolution_clock::time_point p2 = high_resolution_clock::now();
+    auto players_duration = duration_cast<microseconds>(s2 - s1).count();
+    auto enemys_duration = duration_cast<microseconds>(p2 - p1).count();
+    if(players_duration >= enemys_duration)
+        std::cout<<"Victory"<<std::endl;
+    else if(players_duration < enemys_duration)
+        std::cout<<"Defeat"<<std::endl;
 }
 
 void Spaceship::colonise_solar_system(std::vector<Planet> planets){
@@ -1267,7 +1278,7 @@ void Spaceship::civilisation_interaction(int desired_respect, int aliens){
                             done = true;
 
                     case 2: civilisation_history(social_structure, civilisationsnames[rand() % civilisationsnames.size()], enemies_level);
-
+                            break;
             }
         }
     }
@@ -1301,11 +1312,13 @@ void Spaceship::refill_vector(std::string vectortype){
     if(vectortype == "Planets"){
         for(int i = 0; i < planetnamesbuffer.size(); i++){
             planetnames.emplace_back(planetnamesbuffer[i]);
+            planetnamesbuffer.erase(planetnamesbuffer.begin());
         }
     }
     else if(vectortype == "Stars"){
         for(int i = 0; i < starnamesbuffer.size(); i++){
             starnames.emplace_back(starnamesbuffer[i]);
+            starnamesbuffer.erase(starnamesbuffer.begin());
         }
     }
 }
@@ -1549,7 +1562,7 @@ void Spaceship::planet_interaction(){
                     std::string missingelement1;
                     std::string missingelement2;
                     std::string missingelement3;
-                    int aliens = randRange(1000000, 5000000);
+                    long aliens = randRange(1000000, 5000000);
                     if(planets[choice - 1].gethabitability() == false){
                         if(planets[choice - 1].getbreathableatmosphere() == true){
                              while(1){
