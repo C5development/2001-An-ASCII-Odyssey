@@ -35,7 +35,7 @@ CREATE TABLE colonies
     FOREIGN KEY Username REFERENCES users(Username)
 );
 
-CREATE planets
+CREATE TABLE planets
 (
     Realm TEXT PRIMARY KEY,
     Number INTEGER,
@@ -52,7 +52,7 @@ CREATE planets
     FOREIGN KEY Number REFERENCES planets(number)
 ); //ID must be generated in C++ by extracting the number of the colony and inserting it along with the planet's letter into the resources database 
 
-CREATE resources 
+CREATE TABLE resources 
 (
     _id TEXT PRIMARY KEY,
     Resources INTEGER,
@@ -65,4 +65,19 @@ CREATE resources
     Diamonds INTEGER,
     Specimens INTEGER,
     FOREIGN KEY Resources REFERENCES planets(Resources)
+);
+
+CREATE TABLE solarsystem
+(   
+    Number INTEGER,
+    Letter TEXT,
+    Name TEXT,
+    Type TEXT,
+    Temperature INTEGER,
+    Surface REAL,
+    Magneticfield INTEGER,
+    Resources INTEGER,
+    Distance INTEGER,
+    Eccentricity REAL,
+    Rotation INTEGER,
 );

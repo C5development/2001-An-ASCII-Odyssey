@@ -12,6 +12,7 @@
 #include<chrono>
 #include<functional>
 #include<libsqlite.hpp>
+
 using namespace std::chrono;
 
 class Star
@@ -1200,7 +1201,8 @@ void Spaceship::to_solar_system(){
 }
 
 void Spaceship::assign_troops(long aliens, int enemies_drones, int enemies_cyborgs){
-    
+    enemies_drones = randRange(std::round(aliens/2), aliens);
+    enemies_cyborgs = randRange(100000, std::round(aliens/2));
     
 }
 
