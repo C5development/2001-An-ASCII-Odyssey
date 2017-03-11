@@ -74,7 +74,7 @@ void Star::display_stars_data(std::string star_name){
     std::cout<<"|--"<<star_name<<"--|"<<"\n"
     <<"Type of star: "<<startype<<"\n"
     <<"Star's temperature: "<<_starsheat<<" celcius"<<"\n"
-    <<"Star's surface :"<<_starssurface<<" millions of square km"<<"\n"
+    <<"Star's surface :"<<_starssurface<<" million square km"<<"\n"
     <<"Star's radiaton level :"<<_starsradiation<<std::endl;
 }
 
