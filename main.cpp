@@ -11,6 +11,8 @@
 #include<thread>
 #include<chrono>
 #include<functional>
+#include<Windows.h>
+#include<MMSystem.h>
 using namespace std::chrono;
 
 class Star
@@ -695,7 +697,7 @@ class Spaceship
 
 
     public:
-
+        int backgroundmusic();
         void civilisation_interaction(int, int);
         void planet_interaction();
         std::vector<Star> stars_interaction();
@@ -2379,6 +2381,13 @@ int Spaceship::cabin(){
     }
 }
 
+
+    int Spaceship::backgroundmusic()
+{
+    PlaySound(TEXT("file.wav"), NULL, SND_SYNC);
+    system("pause");
+    return 0;
+}
 
 int main()
 {
