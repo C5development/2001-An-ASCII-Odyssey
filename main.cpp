@@ -669,9 +669,12 @@ class Spaceship
     static void battle_processor(int, int, int, int, int);
     static int _drones;
     static int _armors;
+    static int _bombs;
     static void logic_gates(int, int);
     static void battle_reports(int, int, int, int, int, int);
-    static void battle_preparation(int, int, int);
+    static void battle_preparation(int, int, int, float, float, bool);
+    static void damage_calculation(std::string, int, int);
+
     private:
 
         int _diamondsamount = 1234257463; //This is the amount that will be spent on manufacturing processes
@@ -680,7 +683,7 @@ class Spaceship
         int _fuelcapacity = 134135; //This will be used to refill fuel tanks
         int _WARPdrive = 10000; //This is going to be used to power the interstellar travelling mode
         int _antimatterweapon; //Planetdestroyer
-        int _soldiers = 12335; //Soldiers to subyugate other civilisations
+        int _soldiers = 12335; //Soldiers to subjugate other civilisations
         int _scientists = 12334; //Scientists to perfom experiments on subyugated civilisations
         int _slaves = 12345; //Slaves are going to be used to extract minerals from other planets
         int _protozoolevels = 0; //In theory only WARP drive and fuel should be set
@@ -745,6 +748,8 @@ std::vector<std::string> Spaceship::starnamesbuffer;
 int Spaceship::_drones = 100000;
 
 int Spaceship::_armors = 10000;
+
+int Spaceship::_bombs = 10000;
 
 int Spaceship::starsnumber; //IMPORTANT We might need to create a function that updates the value using the database
 //The reason for this is that once the program is initialised again the variable will also be initialised and set to zero!
@@ -964,11 +969,232 @@ void Spaceship::surrender_treaty(std::string social_structure, std::string civil
     }
 }
 
+void Spaceship::damage_calculation(std::string attack_type, int targets, int hp){
 
 
-void Spaceship::battle_preparation(int enemies_drones, int enemies_cyborgs, int enemies_level){
 }
 
+
+void Spaceship::battle_preparation(int enemies_drones, int enemies_cyborgs, int enemies_level, float energy, float enemy_energy, bool turn){
+    std::vector<std::string> reports;
+    int choice;
+    int amount;
+    int morale = 100;
+    int enemy_morale = 100;
+    int enemy_cyborgs_hp = 50 * enemies_level + morale;
+    int enemy_drones_hp = 100 * enemies_level + morale;
+    int cyborgs_hp = 50 * _soldierslevel + morale;
+    int drones_hp = 100 * _soldierslevel + morale;
+    while(1){
+        std::cout<<"<---HEADQUARTERS--->"<<"\n"
+        <<"1. Cyborg attack\n"
+        <<"2. Drones attack\n"
+        <<"3. Metallurgy"<<std::endl;
+        std::cin>>choice;
+        switch(choice){
+
+            case 1: while(1){
+                        if(turn){
+                            std::cout<<std::endl;
+                            std::cout<<"<--CYBORG HEADQUARTERS-->\n"
+                            <<"Welcome commander! we are pleased to serve you!\n"
+                            <<"Tell us what to do my master\n"<<"\n"
+                            <<"1. Annihilate civilians(it will have an effect on the enemy's morale,)\n"
+                            <<"2. Attack enemy(reduce the enemy's army)\n"
+                            <<"3  Return"<<std::endl;
+                            std::cin>>choice;
+                        }
+                        else
+                            choice = rand() % 2 + 1;
+                        switch(choice){
+
+                            case 1: while(1){
+                                        std::cout<<std::endl;
+                                        if(turn){
+                                            std::cout<<"How many civilians do you want to kill my master?"<<std::endl;
+                                            std::cin>>amount;
+                                            if(energy < std::floor(amount/2.0) || _armors < amount){
+                                                std::cout<<std::endl;
+                                                std::cout<<"My lord these are our available resources"<<"\n"
+                                                <<"Energy: "<<energy<<"\n"
+                                                <<"Armors: "<<_armors<<"\n"
+                                                <<"\n"<<std::endl;
+                                            }
+                                            else
+                                                energy -= std::floor(amount / 2.0);
+                                                damage_calculation("Civilians attack", amount, 100.0);
+                                                break;
+                                        }
+                                        else{
+                                            if(enemy_energy > 5000000){
+                                                while(1){
+                                                    amount = rand() % _armors - std::floor(_armors/ 3.0);
+                                                    energy -= std::floor(amount / 2.0);
+                                                    if(energy > std::floor(amount / 2.0) && enemies_cyborgs > amount){
+                                                        break;
+                                                    }
+                                                    else
+                                                        continue;
+                                                }
+                                                damage_calculation("Civilians attack", amount, 100.0);
+                                                break;
+
+                                            }
+                                            else{
+                                                while(1){
+                                                    amount = rand() % _armors - std::floor(_armors/ 5.0);
+                                                    energy -= std::floor(amount / 2.0);
+                                                    if(energy > std::floor(amount / 2.0) && enemies_cyborgs > amount){
+                                                        break;
+                                                    }
+                                                    else
+                                                        continue;
+                                                }
+                                                damage_calculation("Civilians attack", amount, 100.0);
+                                                break;
+                                            }
+
+                                     }
+                                }
+                                break;
+
+                            case 2: while(1){
+                                        if(turn){
+                                            std::cout<<"How many enemies do you want to kill my master?"<<std::endl;
+                                            std::cin>>amount;
+                                            if(energy < std::floor(enemies_cyborgs/2.0) || enemies_cyborgs < amount){
+                                                std::cout<<std::endl;
+                                                std::cout<<"My lord these are our available resources"<<"\n"
+                                                <<"Energy: "<<energy<<"\n"
+                                                <<"Armors: "<<_armors<<"\n"
+                                                <<"\n"<<std::endl;
+                                            }
+                                            else
+                                                energy -= std::floor(amount / 2.0);
+                                                damage_calculation("Cyborgs attack", amount, enemy_cyborgs_hp);
+                                                break;
+                                        }
+                                        else{
+                                            if(enemy_energy > 5000000){
+                                                while(1){
+                                                    amount = rand() % enemies_cyborgs - std::floor(enemies_cyborgs/ 3.0);
+                                                    energy -= std::floor(amount / 2.0);
+                                                    if(energy > std::floor(amount / 2.0) && enemies_cyborgs > amount){
+                                                        break;
+                                                    }
+                                                    else
+                                                        continue;
+                                                }
+                                                damage_calculation("Cyborgs attack", amount, cyborgs_hp);
+                                                break;
+
+                                            }
+                                            else{
+                                                while(1){
+                                                    amount = rand() % enemies_cyborgs - std::floor(enemies_cyborgs/ 5.0);
+                                                    energy -= std::floor(amount / 2.0);
+                                                    if(energy > std::floor(amount / 2.0) && enemies_cyborgs > amount){
+                                                        break;
+                                                    }
+                                                    else
+                                                        continue;
+                                                }
+                                                damage_calculation("Cyborgs attack", amount, cyborgs_hp);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    break;
+                            case 3: break;
+
+
+                        }
+                    }
+            case 2: while(1){
+                        if(turn){
+                            std::cout<<std::endl;
+                            std::cout<<"<--DRONES HEADQUARTERS-->"<<"\n"
+                            <<"1. Bombard planet\n"
+                            <<"2. Kamikazee attack\n"
+                            <<"3. Return"<<std::endl;
+                            std::cin>>choice;
+                        }
+                        else
+                            choice = rand() % 2 + 1;
+                        switch(choice){
+
+                            case 1: while(1){
+                                        std::cout<<std::endl;
+                                        if(turn){
+                                            std::cout<<"<--DRONES HEADQUARTER-->"<<"\n"
+                                            <<"Lord let us know how many bombs you want each drone to drop!"<<std::endl;
+                                            std::cin>>amount;
+                                            if(amount > _bombs || energy < std::floor(amount / 2.0)){
+                                                std::cout<<"My lord this is the current amount of resources you have at disposal"<<"\n"
+                                                <<"Bombs: "<<_bombs<<"\n"
+                                                <<"Drones: "<<_drones<<"\n"
+                                                <<"Energy: "<<energy<<"\n"
+                                                <<std::endl;
+                                            }
+                                            else
+                                                std::cout<<std::endl;
+                                                std::cout<<"Now my lord, type in the amount of drones you want to send for this attack\n"<<std::endl;
+                                                std::cin>>amount;
+                                                if(amount > _drones || energy < std::floor(amount / 2.0)){
+                                                    std::cout<<"My lord, this is the current amount of resources you have at disposal"<<"\n"
+                                                    <<"Bombs: "<<_bombs<<"\n"
+                                                    <<"Drones: "<<_drones<<"\n"
+                                                    <<"Energy: "<<energy<<"\n"
+                                                    <<std::endl;
+                                                }
+                                                else
+                                                    std::cout<<std::endl;
+                                                    std::cout<<"Fantastic my lord, we will send our drones to this miserable planet!\n"
+                                                    <<"and take these dirty inferior beings to an intergalactic hell...\n"<<std::endl;
+                                                    damage_calculation("Drone bombardment", _drones*_bombs, enemy_drones_hp);
+
+                                        }
+                                        else{
+                                            if(enemy_energy > 5000000){
+                                                while(1){
+                                                    amount = rand() % enemies_cyborgs - std::floor(enemies_cyborgs/ 3.0);
+                                                    energy -= std::floor(amount / 2.0);
+                                                    if(energy > std::floor(amount / 2.0) && enemies_cyborgs > amount){
+                                                        break;
+                                                    }
+                                                    else
+                                                        continue;
+                                                }
+                                                damage_calculation("Drone bombardment", amount, drones_hp);
+                                                break;
+
+                                            }
+                                            else{
+                                                while(1){
+                                                    amount = rand() % enemies_cyborgs - std::floor(enemies_cyborgs/ 5.0);
+                                                    energy -= std::floor(amount / 2.0);
+                                                    if(energy > std::floor(amount / 2.0) && enemies_cyborgs > amount){
+                                                        break;
+                                                    }
+                                                    else
+                                                        continue;
+                                                }
+                                                damage_calculation("Drone bombardment", amount, drones_hp);
+                                                break;
+                                            }
+                                        }
+
+                                    }
+
+                            case 2: ;
+
+                        }
+                    }
+                    break;
+
+        }
+    }
+}
 void Spaceship::troops_AI(){
 
 }
@@ -1150,7 +1376,7 @@ void Spaceship::to_solar_system(){
 
 void Spaceship::assign_troops(long aliens, int enemies_drones, int enemies_cyborgs){
     enemies_drones = randRange(std::round(aliens/2), aliens);
-    enemies_cyborgs = randRange(100000, std::round(aliens/2));
+    enemies_cyborgs = randRange(1000000, std::floor(aliens/2.0));
 
 }
 
@@ -1162,7 +1388,10 @@ void Spaceship::civilisation_interaction(int desired_respect, int aliens){
     int surrender_calculation;
     int enemies_drones;
     int enemies_cyborgs;
-    int choice;
+    int selection;
+    float energy = 10000000.0;
+    float enemy_energy = 10000000.0;
+    bool turn = true;
     bool surrender = false;
     bool done = false;
     std::string social_structure;
@@ -1228,9 +1457,10 @@ void Spaceship::civilisation_interaction(int desired_respect, int aliens){
             <<"The confidential reports must be read in order to find out the enemy's level"<<"\n"
             <<"1. Start battle"<<"\n"
             <<"2. Confidential reports from intelligence agency"<<std::endl;
-            std::cin>>choice;
-            switch(choice){
-                    case 1: battle_preparation(enemies_drones, enemies_cyborgs, enemies_level);
+            std::cin>>selection;
+            switch(selection){
+                    case 1: battle_preparation(enemies_drones, enemies_cyborgs, enemies_level, energy, enemy_energy, turn);
+                            //Function switching turns
                             break;
 
 
