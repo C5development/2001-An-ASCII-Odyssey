@@ -658,7 +658,7 @@ Planet::Planet(){
 
 class Spaceship
 {
-
+    static int _specimens;
     static std::vector<std::string> planetnames;
     static std::vector<std::string> starnames;
     static std::vector<std::string> planetnamesbuffer;
@@ -671,18 +671,20 @@ class Spaceship
     static int _armors;
     static int _missiles;
     static int _bombs;
+    static int _metalamount;
+    static int _slaveslevel;
     static void logic_gates(int, int);
     static void battle_reports(int, int, int, int, int, int);
     static void battle_preparation(int, int, int, float, float, bool);
     static void damage_calculation(std::string, int, float);
     static int _soldierslevel;
     static int (randRange(int, int));
+    static void methalurgy();
+    static int efficiency_calculation(int, int);
 
     private:
 
         int _diamondsamount = 1234257463; //This is the amount that will be spent on manufacturing processes
-        int _specimens = 12355839;
-        int _metalamount = 15678; //This will be used for the weapons creation
         int _fuelcapacity = 134135; //This will be used to refill fuel tanks
         int _WARPdrive = 10000; //This is going to be used to power the interstellar travelling mode
         int _antimatterweapon; //Planetdestroyer
@@ -697,7 +699,6 @@ class Spaceship
         int _scientistspoints = 0;
         int _slavespoints = 5;
         int _scientistslevel = 5;
-        int _slaveslevel = 0;
         int _points;
         int _overalllevel;
 
@@ -713,7 +714,6 @@ class Spaceship
         void assign_points(int, std::string);
         void laboratory();
         int genetical_modification(int, std::vector<char>, std::vector<int>);
-        void methalurgy();
         void setlevel(int, std::string, int, int, int, int, int, bool, std::vector<int>, std::vector<int>);
         void purchasepoints(int);
         void pointstransaction(int);
@@ -728,7 +728,6 @@ class Spaceship
         void refill_vector(std::string);
         void to_solar_system();
         void display_planets_database();
-        int efficiency_calculation(int, int);
         void generate_solar_data_base(std::vector<Planet>);
         void display_colonies();
         std::string show_title();
@@ -746,6 +745,8 @@ std::vector<std::string> Spaceship::starnames = {"Acamar", "Adhafera", "Kornepho
 
 std::vector<std::string> Spaceship::starnamesbuffer;
 
+int Spaceship::_metalamount = 150000;
+
 int Spaceship::_drones = 100000;
 
 int Spaceship::_armors = 10000;
@@ -754,9 +755,13 @@ int Spaceship::_bombs = 10000;
 
 int Spaceship:: _missiles = 10000;
 
+int Spaceship::_specimens = 194821;
+
+int Spaceship::_slaveslevel;
+
 int Spaceship::starsnumber; //IMPORTANT We might need to create a function that updates the value using the database
 //The reason for this is that once the program is initialised again the variable will also be initialised and set to zero!
-int Spaceship::_soldierslevel;
+int Spaceship::_soldierslevel = 0;
 
 int Spaceship::randRange(int low, int high)
 {
@@ -977,6 +982,19 @@ void Spaceship::damage_calculation(std::string attack_type, int targets, float h
 
 }
 
+
+void Spaceship::troops_AI(){
+
+}
+
+void Spaceship::troops_commander(int level){
+    bool done = false;
+    int energy = 1000000 * level;
+    while(!done){
+        ;
+    }
+
+}
 
 void Spaceship::battle_preparation(int enemies_drones, int enemies_cyborgs, int enemies_level, float energy, float enemy_energy, bool turn){
     std::vector<std::string> reports;
@@ -1266,29 +1284,12 @@ void Spaceship::battle_preparation(int enemies_drones, int enemies_cyborgs, int 
                         }
                     }
                     break;
-            case 3: while(1){
-                        std::cout<<std::endl;
-                        std::cout<<"<--Metallurgy laboratory\n"
-                        <<"1. Drones\n"
-                        <<"2. Cyborgs\n"
-                        <<"3. Bombs\n"
-                        <<"4. Missiles"<<std::endl;
-                    }
+            case 3: methalurgy();
+                    break;
         }
     }
 }
-void Spaceship::troops_AI(){
 
-}
-
-void Spaceship::troops_commander(int level){
-    bool done = false;
-    int energy = 1000000 * level;
-    while(!done){
-        ;
-    }
-
-}
 
 void Spaceship::battle_reports(int warriors, int surrender_limit, int deaths, int arbitrary_stop, int adjustment, int nanoseconds){
     int results;
@@ -2420,7 +2421,9 @@ void Spaceship::methalurgy(){
         <<"Specimens: "<<_specimens<<"\n"
         <<"1. Drones factory"<<"\n"
         <<"2. Cyborg's armors and weapons"<<"\n"
-        <<"3. Exit"<<std::endl;
+        <<"3. Bombs\n"
+        <<"4. Missiles\n"
+        <<"5. Exit" <<std::endl;
         std::cin>>choice;
         switch(choice){
 
@@ -2441,6 +2444,7 @@ void Spaceship::methalurgy(){
                             <<"Type in a smaller amount!"<<std::endl;
                             std::cin>>choice;
                         }
+                        usleep(efficiency_calculation(choice, 1000));
                         _metalamount -= choice * 25;
                         _drones += choice;
                         if(_specimens < _drones){
@@ -2458,6 +2462,7 @@ void Spaceship::methalurgy(){
                     else if(choice == 0)
                         break;
                     else if(_metalamount > choice * 25){
+                        usleep(efficiency_calculation(choice, 1000));
                         _metalamount -= choice * 25;
                         _drones += choice;
                         if(_specimens < _drones){
@@ -2492,6 +2497,7 @@ void Spaceship::methalurgy(){
                             <<"Type in a smaller amount!"<<std::endl;
                             std::cin>>choice;
                         }
+                        usleep(efficiency_calculation(choice, 1000));
                         _metalamount -= choice * 17;
                         _armors += choice;
                         if(_specimens < _armors){
@@ -2509,6 +2515,7 @@ void Spaceship::methalurgy(){
                     else if(choice == 0)
                         break;
                     else if(_metalamount > choice * 17){
+                        usleep(efficiency_calculation(choice, 1000));
                         _metalamount -= choice * 17;
                         _armors += choice;
                         if(_specimens < _armors){
@@ -2522,9 +2529,68 @@ void Spaceship::methalurgy(){
                             break;
                         }
                     }
+                    break;
 
-            case 3: break;
-
+            case 3: std::cout<<std::endl;
+                    std::cout<<"Metal: "<<_metalamount<<"\n"
+                    <<"Bomb's price: "<<"10"<<"\n"
+                    <<"\n"<<std::endl;
+                    std::cout<<"How many bombs?"<<std::endl;
+                    std::cin>>choice;
+                    if(_metalamount == 0){
+                        std::cout<<"Lord! our metal reserves are fully empty we must extract minerals from a nearby planet"<<std::endl;
+                        break;
+                    }
+                    else if(_metalamount < choice * 10){
+                        while(1){
+                            if(_metalamount < choice * 10)
+                                break;
+                            std::cout<<"Lord! you don't have that much metal yet"<<"\n"
+                            <<"Type in a smaller amount!"<<std::endl;
+                            std::cin>>choice;
+                        }
+                        efficiency_calculation(choice, 1000);
+                        _metalamount -= choice * 10;
+                        _bombs += choice;
+                    }
+                    else if(choice == 0)
+                        break;
+                    else if(_metalamount > choice * 10){
+                        efficiency_calculation(choice, 1000);
+                        _metalamount -= choice * 10;
+                        _bombs += choice;
+                    }
+                    break;
+            case 4: std::cout<<std::endl;
+                    std::cout<<"Metal: "<<_metalamount<<"\n"
+                    <<"Missile's price: "<<"10"<<"\n"
+                    <<"\n"<<std::endl;
+                    std::cout<<"How many missiles?"<<std::endl;
+                    std::cin>>choice;
+                    if(_metalamount == 0){
+                        std::cout<<"Lord! our metal reserves are fully empty we must extract minerals from a nearby planet"<<std::endl;
+                        break;
+                    }
+                    else if(_metalamount < choice * 10){
+                        while(1){
+                            if(_metalamount < choice * 10)
+                                break;
+                            std::cout<<"Lord! you don't have that much metal yet"<<"\n"
+                            <<"Type in a smaller amount!"<<std::endl;
+                            std::cin>>choice;
+                        }
+                        _metalamount -= choice * 10;
+                        _missiles += choice;
+                    }
+                    else if(choice == 0)
+                        break;
+                    else if(_metalamount > choice * 10){
+                        usleep(efficiency_calculation(choice, 1000));
+                        _metalamount -= choice * 10;
+                        _missiles += choice;
+                    }
+                    break;
+            case 5: break;
         }
         break;
     }
@@ -2546,6 +2612,7 @@ void Spaceship::read_story(){
     readstory.close();
 }
 
+
 std::string Spaceship::show_title(){
 return "   ___   ____  ____ ___   ___             ___   _____ ______________   ____      __                           \n"
        "  |__ \\ / __ \\/ __ <  /  /   |  ____     /   | / ___// ____/  _/  _/  / __ \\____/ /_  _______________  __  __ \n"
@@ -2558,7 +2625,6 @@ return "   ___   ____  ____ ___   ___             ___   _____ ______________   _
 int Spaceship::cabin(){
     std::cout<<show_title()<<std::endl;
     std::string choice;
-    bool back_to_solar_system = false;
     while(1){
         std::cout<<std::endl;
         std::cout<<"<<<CABIN OF THE INTERSTELLAR FALCON IV WELCOME ON BOARD MY MASTER>>>"<<"\n"
