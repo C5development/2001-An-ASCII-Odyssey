@@ -1117,6 +1117,7 @@ void Spaceship::battle_preparation(int enemies_drones, int enemies_cyborgs, int 
 
                         }
                     }
+                    break;
             case 2: while(1){
                         if(turn){
                             std::cout<<std::endl;
@@ -1195,6 +1196,7 @@ void Spaceship::battle_preparation(int enemies_drones, int enemies_cyborgs, int 
                                         }
 
                                     }
+                                    break;
 
                             case 2: while(1){
                                          std::cout<<std::endl;
@@ -1259,11 +1261,19 @@ void Spaceship::battle_preparation(int enemies_drones, int enemies_cyborgs, int 
                                             }
                                         }
                                     }
+                                    break;
 
                         }
                     }
                     break;
-
+            case 3: while(1){
+                        std::cout<<std::endl;
+                        std::cout<<"<--Metallurgy laboratory\n"
+                        <<"1. Drones\n"
+                        <<"2. Cyborgs\n"
+                        <<"3. Bombs\n"
+                        <<"4. Missiles"<<std::endl;
+                    }
         }
     }
 }
