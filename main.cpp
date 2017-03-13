@@ -669,11 +669,13 @@ class Spaceship
     static void battle_processor(int, int, int, int, int);
     static int _drones;
     static int _armors;
-    static int _bombs;
+    static int _missiles;
     static void logic_gates(int, int);
     static void battle_reports(int, int, int, int, int, int);
     static void battle_preparation(int, int, int, float, float, bool);
     static void damage_calculation(std::string, int, int);
+    static int _soldierslevel;
+    static int (randRange(int, int));
 
     private:
 
@@ -693,7 +695,6 @@ class Spaceship
         int _soldierspoints = 0;
         int _scientistspoints = 0;
         int _slavespoints = 5;
-        static int _soldierslevel;
         int _scientistslevel = 5;
         int _slaveslevel = 0;
         int _points;
@@ -979,6 +980,8 @@ void Spaceship::battle_preparation(int enemies_drones, int enemies_cyborgs, int 
     std::vector<std::string> reports;
     int choice;
     int amount;
+    int missiles_amount; //AI's choice of how many missiles will be dropped
+    int enemies_missiles; //Amount of missiles the enemy has at disposal
     int morale = 100;
     int enemy_morale = 100;
     int enemy_cyborgs_hp = 50 * enemies_level + morale;
@@ -1005,7 +1008,7 @@ void Spaceship::battle_preparation(int enemies_drones, int enemies_cyborgs, int 
                             std::cin>>choice;
                         }
                         else
-                            choice = rand() % 2 + 1;
+                            choice = randRange(1, 2);
                         switch(choice){
 
                             case 1: while(1){
@@ -1077,7 +1080,7 @@ void Spaceship::battle_preparation(int enemies_drones, int enemies_cyborgs, int 
                                         else{
                                             if(enemy_energy > 5000000){
                                                 while(1){
-                                                    amount = rand() % enemies_cyborgs - std::floor(enemies_cyborgs/ 3.0);
+                                                    amount = randRange(enemies_cyborgs, std::floor(enemies_cyborgs/ 3.0));
                                                     energy -= std::floor(amount / 2.0);
                                                     if(energy > std::floor(amount / 2.0) && enemies_cyborgs > amount){
                                                         break;
@@ -1091,7 +1094,7 @@ void Spaceship::battle_preparation(int enemies_drones, int enemies_cyborgs, int 
                                             }
                                             else{
                                                 while(1){
-                                                    amount = rand() % enemies_cyborgs - std::floor(enemies_cyborgs/ 5.0);
+                                                    amount = randRange(enemies_cyborgs, std::floor(enemies_cyborgs/ 5.0));
                                                     energy -= std::floor(amount / 2.0);
                                                     if(energy > std::floor(amount / 2.0) && enemies_cyborgs > amount){
                                                         break;
@@ -1114,19 +1117,19 @@ void Spaceship::battle_preparation(int enemies_drones, int enemies_cyborgs, int 
                         if(turn){
                             std::cout<<std::endl;
                             std::cout<<"<--DRONES HEADQUARTERS-->"<<"\n"
-                            <<"1. Bombard planet\n"
-                            <<"2. Kamikazee attack\n"
+                            <<"1. Missiles (DronesvsDrones)\n"
+                            <<"2. Bombardment(DronesvsCyborgs)\n"
                             <<"3. Return"<<std::endl;
                             std::cin>>choice;
                         }
                         else
-                            choice = rand() % 2 + 1;
+                            choice = randRange(1, 2);
                         switch(choice){
 
                             case 1: while(1){
                                         std::cout<<std::endl;
                                         if(turn){
-                                            std::cout<<"<--DRONES HEADQUARTER-->"<<"\n"
+                                            std::cout<<"<--DRONES HEADQUARTERS-->"<<"\n"
                                             <<"Lord let us know how many bombs you want each drone to drop!"<<std::endl;
                                             std::cin>>amount;
                                             if(amount > _bombs || energy < std::floor(amount / 2.0)){
@@ -1151,15 +1154,16 @@ void Spaceship::battle_preparation(int enemies_drones, int enemies_cyborgs, int 
                                                     std::cout<<std::endl;
                                                     std::cout<<"Fantastic my lord, we will send our drones to this miserable planet!\n"
                                                     <<"and take these dirty inferior beings to an intergalactic hell...\n"<<std::endl;
-                                                    damage_calculation("Drone bombardment", _drones*_bombs, enemy_drones_hp);
+                                                    damage_calculation("Drone bombardment", amount*_missiles, enemy_drones_hp);
 
                                         }
                                         else{
                                             if(enemy_energy > 5000000){
                                                 while(1){
-                                                    amount = rand() % enemies_cyborgs - std::floor(enemies_cyborgs/ 3.0);
+                                                    amount = randRange(enemies_drones, std::floor(enemies_drones/ 5.0));
                                                     energy -= std::floor(amount / 2.0);
-                                                    if(energy > std::floor(amount / 2.0) && enemies_cyborgs > amount){
+                                                    missiles_amount = randRange(enemies_missiles, std::floor(enemies_missiles/5.0));
+                                                    if(energy > std::floor(amount / 2.0) && enemies_drones >= amount && enemies_missiles >= missiles_amount){
                                                         break;
                                                     }
                                                     else
@@ -1171,9 +1175,10 @@ void Spaceship::battle_preparation(int enemies_drones, int enemies_cyborgs, int 
                                             }
                                             else{
                                                 while(1){
-                                                    amount = rand() % enemies_cyborgs - std::floor(enemies_cyborgs/ 5.0);
+                                                    amount = rand() % enemies_drones + std::floor(enemies_drones/ 3.0);
                                                     energy -= std::floor(amount / 2.0);
-                                                    if(energy > std::floor(amount / 2.0) && enemies_cyborgs > amount){
+                                                    missiles_amount = randRange(enemies_missiles, std::floor(enemies_missiles/3.0));
+                                                    if(energy > std::floor(amount / 2.0) && enemies_drones > amount){
                                                         break;
                                                     }
                                                     else
@@ -1186,7 +1191,14 @@ void Spaceship::battle_preparation(int enemies_drones, int enemies_cyborgs, int 
 
                                     }
 
-                            case 2: ;
+                            case 2: while(1){
+                                        std::cout<<std::endl;
+                                        if(turn){
+
+
+                                        }
+
+                            }
 
                         }
                     }
