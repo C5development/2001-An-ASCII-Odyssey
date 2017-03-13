@@ -670,10 +670,11 @@ class Spaceship
     static int _drones;
     static int _armors;
     static int _missiles;
+    static int _bombs;
     static void logic_gates(int, int);
     static void battle_reports(int, int, int, int, int, int);
     static void battle_preparation(int, int, int, float, float, bool);
-    static void damage_calculation(std::string, int, int);
+    static void damage_calculation(std::string, int, float);
     static int _soldierslevel;
     static int (randRange(int, int));
 
@@ -716,7 +717,6 @@ class Spaceship
         void setlevel(int, std::string, int, int, int, int, int, bool, std::vector<int>, std::vector<int>);
         void purchasepoints(int);
         void pointstransaction(int);
-        int randRange(int, int);
         std::string define_stars_name();
         std::string define_planets_name();
         void planet_destroyer(int);
@@ -751,6 +751,8 @@ int Spaceship::_drones = 100000;
 int Spaceship::_armors = 10000;
 
 int Spaceship::_bombs = 10000;
+
+int Spaceship:: _missiles = 10000;
 
 int Spaceship::starsnumber; //IMPORTANT We might need to create a function that updates the value using the database
 //The reason for this is that once the program is initialised again the variable will also be initialised and set to zero!
@@ -970,7 +972,7 @@ void Spaceship::surrender_treaty(std::string social_structure, std::string civil
     }
 }
 
-void Spaceship::damage_calculation(std::string attack_type, int targets, int hp){
+void Spaceship::damage_calculation(std::string attack_type, int targets, float hp){
 
 
 }
@@ -982,10 +984,12 @@ void Spaceship::battle_preparation(int enemies_drones, int enemies_cyborgs, int 
     int amount;
     int missiles_amount; //AI's choice of how many missiles will be dropped
     int enemies_missiles; //Amount of missiles the enemy has at disposal
+    int enemies_bombs;
+    int bombs_amount;
     int morale = 100;
     int enemy_morale = 100;
-    int enemy_cyborgs_hp = 50 * enemies_level + morale;
-    int enemy_drones_hp = 100 * enemies_level + morale;
+    float enemy_cyborgs_hp = 50.0 * enemies_level + morale;
+    float enemy_drones_hp = 100.0 * enemies_level + morale;
     int cyborgs_hp = 50 * _soldierslevel + morale;
     int drones_hp = 100 * _soldierslevel + morale;
     while(1){
@@ -1130,6 +1134,72 @@ void Spaceship::battle_preparation(int enemies_drones, int enemies_cyborgs, int 
                                         std::cout<<std::endl;
                                         if(turn){
                                             std::cout<<"<--DRONES HEADQUARTERS-->"<<"\n"
+                                            <<"Lord let us know how many missiles you want each drone to drop!"<<std::endl;
+                                            std::cin>>amount;
+                                            if(amount > _bombs || energy < std::floor(amount / 2.0)){
+                                                std::cout<<"My lord this is the current amount of resources you have at disposal"<<"\n"
+                                                <<"Bombs: "<<_bombs<<"\n"
+                                                <<"Drones: "<<_drones<<"\n"
+                                                <<"Energy: "<<energy<<"\n"
+                                                <<std::endl;
+                                            }
+                                            else
+                                                std::cout<<std::endl;
+                                                std::cout<<"Now my lord, type in the amount of drones you want to send for this attack\n"<<std::endl;
+                                                std::cin>>amount;
+                                                if(amount > _drones || energy < std::floor(amount / 2.0)){
+                                                    std::cout<<"My lord, this is the current amount of resources you have at disposal"<<"\n"
+                                                    <<"Bombs: "<<_bombs<<"\n"
+                                                    <<"Drones: "<<_drones<<"\n"
+                                                    <<"Missiles: "<<_missiles<<"\n"
+                                                    <<"Energy: "<<energy<<"\n"
+                                                    <<std::endl;
+                                                }
+                                                else
+                                                    std::cout<<std::endl;
+                                                    std::cout<<"Fantastic my lord, we will send our drones to this miserable planet!\n"
+                                                    <<"and take these dirty inferior beings to an intergalactic hell...\n"<<std::endl;
+                                                    damage_calculation("Missile attack", amount*_missiles, enemy_drones_hp);
+
+                                        }
+                                        else{
+                                            if(enemy_energy > 5000000){
+                                                while(1){
+                                                    amount = randRange(enemies_drones, std::floor(enemies_drones/ 5.0));
+                                                    energy -= std::floor(amount / 2.0);
+                                                    missiles_amount = randRange(enemies_missiles, std::floor(enemies_missiles/5.0));
+                                                    if(energy > std::floor(amount / 2.0) && enemies_drones >= amount && enemies_missiles >= missiles_amount){
+                                                        break;
+                                                    }
+                                                    else
+                                                        continue;
+                                                }
+                                                damage_calculation("Missile attack", amount*missiles_amount, drones_hp);
+                                                break;
+
+                                            }
+                                            else{
+                                                while(1){
+                                                    amount = rand() % enemies_drones + std::floor(enemies_drones/ 3.0);
+                                                    energy -= std::floor(amount / 2.0);
+                                                    missiles_amount = randRange(enemies_missiles, std::floor(enemies_missiles/3.0));
+                                                    if(energy > std::floor(amount / 2.0) && enemies_drones >= amount && enemies_missiles >= missiles_amount){
+                                                        break;
+                                                    }
+                                                    else
+                                                        continue;
+                                                }
+                                                damage_calculation("Missile attack", amount*missiles_amount, drones_hp);
+                                                break;
+                                            }
+                                        }
+
+                                    }
+
+                            case 2: while(1){
+                                         std::cout<<std::endl;
+                                        if(turn){
+                                            std::cout<<"<--DRONES HEADQUARTERS-->"<<"\n"
                                             <<"Lord let us know how many bombs you want each drone to drop!"<<std::endl;
                                             std::cin>>amount;
                                             if(amount > _bombs || energy < std::floor(amount / 2.0)){
@@ -1154,7 +1224,7 @@ void Spaceship::battle_preparation(int enemies_drones, int enemies_cyborgs, int 
                                                     std::cout<<std::endl;
                                                     std::cout<<"Fantastic my lord, we will send our drones to this miserable planet!\n"
                                                     <<"and take these dirty inferior beings to an intergalactic hell...\n"<<std::endl;
-                                                    damage_calculation("Drone bombardment", amount*_missiles, enemy_drones_hp);
+                                                    damage_calculation("Drone bombardment", amount*_bombs, enemy_drones_hp);
 
                                         }
                                         else{
@@ -1162,14 +1232,14 @@ void Spaceship::battle_preparation(int enemies_drones, int enemies_cyborgs, int 
                                                 while(1){
                                                     amount = randRange(enemies_drones, std::floor(enemies_drones/ 5.0));
                                                     energy -= std::floor(amount / 2.0);
-                                                    missiles_amount = randRange(enemies_missiles, std::floor(enemies_missiles/5.0));
-                                                    if(energy > std::floor(amount / 2.0) && enemies_drones >= amount && enemies_missiles >= missiles_amount){
+                                                    missiles_amount = randRange(enemies_bombs, std::floor(enemies_bombs/5.0));
+                                                    if(energy > std::floor(amount / 2.0) && enemies_drones >= amount && enemies_bombs >= bombs_amount){
                                                         break;
                                                     }
                                                     else
                                                         continue;
                                                 }
-                                                damage_calculation("Drone bombardment", amount, drones_hp);
+                                                damage_calculation("Drone bombardment", amount*bombs_amount, drones_hp);
                                                 break;
 
                                             }
@@ -1177,28 +1247,18 @@ void Spaceship::battle_preparation(int enemies_drones, int enemies_cyborgs, int 
                                                 while(1){
                                                     amount = rand() % enemies_drones + std::floor(enemies_drones/ 3.0);
                                                     energy -= std::floor(amount / 2.0);
-                                                    missiles_amount = randRange(enemies_missiles, std::floor(enemies_missiles/3.0));
-                                                    if(energy > std::floor(amount / 2.0) && enemies_drones > amount){
+                                                    missiles_amount = randRange(enemies_bombs, std::floor(enemies_bombs/3.0));
+                                                    if(energy > std::floor(amount / 2.0) && enemies_drones > amount && enemies_bombs >= bombs_amount){
                                                         break;
                                                     }
                                                     else
                                                         continue;
                                                 }
-                                                damage_calculation("Drone bombardment", amount, drones_hp);
+                                                damage_calculation("Drone bombardment", amount*bombs_amount, drones_hp);
                                                 break;
                                             }
                                         }
-
                                     }
-
-                            case 2: while(1){
-                                        std::cout<<std::endl;
-                                        if(turn){
-
-
-                                        }
-
-                            }
 
                         }
                     }
