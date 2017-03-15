@@ -563,7 +563,7 @@ void Planet::determine_amount_of_resources(){
                 _pseudomona = randRange(10000, 60000);
                 //Given in thousands of millions
 
-        case 6: _gas = randRange(1, 10000); //Given in  megatons
+        case 6: _gas = randRange(1000, 10000); //Given in  megatons
     }
 }
 
