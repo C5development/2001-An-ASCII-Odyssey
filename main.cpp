@@ -675,7 +675,7 @@ class Spaceship
     static int _slaveslevel;
     static void logic_gates(int, int);
     static void battle_reports(int, int, int, int, int, int, bool);
-    static void battle_preparation(int, int, int, float, float, bool, long);
+    static void battle_preparation(int, int, int, float, float, long);
     static void damage_calculation(std::vector<std::string>, std::string, int, float, int, long, int, bool);
     static int _soldierslevel;
     static int (randRange(int, int));
@@ -683,6 +683,7 @@ class Spaceship
     static int efficiency_calculation(int, int, bool);
     static float soldiers_fate(float);
     static long random_victim_assignment(long);
+    static void turn_assignment(bool);
     private:
 
         int _diamondsamount = 1234257463; //This is the amount that will be spent on manufacturing processes
@@ -979,31 +980,56 @@ void Spaceship::surrender_treaty(std::string social_structure, std::string civil
 void Spaceship::damage_calculation(std::vector<std::string> balance, std::string attack_type, int amount, float hp, int level, long civilians, int morale, bool turn){
     float total_damage;
     float total_hp;
-    float calculation;
+    float targets;
+    int random_civilians_casualties = randRange(1000, 10000);
     int morale_effect;
     bool battle;
     if(attack_type == "Civilians attack"){
         for(int i = 0; i < amount; i++){
             civilians -= 1;
         }
-        morale_effect = efficiency_calculation(amount, randRange(1, 10), battle);
+        morale_effect = efficiency_calculation(amount, randRange(1, 2), true);
         morale -= morale_effect;
     }
     else if(attack_type == "Cyborgs attack"){
-        total_damage = amount * 50 * level;
-        calculation = std::ceil(total_damage/hp);
-
+        total_damage = amount * 50 * level - morale;
+        targets = std::ceil(total_damage/hp);
+        civilians -= random_civilians_casualties;
+        if(turn)
+            battle_processor(balance, 0, 0, 0, targets, level, turn);
+        else
+            battle_processor(balance, 0, targets, 0, 0, level, turn);
     }
     else if(attack_type == "Missiles attack"){
+        total_damage = amount * 100 * level - morale;
+        targets = std::ceil(total_damage/hp);
+        civilians -= random_civilians_casualties;
+        if(turn)
+            battle_processor(balance, amount, 0, targets, 0, level, turn);
+        else
+            battle_processor(balance, targets, 0, amount, 0, level, turn);
     }
     else if(attack_type == "Drone bombardment"){
+        total_damage = amount * 100 * level - morale;
+        targets = std::ceil(total_damage/hp);
+        civilians -= random_civilians_casualties;
+        if(turn)
+            battle_processor(balance, amount, 0, 0, targets, level, turn);
+        else
+            battle_processor(balance, 0, targets, 0, amount, level, turn);
     }
 
 }
 
+void Spaceship::turn_assignment(bool turn){
+    if(turn)
+        turn = false;
+    else
+        turn = true;
+}
 
 
-void Spaceship::battle_preparation(int enemies_drones, int enemies_cyborgs, int enemies_level, float energy, float enemy_energy, bool turn, long aliens){
+void Spaceship::battle_preparation(int enemies_drones, int enemies_cyborgs, int enemies_level, float energy, float enemy_energy, long aliens){
     std::vector<std::string> balance;
     int choice;
     int amount;
@@ -1013,11 +1039,13 @@ void Spaceship::battle_preparation(int enemies_drones, int enemies_cyborgs, int 
     int bombs_amount;
     int morale = 100;
     int enemy_morale = 100;
+    bool turn = false;
     float enemy_cyborgs_hp = 50.0 * enemies_level + morale;
     float enemy_drones_hp = 100.0 * enemies_level + morale;
     int cyborgs_hp = 50 * _soldierslevel + morale;
     int drones_hp = 100 * _soldierslevel + morale;
     while(1){
+        turn_assignment(turn);
         if(turn){
              std::cout<<"<---HEADQUARTERS--->"<<"\n"
             <<"1. Cyborg attack\n"
@@ -1337,6 +1365,13 @@ void Spaceship::casualties(long warriors, int level, bool turn){
     int deaths;
     int arbitrary_stop;
     int adjustment = 13;
+    if(warriors % 2){
+        surrender_limit = rand() % warriors/4;
+    }
+    else if(warriors % 2 != 0){
+        warriors += 1;
+        surrender_limit = rand() % warriors/4;
+    }
     std::thread t1(battle_reports, warriors, surrender_limit, deaths, arbitrary_stop, adjustment, nanoseconds, turn);
     t1.join();
 }
@@ -1380,12 +1415,25 @@ void Spaceship::battle_processor(std::vector<std::string> balance, int drones, i
     <<"Our soldiers will get ready for the glorious day my lord!"<<"\n"
     <<"Always willing to serve you and die for you! "<<"\n"
     <<std::endl;
-    int player_warriors = drones + cyborgs;
-    int enemy_warriors = enemies_drones + enemies_cyborgs;
+    long first_turn;
+    long second_turn;
+    long player_warriors = drones + cyborgs;
+    long enemy_warriors = enemies_drones + enemies_cyborgs;
+    int fighter_level;
+    if(turn){
+        first_turn = random_victim_assignment(enemy_warriors);
+        second_turn = player_warriors;
+        fighter_level = _soldierslevel;
 
-    std::future<int> result1(std::async(outcome_calculator, player_warriors, level, turn));
+    }
+    else{
+        first_turn = random_victim_assignment(player_warriors);
+        second_turn = enemy_warriors;
+        fighter_level = level;
+    }
+    std::future<int> result1(std::async(outcome_calculator, first_turn, fighter_level, turn));
     int players_duration = result1.get();
-    std::future<int> result2(std::async(outcome_calculator, enemy_warriors, 5, turn));
+    std::future<int> result2(std::async(outcome_calculator, second_turn, fighter_level, turn));
     int enemys_duration = result2.get();
     if(players_duration >= enemys_duration)
         balance.push_back("Victory");
@@ -1588,7 +1636,7 @@ void Spaceship::civilisation_interaction(int desired_respect, int aliens){
             <<"2. Confidential reports from intelligence agency"<<std::endl;
             std::cin>>selection;
             switch(selection){
-                    case 1: battle_preparation(enemies_drones, enemies_cyborgs, enemies_level, energy, enemy_energy, turn, aliens);
+                    case 1: battle_preparation(enemies_drones, enemies_cyborgs, enemies_level, energy, enemy_energy, aliens);
                             //Function switching turns
                             break;
 
