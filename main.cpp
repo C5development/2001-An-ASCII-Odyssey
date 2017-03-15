@@ -11,6 +11,7 @@
 #include<thread>
 #include<chrono>
 #include<future>
+#include "libsqlite.hpp"
 using namespace std::chrono;
 
 class Star
@@ -2804,7 +2805,8 @@ int Spaceship::cabin(){
 
 
 int main()
-{
+{   
+    srand(unsigned( time(NULL) ));
     Spaceship s;
     s.cabin();
 }
