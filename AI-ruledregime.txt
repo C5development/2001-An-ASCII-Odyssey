@@ -1,4 +1,4 @@
-Colosus was a secret project being developed by a secret agency of Tripsilum's government, in an era where quantum computing was taking over
+Colosus was a secret project being developed by a secret agency under Tripsilum's government, in an era where quantum computing was taking over
 and optimisation algorithms became a crucial part of everybody's lives in order to determine the amount of scarce resources that
 was going to be consumed, for specific tasks and needs; Colosus was going to be a multi-core quantum computer inspired by a neurosynaptic
 non-deterministic architecture that tried to mimick the behaviour of primitive brains evolved from Truskimlaos a similar species to our
