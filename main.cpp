@@ -11,7 +11,7 @@
 #include<thread>
 #include<chrono>
 #include<future>
-#include "libsqlite.hpp"
+
 using namespace std::chrono;
 
 class Star
@@ -680,7 +680,7 @@ class Spaceship
     static void damage_calculation(std::vector<std::string>, std::string, int, float, int, long, int, bool);
     static int _soldierslevel;
     static int (randRange(int, int));
-    static void methalurgy();
+    static void methalurgy(bool, bool, bool, bool, bool);
     static int efficiency_calculation(int, int, bool);
     static float soldiers_fate(float);
     static long random_victim_assignment(long);
@@ -1041,6 +1041,10 @@ void Spaceship::battle_preparation(int enemies_drones, int enemies_cyborgs, int 
     int morale = 100;
     int enemy_morale = 100;
     bool turn = false;
+    bool lack_drones;
+    bool lack_cyborgs;
+    bool lack_missiles;
+    bool lack_bombs;
     float enemy_cyborgs_hp = 50.0 * enemies_level + morale;
     float enemy_drones_hp = 100.0 * enemies_level + morale;
     int cyborgs_hp = 50 * _soldierslevel + morale;
@@ -1324,7 +1328,7 @@ void Spaceship::battle_preparation(int enemies_drones, int enemies_cyborgs, int 
                         }
                     }
                     break;
-            case 3: methalurgy();
+            case 3: methalurgy(turn, lack_drones, lack_cyborgs, lack_bombs, lack_missiles);
                     break;
         }
     }
@@ -1553,7 +1557,8 @@ void Spaceship::to_solar_system(){
 }
 
 void Spaceship::assign_troops(long aliens, int enemies_drones, int enemies_cyborgs){
-    enemies_drones = randRange(std::round(aliens/2), aliens);
+    std::cout<<aliens<<std::endl;
+    enemies_drones = randRange(int(std::round(aliens/2)), aliens);
     enemies_cyborgs = randRange(1000000, std::floor(aliens/2.0));
     aliens -= enemies_cyborgs + enemies_cyborgs;
 }
@@ -1645,7 +1650,6 @@ void Spaceship::civilisation_interaction(int desired_respect, int aliens){
                     case 2: civilisation_history(social_structure, civilisationsnames[rand() % civilisationsnames.size()], enemies_level);
                             break;
             }
-            done = true;
         }
     }
 }
@@ -2506,22 +2510,26 @@ void Spaceship::laboratory(){
   }
 }
 
-void Spaceship::methalurgy(){
+void Spaceship::methalurgy(bool turn, bool lack_drones, bool lack_cyborgs, bool lack_bombs, bool lack_missiles){
     int choice;
     while(1){
-        std::cout<<"\n"
-        <<"\n"
-        <<"<--METHALLURGY LABORATORY-->"<<"\n"
-        <<"\n"
-        <<"Metal: "<<_metalamount<<"\n"
-        <<"\n"
-        <<"Specimens: "<<_specimens<<"\n"
-        <<"1. Drones factory"<<"\n"
-        <<"2. Cyborg's armors and weapons"<<"\n"
-        <<"3. Bombs\n"
-        <<"4. Missiles\n"
-        <<"5. Exit" <<std::endl;
-        std::cin>>choice;
+        if(turn){
+             std::cout<<"\n"
+            <<"\n"
+            <<"<--METHALLURGY LABORATORY-->"<<"\n"
+            <<"\n"
+            <<"Metal: "<<_metalamount<<"\n"
+            <<"\n"
+            <<"Specimens: "<<_specimens<<"\n"
+            <<"1. Drones factory"<<"\n"
+            <<"2. Cyborg's armors and weapons"<<"\n"
+            <<"3. Bombs\n"
+            <<"4. Missiles\n"
+            <<"5. Exit" <<std::endl;
+            std::cin>>choice;
+        }
+        else
+            ;
         switch(choice){
 
             case 1: std::cout<<std::endl;
@@ -2781,7 +2789,7 @@ int Spaceship::cabin(){
            }
         }
         else if(choice == "M" || choice == "m"){
-            methalurgy();
+            methalurgy(true, false, false, false, false);
         }
         else if(choice == "P" || choice == "p"){
             purchasepoints(_diamondsamount);
@@ -2805,13 +2813,9 @@ int Spaceship::cabin(){
 
 
 int main()
-{   
+{
     srand(unsigned( time(NULL) ));
     Spaceship s;
     s.cabin();
 }
-
-
-
-
 
