@@ -10,9 +10,14 @@
 #include<unistd.h> //Import the sleep function (only works with linux compiler)
 #include<thread>
 #include<chrono>
+<<<<<<< HEAD
 #include<functional>
 #include<Windows.h>
 #include<MMSystem.h>
+=======
+#include<future>
+
+>>>>>>> 5a6f7ec6afd598c2a04a5ef4fa6430679849b123
 using namespace std::chrono;
 
 class Star
@@ -76,7 +81,7 @@ void Star::display_stars_data(std::string star_name){
     std::cout<<"|--"<<star_name<<"--|"<<"\n"
     <<"Type of star: "<<startype<<"\n"
     <<"Star's temperature: "<<_starsheat<<" celcius"<<"\n"
-    <<"Star's surface :"<<_starssurface<<" million square km"<<"\n"
+    <<"Star's surface :"<<_starssurface<<" millions of square km"<<"\n"
     <<"Star's radiaton level :"<<_starsradiation<<std::endl;
 }
 
@@ -564,7 +569,7 @@ void Planet::determine_amount_of_resources(){
                 _pseudomona = randRange(10000, 60000);
                 //Given in thousands of millions
 
-        case 6: _gas = randRange(1, 10000); //Given in  megatons
+        case 6: _gas = randRange(1000, 10000); //Given in  megatons
     }
 }
 
@@ -660,38 +665,49 @@ Planet::Planet(){
 
 class Spaceship
 {
-
+    static int _specimens;
     static std::vector<std::string> planetnames;
     static std::vector<std::string> starnames;
     static std::vector<std::string> planetnamesbuffer;
     static std::vector<std::string> starnamesbuffer;
     static int starsnumber;
-    static void casualties(long, int);
-    static void battle_mode(int, int, int, int, int);
-
+    static int outcome_calculator(long, int, bool);
+    static void casualties(long, int, bool);
+    static void battle_processor(std::vector<std::string>, int, int, int, int, int, bool);
+    static int _drones;
+    static int _armors;
+    static int _missiles;
+    static int _bombs;
+    static int _metalamount;
+    static int _slaveslevel;
+    static void logic_gates(int, int);
+    static void battle_reports(int, int, int, int, int, int, bool);
+    static void battle_preparation(int, int, int, float, float, long);
+    static void damage_calculation(std::vector<std::string>, std::string, int, float, int, long, int, bool);
+    static int _soldierslevel;
+    static int (randRange(int, int));
+    static void methalurgy(bool, bool, bool, bool, bool);
+    static int efficiency_calculation(int, int, bool);
+    static float soldiers_fate(float);
+    static long random_victim_assignment(long);
+    static void turn_assignment(bool);
     private:
 
         int _diamondsamount = 1234257463; //This is the amount that will be spent on manufacturing processes
-        int _specimens = 12355839;
-        int _metalamount = 15678; //This will be used for the weapons creation
         int _fuelcapacity = 134135; //This will be used to refill fuel tanks
         int _WARPdrive = 10000; //This is going to be used to power the interstellar travelling mode
         int _antimatterweapon; //Planetdestroyer
-        int _soldiers = 12335; //Soldiers to subyugate other civilisations
+        int _soldiers = 12335; //Soldiers to subjugate other civilisations
         int _scientists = 12334; //Scientists to perfom experiments on subyugated civilisations
         int _slaves = 12345; //Slaves are going to be used to extract minerals from other planets
         int _protozoolevels = 0; //In theory only WARP drive and fuel should be set
         int _staphilococcuslevels = 200;
         int _pseudomonalevels = 0;
         int _evolutionexpressaccelerator = 0;
-        int _drones = 1000000;
-        int _armors = 10000;
         int _soldierspoints = 0;
         int _scientistspoints = 0;
         int _slavespoints = 5;
-        static int _soldierslevel;
         int _scientistslevel = 5;
-        int _slaveslevel = 0;
         int _points;
         int _overalllevel;
 
@@ -707,11 +723,9 @@ class Spaceship
         void assign_points(int, std::string);
         void laboratory();
         int genetical_modification(int, std::vector<char>, std::vector<int>);
-        void methalurgy();
         void setlevel(int, std::string, int, int, int, int, int, bool, std::vector<int>, std::vector<int>);
         void purchasepoints(int);
         void pointstransaction(int);
-        int randRange(int, int);
         std::string define_stars_name();
         std::string define_planets_name();
         void planet_destroyer(int);
@@ -721,12 +735,8 @@ class Spaceship
         void refill_vector(std::string);
         void to_solar_system();
         void display_planets_database();
-        int efficiency_calculation(int, int);
-        void generate_stars_data_base(int, std::vector<Star>);
         void generate_solar_data_base(std::vector<Planet>);
-        void colonise_solar_system(std::vector<Planet>);
         void display_colonies();
-        void print();
         std::string show_title();
         void read_story();
         void save_game(); //DATABASE
@@ -742,9 +752,23 @@ std::vector<std::string> Spaceship::starnames = {"Acamar", "Adhafera", "Kornepho
 
 std::vector<std::string> Spaceship::starnamesbuffer;
 
+int Spaceship::_metalamount = 150000;
+
+int Spaceship::_drones = 100000;
+
+int Spaceship::_armors = 10000;
+
+int Spaceship::_bombs = 10000;
+
+int Spaceship:: _missiles = 10000;
+
+int Spaceship::_specimens = 19482109;
+
+int Spaceship::_slaveslevel;
+
 int Spaceship::starsnumber; //IMPORTANT We might need to create a function that updates the value using the database
 //The reason for this is that once the program is initialised again the variable will also be initialised and set to zero!
-int Spaceship::_soldierslevel;
+int Spaceship::_soldierslevel = 0;
 
 int Spaceship::randRange(int low, int high)
 {
@@ -886,8 +910,8 @@ int Spaceship::genetical_modification(int choice, std::vector<char> planetsavail
 void Spaceship::civilisation_history(std::string social_structure, std::string civilisationname, int enemies_level){
 //Reads the civilisations' stories from text files
     if(social_structure == "Techno fascist regime"){
-        std::cout<<"Level: "<<enemies_level<<"\n"
-        <<civilisationname<<std::endl;
+        std::cout<<civilisationname<<"\n"
+        <<"Level: "<<enemies_level<<std::endl;
         std::ifstream Technofascist;
         std::string line;
         Technofascist.open("Technofascistregime.txt");
@@ -900,8 +924,8 @@ void Spaceship::civilisation_history(std::string social_structure, std::string c
         Technofascist.close();
     }
     else if(social_structure == "Liberal democracy"){
-        std::cout<<"Level: "<<enemies_level<<"\n"
-        <<civilisationname<<std::endl;
+        std::cout<<civilisationname<<"\n"
+        <<"Level: "<<enemies_level<<std::endl;
         std::ifstream Liberaldemocracy;
         std::string line;
         Liberaldemocracy.open("Liberaldemocraticregime.txt");
@@ -914,8 +938,8 @@ void Spaceship::civilisation_history(std::string social_structure, std::string c
         Liberaldemocracy.close();
     }
     else if(social_structure == "Techno-utopian anarchy"){
-        std::cout<<"Level: "<<enemies_level<<"\n"
-        <<civilisationname<<std::endl;
+        std::cout<<civilisationname<<"\n"
+        <<"Level: "<<enemies_level<<std::endl;
         std::ifstream Technoutopian;
         std::string line;
         Technoutopian.open("Technoutopiananarchistregime.txt");
@@ -928,8 +952,8 @@ void Spaceship::civilisation_history(std::string social_structure, std::string c
         Technoutopian.close();
     }
     else if(social_structure == "AI-ruled planetary nation"){
-        std::cout<<"Level: "<<enemies_level<<"\n"
-        <<civilisationname<<std::endl;
+        std::cout<<civilisationname<<"\n"
+        <<"Level: "<<enemies_level<<std::endl;
         std::ifstream AIruled;
         std::string line;
         AIruled.open("AI-ruledregime.txt");
@@ -960,113 +984,484 @@ void Spaceship::surrender_treaty(std::string social_structure, std::string civil
     }
 }
 
+void Spaceship::damage_calculation(std::vector<std::string> balance, std::string attack_type, int amount, float hp, int level, long civilians, int morale, bool turn){
+    float total_damage;
+    float total_hp;
+    float targets;
+    int random_civilians_casualties = randRange(1000, 10000);
+    int morale_effect;
+    bool battle;
+    if(attack_type == "Civilians attack"){
+        for(int i = 0; i < amount; i++){
+            civilians -= 1;
+        }
+        morale_effect = efficiency_calculation(amount, randRange(1, 2), true);
+        morale -= morale_effect;
+    }
+    else if(attack_type == "Cyborgs attack"){
+        total_damage = amount * 50 * level - morale;
+        targets = std::ceil(total_damage/hp);
+        civilians -= random_civilians_casualties;
+        if(turn)
+            battle_processor(balance, 0, 0, 0, targets, level, turn);
+        else
+            battle_processor(balance, 0, targets, 0, 0, level, turn);
+    }
+    else if(attack_type == "Missiles attack"){
+        total_damage = amount * 100 * level - morale;
+        targets = std::ceil(total_damage/hp);
+        civilians -= random_civilians_casualties;
+        if(turn)
+            battle_processor(balance, amount, 0, targets, 0, level, turn);
+        else
+            battle_processor(balance, targets, 0, amount, 0, level, turn);
+    }
+    else if(attack_type == "Drone bombardment"){
+        total_damage = amount * 100 * level - morale;
+        targets = std::ceil(total_damage/hp);
+        civilians -= random_civilians_casualties;
+        if(turn)
+            battle_processor(balance, amount, 0, 0, targets, level, turn);
+        else
+            battle_processor(balance, 0, targets, 0, amount, level, turn);
+    }
+
+}
+
+void Spaceship::turn_assignment(bool turn){
+    if(turn)
+        turn = false;
+    else
+        turn = true;
+}
 
 
-void Spaceship::casualties(long warriors, int level){
-    int nanoseconds = 17 - level;
-    int surrender_limit = 100000;
-    while(warriors < surrender_limit){
-        usleep(nanoseconds);
-        warriors -= 1;
+void Spaceship::battle_preparation(int enemies_drones, int enemies_cyborgs, int enemies_level, float energy, float enemy_energy, long aliens){
+    std::vector<std::string> balance;
+    int choice;
+    int amount;
+    int missiles_amount; //AI's choice of how many missiles will be dropped
+    int enemies_missiles; //Amount of missiles the enemy has at disposal
+    int enemies_bombs;
+    int bombs_amount;
+    int morale = 100;
+    int enemy_morale = 100;
+    bool turn = false;
+    bool lack_drones;
+    bool lack_cyborgs;
+    bool lack_missiles;
+    bool lack_bombs;
+    float enemy_cyborgs_hp = 50.0 * enemies_level + morale;
+    float enemy_drones_hp = 100.0 * enemies_level + morale;
+    int cyborgs_hp = 50 * _soldierslevel + morale;
+    int drones_hp = 100 * _soldierslevel + morale;
+    while(1){
+        turn_assignment(turn);
+        if(turn){
+             std::cout<<"<---HEADQUARTERS--->"<<"\n"
+            <<"1. Cyborg attack\n"
+            <<"2. Drones attack\n"
+            <<"3. Metallurgy"<<std::endl;
+            std::cin>>choice;
+        }
+        else
+            choice = randRange(1, 2);
+        switch(choice){
+
+            case 1: while(1){
+                        if(turn){
+                            std::cout<<std::endl;
+                            std::cout<<"<--CYBORG HEADQUARTERS-->\n"
+                            <<"Welcome commander! we are pleased to serve you!\n"
+                            <<"Tell us what to do my master\n"<<"\n"
+                            <<"1. Annihilate civilians(it will have an effect on the enemy's morale,)\n"
+                            <<"2. Attack enemy(reduce the enemy's army)\n"
+                            <<"3  Return"<<std::endl;
+                            std::cin>>choice;
+                        }
+                        else
+                            choice = randRange(1, 2);
+                        switch(choice){
+
+                            case 1: while(1){
+                                        std::cout<<std::endl;
+                                        if(turn){
+                                            std::cout<<"How many civilians do you want to kill my master?"<<std::endl;
+                                            std::cin>>amount;
+                                            if(energy < std::floor(amount/2.0) || _armors < amount){
+                                                std::cout<<std::endl;
+                                                std::cout<<"My lord these are our available resources"<<"\n"
+                                                <<"Energy: "<<energy<<"\n"
+                                                <<"Armors: "<<_armors<<"\n"
+                                                <<"\n"<<std::endl;
+                                            }
+                                            else
+                                                energy -= std::floor(amount / 2.0);
+                                                damage_calculation(balance, "Civilians attack", amount, 100.0, _soldierslevel, aliens, enemy_morale, turn);
+                                                break;
+                                        }
+                                        else{
+                                            if(enemy_energy > 5000000){
+                                                while(1){
+                                                    amount = rand() % _armors - std::floor(_armors/ 3.0);
+                                                    energy -= std::floor(amount / 2.0);
+                                                    if(energy > std::floor(amount / 2.0) && enemies_cyborgs > amount){
+                                                        break;
+                                                    }
+                                                    else
+                                                        continue;
+                                                }
+                                                damage_calculation(balance, "Civilians attack", amount, 100.0, _soldierslevel, aliens, morale, turn);
+                                                break;
+
+                                            }
+                                            else{
+                                                while(1){
+                                                    amount = rand() % _armors - std::floor(_armors/ 5.0);
+                                                    energy -= std::floor(amount / 2.0);
+                                                    if(energy > std::floor(amount / 2.0) && enemies_cyborgs > amount){
+                                                        break;
+                                                    }
+                                                    else
+                                                        continue;
+                                                }
+                                                damage_calculation(balance, "Civilians attack", amount, 100.0, enemies_level, aliens, morale, turn);
+                                                break;
+                                            }
+
+                                     }
+                                }
+                                break;
+
+                            case 2: while(1){
+                                        if(turn){
+                                            std::cout<<"How many enemies do you want to kill my master?"<<std::endl;
+                                            std::cin>>amount;
+                                            if(energy < std::floor(enemies_cyborgs/2.0) || enemies_cyborgs < amount){
+                                                std::cout<<std::endl;
+                                                std::cout<<"My lord these are our available resources"<<"\n"
+                                                <<"Energy: "<<energy<<"\n"
+                                                <<"Armors: "<<_armors<<"\n"
+                                                <<"\n"<<std::endl;
+                                            }
+                                            else
+                                                energy -= std::floor(amount / 2.0);
+                                                damage_calculation(balance, "Cyborgs attack", amount, enemy_cyborgs_hp, _soldierslevel, aliens, enemy_morale, turn);
+                                                break;
+                                        }
+                                        else{
+                                            if(enemy_energy > 5000000){
+                                                while(1){
+                                                    amount = randRange(enemies_cyborgs, std::floor(enemies_cyborgs/ 3.0));
+                                                    energy -= std::floor(amount / 2.0);
+                                                    if(energy > std::floor(amount / 2.0) && enemies_cyborgs > amount){
+                                                        break;
+                                                    }
+                                                    else
+                                                        continue;
+                                                }
+                                                damage_calculation(balance, "Cyborgs attack", amount, cyborgs_hp, enemies_level, aliens, morale, turn);
+                                                break;
+
+                                            }
+                                            else{
+                                                while(1){
+                                                    amount = randRange(enemies_cyborgs, std::floor(enemies_cyborgs/ 5.0));
+                                                    energy -= std::floor(amount / 2.0);
+                                                    if(energy > std::floor(amount / 2.0) && enemies_cyborgs > amount){
+                                                        break;
+                                                    }
+                                                    else
+                                                        continue;
+                                                }
+                                                damage_calculation(balance, "Cyborgs attack", amount, cyborgs_hp, enemies_level, aliens, morale, turn);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    break;
+                            case 3: break;
+
+
+                        }
+                    }
+                    break;
+            case 2: while(1){
+                        if(turn){
+                            std::cout<<std::endl;
+                            std::cout<<"<--DRONES HEADQUARTERS-->"<<"\n"
+                            <<"1. Missiles (DronesvsDrones)\n"
+                            <<"2. Bombardment(DronesvsCyborgs)\n"
+                            <<"3. Return"<<std::endl;
+                            std::cin>>choice;
+                        }
+                        else
+                            choice = randRange(1, 2);
+                        switch(choice){
+
+                            case 1: while(1){
+                                        std::cout<<std::endl;
+                                        if(turn){
+                                            std::cout<<"<--DRONES HEADQUARTERS-->"<<"\n"
+                                            <<"Lord let us know how many missiles you want each drone to drop!"<<std::endl;
+                                            std::cin>>amount;
+                                            if(amount > _bombs || energy < std::floor(amount / 2.0)){
+                                                std::cout<<"My lord this is the current amount of resources you have at disposal"<<"\n"
+                                                <<"Bombs: "<<_bombs<<"\n"
+                                                <<"Drones: "<<_drones<<"\n"
+                                                <<"Energy: "<<energy<<"\n"
+                                                <<std::endl;
+                                            }
+                                            else
+                                                std::cout<<std::endl;
+                                                std::cout<<"Now my lord, type in the amount of drones you want to send for this attack\n"<<std::endl;
+                                                std::cin>>amount;
+                                                if(amount > _drones || energy < std::floor(amount / 2.0)){
+                                                    std::cout<<"My lord, this is the current amount of resources you have at disposal"<<"\n"
+                                                    <<"Bombs: "<<_bombs<<"\n"
+                                                    <<"Drones: "<<_drones<<"\n"
+                                                    <<"Missiles: "<<_missiles<<"\n"
+                                                    <<"Energy: "<<energy<<"\n"
+                                                    <<std::endl;
+                                                }
+                                                else
+                                                    std::cout<<std::endl;
+                                                    std::cout<<"Fantastic my lord, we will send our drones to this miserable planet!\n"
+                                                    <<"and take these dirty inferior beings to an intergalactic hell...\n"<<std::endl;
+                                                    damage_calculation(balance, "Missile attack", amount*_missiles, enemy_drones_hp, enemies_level, aliens, enemy_morale, turn);
+
+                                        }
+                                        else{
+                                            if(enemy_energy > 5000000){
+                                                while(1){
+                                                    amount = randRange(enemies_drones, std::floor(enemies_drones/ 5.0));
+                                                    energy -= std::floor(amount / 2.0);
+                                                    missiles_amount = randRange(enemies_missiles, std::floor(enemies_missiles/5.0));
+                                                    if(energy > std::floor(amount / 2.0) && enemies_drones >= amount && enemies_missiles >= missiles_amount){
+                                                        break;
+                                                    }
+                                                    else
+                                                        continue;
+                                                }
+                                                damage_calculation(balance, "Missile attack", amount*missiles_amount, drones_hp, enemies_level, _specimens, morale, turn);
+                                                break;
+
+                                            }
+                                            else{
+                                                while(1){
+                                                    amount = rand() % enemies_drones + std::floor(enemies_drones/ 3.0);
+                                                    energy -= std::floor(amount / 2.0);
+                                                    missiles_amount = randRange(enemies_missiles, std::floor(enemies_missiles/3.0));
+                                                    if(energy > std::floor(amount / 2.0) && enemies_drones >= amount && enemies_missiles >= missiles_amount){
+                                                        break;
+                                                    }
+                                                    else
+                                                        continue;
+                                                }
+                                                damage_calculation(balance, "Missile attack", amount*missiles_amount, drones_hp, enemies_level, _specimens, morale, turn);
+                                                break;
+                                            }
+                                        }
+
+                                    }
+                                    break;
+
+                            case 2: while(1){
+                                         std::cout<<std::endl;
+                                        if(turn){
+                                            std::cout<<"<--DRONES HEADQUARTERS-->"<<"\n"
+                                            <<"Lord let us know how many bombs you want each drone to drop!"<<std::endl;
+                                            std::cin>>amount;
+                                            if(amount > _bombs || energy < std::floor(amount / 2.0)){
+                                                std::cout<<"My lord this is the current amount of resources you have at disposal"<<"\n"
+                                                <<"Bombs: "<<_bombs<<"\n"
+                                                <<"Drones: "<<_drones<<"\n"
+                                                <<"Energy: "<<energy<<"\n"
+                                                <<std::endl;
+                                            }
+                                            else
+                                                std::cout<<std::endl;
+                                                std::cout<<"Now my lord, type in the amount of drones you want to send for this attack\n"<<std::endl;
+                                                std::cin>>amount;
+                                                if(amount > _drones || energy < std::floor(amount / 2.0)){
+                                                    std::cout<<"My lord, this is the current amount of resources you have at disposal"<<"\n"
+                                                    <<"Bombs: "<<_bombs<<"\n"
+                                                    <<"Drones: "<<_drones<<"\n"
+                                                    <<"Energy: "<<energy<<"\n"
+                                                    <<std::endl;
+                                                }
+                                                else
+                                                    std::cout<<std::endl;
+                                                    std::cout<<"Fantastic my lord, we will send our drones to this miserable planet!\n"
+                                                    <<"and take these dirty inferior beings to an intergalactic hell...\n"<<std::endl;
+                                                    damage_calculation(balance, "Drone bombardment", amount*_bombs, enemy_drones_hp, _soldierslevel, aliens, enemy_morale, turn);
+
+                                        }
+                                        else{
+                                            if(enemy_energy > 5000000){
+                                                while(1){
+                                                    amount = randRange(enemies_drones, std::floor(enemies_drones/ 5.0));
+                                                    energy -= std::floor(amount / 2.0);
+                                                    missiles_amount = randRange(enemies_bombs, std::floor(enemies_bombs/5.0));
+                                                    if(energy > std::floor(amount / 2.0) && enemies_drones >= amount && enemies_bombs >= bombs_amount){
+                                                        break;
+                                                    }
+                                                    else
+                                                        continue;
+                                                }
+                                                damage_calculation(balance, "Drone bombardment", amount*bombs_amount, drones_hp, enemies_level, _specimens, morale, turn);
+                                                break;
+
+                                            }
+                                            else{
+                                                while(1){
+                                                    amount = rand() % enemies_drones + std::floor(enemies_drones/ 3.0);
+                                                    energy -= std::floor(amount / 2.0);
+                                                    missiles_amount = randRange(enemies_bombs, std::floor(enemies_bombs/3.0));
+                                                    if(energy > std::floor(amount / 2.0) && enemies_drones > amount && enemies_bombs >= bombs_amount){
+                                                        break;
+                                                    }
+                                                    else
+                                                        continue;
+                                                }
+                                                damage_calculation(balance, "Drone bombardment", amount*bombs_amount, drones_hp, enemies_level, aliens, morale, turn);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    break;
+
+                        }
+                    }
+                    break;
+            case 3: methalurgy(turn, lack_drones, lack_cyborgs, lack_bombs, lack_missiles);
+                    break;
+        }
     }
 }
 
-void Spaceship::battle_mode(int drones, int cyborgs, int enemies_drones, int enemies_cyborgs, int level){
-    //One processor to rule them all, One processor to find them,
-    //One processor to bring them all and in the darkness bind them
-    int player_warriors = drones + cyborgs;
-    int enemy_warriors = enemies_drones + enemies_cyborgs;
-    high_resolution_clock::time_point s1 = high_resolution_clock::now();
-    std::thread t1(casualties, player_warriors, level);
+
+void Spaceship::battle_reports(int warriors, int surrender_limit, int deaths, int arbitrary_stop, int adjustment, int nanoseconds, bool turn){
+    int results;
+    std::string report;
+    if(turn)
+        report = "The enemy had ";
+    else
+        report = "My lord we had ";
+    while(warriors >= surrender_limit){
+        if (deaths > 300000){
+            results = deaths;
+            deaths = 0;
+            adjustment = 5;
+        }
+        arbitrary_stop = rand() % adjustment + deaths;
+        usleep(nanoseconds);
+        warriors -= 1;
+        deaths += 1;
+        if(deaths == arbitrary_stop){
+            if(results > 0){
+                std::cout<<report<<deaths + results<<" casualties"<<std::endl;
+                adjustment = deaths;
+            }
+            else
+                std::cout<<report<<deaths<<" casualties"<<std::endl;
+                adjustment = deaths;
+        }
+    }
+}
+
+void Spaceship::casualties(long warriors, int level, bool turn){
+    int nanoseconds = 17 - level;
+    int surrender_limit = rand() % 500000;
+    int deaths;
+    int arbitrary_stop;
+    int adjustment = 13;
+    if(warriors % 2){
+        surrender_limit = rand() % warriors/4;
+    }
+    else if(warriors % 2 != 0){
+        warriors += 1;
+        surrender_limit = rand() % warriors/4;
+    }
+    std::thread t1(battle_reports, warriors, surrender_limit, deaths, arbitrary_stop, adjustment, nanoseconds, turn);
     t1.join();
-    high_resolution_clock::time_point s2 = high_resolution_clock::now();
+}
+int Spaceship::outcome_calculator(long warriors, int level, bool turn){
     high_resolution_clock::time_point p1 = high_resolution_clock::now();
-    std::thread t2(casualties, enemy_warriors, _soldierslevel);
+    std::thread t2(casualties, warriors, level, turn);
     t2.join();
     high_resolution_clock::time_point p2 = high_resolution_clock::now();
-    auto players_duration = duration_cast<microseconds>(s2 - s1).count();
-    auto enemys_duration = duration_cast<microseconds>(p2 - p1).count();
+    auto duration = duration_cast<milliseconds>(p2 - p1).count();
+    return duration;
+}
+
+float Spaceship::soldiers_fate(float ceilling){
+    float addition = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX/ceilling));
+    return addition;
+}
+
+long Spaceship::random_victim_assignment(long warriors){
+    float pivot;
+    float fate;
+    float ceilling;
+    int random_constant;
+    pivot = std::floor(warriors/2);
+    random_constant = randRange(1, 2);
+    ceilling = warriors - pivot;
+    fate = soldiers_fate(ceilling);
+    if(random_constant == 1){
+        warriors += fate;
+    }
+    else if(random_constant == 2){
+        warriors -= fate;
+    }
+    int n = static_cast<long>(warriors);
+    return n;
+}
+
+void Spaceship::battle_processor(std::vector<std::string> balance, int drones, int cyborgs, int enemies_drones, int enemies_cyborgs, int level, bool turn){
+    //One processor to rule them all, One processor to find them,
+    //One processor to bring them all and in the darkness bind them
+    std::cout<<"\n"
+    <<"Our soldiers will get ready for the glorious day my lord!"<<"\n"
+    <<"Always willing to serve you and die for you! "<<"\n"
+    <<std::endl;
+    long first_turn;
+    long second_turn;
+    long player_warriors = drones + cyborgs;
+    long enemy_warriors = enemies_drones + enemies_cyborgs;
+    int fighter_level;
+    if(turn){
+        first_turn = random_victim_assignment(enemy_warriors);
+        second_turn = player_warriors;
+        fighter_level = _soldierslevel;
+
+    }
+    else{
+        first_turn = random_victim_assignment(player_warriors);
+        second_turn = enemy_warriors;
+        fighter_level = level;
+    }
+    std::future<int> result1(std::async(outcome_calculator, first_turn, fighter_level, turn));
+    int players_duration = result1.get();
+    std::future<int> result2(std::async(outcome_calculator, second_turn, fighter_level, turn));
+    int enemys_duration = result2.get();
     if(players_duration >= enemys_duration)
-        std::cout<<"Victory"<<std::endl;
+        balance.push_back("Victory");
     else if(players_duration < enemys_duration)
-        std::cout<<"Defeat"<<std::endl;
+        balance.push_back("Defeat");
 }
 
-void Spaceship::colonise_solar_system(std::vector<Planet> planets){
-//std::string colonysname;
-//This function will interact with TWO DATABASES namely colonies and planets (for reference check the function beloW)
-//In this function we are going to use a for loop to insert each element within the database
-//This method is way trickier than it seems!
-//The reason for this is that planetsbuffer is a static attribute, meaning that each time a solar system is generated if others have been generated previously
-//the indexing method to find our planetsname won't work in accordance to the user's preference, we will need to use
-//a variable counting the name of elements that there is in planetsbuffer everytime a planetary system is generated
-//when planetsname has been reduced down to the maximum number of planets that can be generated (8)
-//This variable will be reset to zero(an if-statement within the planet_interaction method will do that for us
-//then subtracting planets.size() to planetsbuffer-size() will do the job for us, regarding the indexing problem, the last elements will be the most recently created
-//and so when accessing the names we will just have to do code the following
-//planetnamesbuffer[choice + (planetsbuffer.size() - planets.size()]
-//a minus one may need to be added we will check it later
-//This will be used for the first element to be inserted and for the sake of simplicity
-//I just typed i. I will type in capital letters the databases that will be modified
-//FIRST THE COLONIES DATABASE
-//we tell the user to give a name to its colony
-//an if-statement must be added again to check if the name already exists
-//Now insert colonies name along with the STARSNUMBER variable(our primary key for the star database and foreign key for the colonies database)
-//Just two columns, starsname and colonies name(the latter will be our Primary key for the colonies database and the foreign key!
-//for the planets database
-//it is VERY IMPORTANT to include that if-statement otherwise the foreign and primary key of the colonies database won't work
-//leading to HORRIBLE BUGS
-//SECONDLY THE PLANETS DATABASE
-//next we just insert the elements within the planets database
-//NOTE1: read line 994, for the sake of simplicity I typed i as the index to planetnamesbuffer, this MUST NOT be done
-//there will be HORRIBLE BUGS otherwise XDDDD
-//for(int i = 0; i < planets.size(); i++){
-//  insert(planetnamesbuffer[i](text), planets[i].getplanetstemperature(integer), planets[i].getplanetsurface(real), planets[i].getatmospherecomposition(text), planets[i].getmagneticfieldsintensity(integer), planets[i].geteccentricity(real), planets[i].getdistancefromstar(integer))
-}//}
-//NOTE:  It is key that we include the starsnumber variable! (read line 1001)
-//This will also be tricky, since, if more colonies have been previously generated, we will need to access a specific star
-//The stars name itself CANNOT be our primary key(value used to access all the entity's data(an entity is just an object in the database)
-//It will be good if we stick to a technical jargon to communicate more effectively
-//The reason for this is that the stars' names will repeat themselves after a given number of iterations
-//The only solution to this, is to create a static variable storing the number of stars,
-//This variable will also be in the stars database and it will also be the PRIMARY KEY of this database
-//as well as the FOREIGN KEY
 
-void Spaceship::generate_stars_data_base(int choice, std::vector<Star> stars){
-//This function is called in the line 773!
-//The starsnumber must be extracted from the last row of the database in order to update the value
-//an if statement will do this for us i.e (if database empty nothing is done if not extract starsnumber from the last row or entity)
-//If we don't do this a HORRIBLE BUG will make our lives very unbearable XDD
-//starsnumber += 1 the static variable will be increased by one
-//insert(starsnumber(PRIMARY KEY and FOREIGN KEY), stars[choice - 1].getstarsname(text), stars[choice - 1].getstartype(text), stars[choice - 1].getstarsurface(real), stars[choice - 1].getstarstemperature(integer),stars[choice - 1].getstarsradiation(integer))
-//A foreign key is the identifier for the colonies database both colonies and stars share this key so they are connected
-//That means two things
-//First: Before generating the colonies database the star database MUST have been defined
-//Second: The foreign key must be added as a column to the colonies database, each colony will have its corresponding star
-//Only two columns are needed for the colonies(the other column will be the colony name IMPORTED by the user (important to use a place holder here)
-//That will give us EXTRA MARKS!!
-//The colony's name is going to be our foreign key to access the planetary system
-//In total three data bases interact
-//Stars>>Colonies>>Planets
-//This is the order in which they must be created for this to be possible
-//NOTE: When the user decides to delete a data base (from the colonies function contained in the CABIN function!)
-//Elements must be deleted in the opposite order, this will make it look even simpler
-//CREATE DATABASE
-//Stars>>Colonies>>Planets
-//DELETE DATABASE
-//Planets>>Colonies>>Stars
-//With their corresponding methods(functions) defined i.e delete_stars, delete_planets, delete_Colonies.
-//Check line 1254! If the users decides to create a colony, the colonies_solar_system function will be called
-//Lines 1299 and 1303 is where we are calling the function
-}
-
-//This are the most challenging parts of the database interaction, foreign and primary keys must be defined using sqlitestudio
-//It is a piece of cake tho we might need some assistance(on friday we will ask)
-
-int Spaceship::efficiency_calculation(int resources, int slaves){
+int Spaceship::efficiency_calculation(int resources, int slaves, bool battle){
     int efficiency;
     int time;
-    if(_slaveslevel >= 0 && _slaveslevel <= 5){
+    int level;
+    if(battle)
+        level = _soldierslevel;
+    else
+        level = _slaveslevel;
+    if(level >= 0 && level <= 5){
         if(resources < 5000){
             slaves % 2 == 0 ? slaves = randRange(10, 15) : slaves = randRange(1, 5);
             efficiency = 20* 2 - slaves;
@@ -1108,7 +1503,7 @@ int Spaceship::efficiency_calculation(int resources, int slaves){
                 time = 4;
         }
     }
-    else if(_slaveslevel > 10 && _slaveslevel <= 15){
+    else if(level > 10 && level <= 15){
         if(resources < 5000){
             slaves % 2 == 0 ? slaves = randRange(10, 15) : slaves = randRange(1, 5);
             efficiency = randRange(5, 10) * 2 - slaves;
@@ -1126,7 +1521,7 @@ int Spaceship::efficiency_calculation(int resources, int slaves){
                 time = 3;
         }
     }
-    else if(_slaveslevel >= 15){
+    else if(level >= 15){
         if(resources < 5000){
             slaves % 2 == 0 ? slaves = randRange(10, 15) : slaves = randRange(1, 5);
             efficiency = randRange(1, 5) * 2 - slaves;
@@ -1149,61 +1544,29 @@ int Spaceship::efficiency_calculation(int resources, int slaves){
 }
 
 void Spaceship::display_colonies(){
-//Simply display the data from the colonies database, let the user choose what colony he wants to visit (PLACEHOLDERS) and then
-//display its corresponding planetary system's data,
-//HINT: insert whatever where whatever is equal to whatever (foreign key)
-//NOTE: This is going to be tricky as FUCK but the purpose of owning a colony is that you can extract resources from it without
-//wasting fuel (captain Kurg creates a blackhole or whatever)
-//It is interesting for the game since it will give the player a second chance if he runs out of fuel
-//However, and to make it more interesting (otherwise the game would be too easy) a colony must be deleted whenever it is visited
-//We will cout the explanation (artificial worm holes dilate space-time and cannot be overused without causing a terrible vaccuum that destroys
-//the universe) anything XDD
-//You could add a time function that calculates the difference in hours between the last moment the user displayed a colony
-//and when he displays it so that according to the time it passed more or less resources will be available
-//It sounds easy, but it is trickier than it seems
+
 }
 
 void Spaceship::display_planets_database(){
-//I don't know what the fuck this is, we can get rid of it
+
 }
 
 void Spaceship::generate_solar_data_base(std::vector<Planet>){
-//Okay this is the easiest database, it will be a temporary database meaning that everytime the user chooses
-//to get back to the cabin (line , all of its elements will be deleted!
-//The planet_destroyer function (go to line 1269)
-//will simply delete the corresponding row from the database
-//NOTE: The player cannot colonise a solar system that contains a civilisation that has not been defeated!!
-//Therefore from the battlemode function, a variable within this databas will have to be modified
-//Such variable will be a boolean (True if defeated False if not)
-//HINT: Use an if-statement with planets[i].getplanethabitability() to check for habitability
-//then use planets[i].getdefeat() to insert the boolean in the database
-//Colonies don't need to include this variable since they can only be created, once it has been set to true
-//NOTE: The fact that a for loop will be needed is too obvious for it to be mentioned
-//A totally new planet_interaction function must be created here, since the data is not coming from an object's getters
-//This is a LOT of code and can make your contribution very RELEVANT
-//If the planet is habitable the civilisation contained in that planet must also be included
-//We will have to create ANOTHER DATABASE with civilisations contained in this solar system, it will be
-//a temporary database, which hopefully will also make things easier for us
-//For the sake of consistency, read the planet interaction database (The most important one)
-//NOTE: That is A LOT of work, but that way you will get extra marks there is a week before the deadline we can get this shit done
-//and call it a day
-//Luckily, we already have a planet_interaction function, use that as a reference
 
 }
 
 void Spaceship::to_solar_system(){
-//EXTRACTS DATA FROM A TEMPORARY DATABASE DEFINED WHEN PLANETS ARE GENERATED(PLANETSINTERACTION) IT CAN ONLY BE MODIFIED BY THE PLANET_DESTROYER FUNCTION
-//We will work on this once the most fundamental databases have been created
-//It simply displays the data from the generate_solar_data_base
+
 
     std::cout<<"Puta"<<std::endl;
 
 }
 
 void Spaceship::assign_troops(long aliens, int enemies_drones, int enemies_cyborgs){
-    enemies_drones = randRange(std::round(aliens/2), aliens);
-    enemies_cyborgs = randRange(100000, std::round(aliens/2));
-    
+    std::cout<<aliens<<std::endl;
+    enemies_drones = randRange(int(std::round(aliens/2)), aliens);
+    enemies_cyborgs = randRange(1000000, std::floor(aliens/2.0));
+    aliens -= enemies_cyborgs + enemies_cyborgs;
 }
 
 void Spaceship::civilisation_interaction(int desired_respect, int aliens){
@@ -1214,7 +1577,10 @@ void Spaceship::civilisation_interaction(int desired_respect, int aliens){
     int surrender_calculation;
     int enemies_drones;
     int enemies_cyborgs;
-    int choice;
+    int selection;
+    float energy = 10000000.0;
+    float enemy_energy = 10000000.0;
+    bool turn = true;
     bool surrender = false;
     bool done = false;
     std::string social_structure;
@@ -1280,10 +1646,12 @@ void Spaceship::civilisation_interaction(int desired_respect, int aliens){
             <<"The confidential reports must be read in order to find out the enemy's level"<<"\n"
             <<"1. Start battle"<<"\n"
             <<"2. Confidential reports from intelligence agency"<<std::endl;
-            std::cin>>choice;
-            switch(choice){
-                    case 1: battle_mode(_drones, _armors, enemies_drones, enemies_cyborgs, enemies_level);
-                            done = true;
+            std::cin>>selection;
+            switch(selection){
+                    case 1: battle_preparation(enemies_drones, enemies_cyborgs, enemies_level, energy, enemy_energy, aliens);
+                            //Function switching turns
+                            break;
+
 
                     case 2: civilisation_history(social_structure, civilisationsnames[rand() % civilisationsnames.size()], enemies_level);
                             break;
@@ -1406,11 +1774,9 @@ void Spaceship::planet_interaction(){
             if(dead_solar_system){
                 std::cout<<"This solar system can be colonised"<<"\n"
                 <<"Since all of its planets are dead"<<std::endl;
-                colonise_solar_system(planets);
             }
             else if(!dead_solar_system)  //Planettype can still be four but potentially habitable
                 std::cout<<"There might be one or more potentially habitable planets in this solar system"<<std::endl;
-                colonise_solar_system(planets);
         }
         else if(!potential_colony){
             std::cout<<"You still must conquer those planets that are habitable"<<std::endl;
@@ -1446,7 +1812,7 @@ void Spaceship::planet_interaction(){
                     while(1){
                         std::cout<<"Tell us the amount of metal that you want my lord"<<std::endl;
                         std::cin>>desired_amount;
-                        efficiency = efficiency_calculation(planets[choice - 1].getmetal(), slaves);
+                        efficiency = efficiency_calculation(planets[choice - 1].getmetal(), slaves, false);
                         std::cout<<efficiency<<std::endl;
                         if(desired_amount > planets[choice - 1].getmetal()){
                             std::cout<<"Try typing in the amount again"<<std::endl;
@@ -1490,7 +1856,7 @@ void Spaceship::planet_interaction(){
                     while(1){
                         std::cout<<"Please, tell us the amount of diamonds that you want my lord"<<std::endl;
                         std::cin>>desired_amount;
-                        efficiency = efficiency_calculation(slaves, planets[choice -1].getdiamonds());
+                        efficiency = efficiency_calculation(slaves, planets[choice -1].getdiamonds(), false);
                         if(desired_amount > planets[choice - 1].getdiamonds()){
                             std::cout<<"There is not that many diamonds my lord"<<std::endl;
                         }
@@ -1533,7 +1899,7 @@ void Spaceship::planet_interaction(){
                     while(1){
                         std::cout<<"Let us know how many megatons you want my lord"<<std::endl;
                         std::cin>>desired_amount;
-                        efficiency = efficiency_calculation(slaves, planets[choice -1].getmercury());
+                        efficiency = efficiency_calculation(slaves, planets[choice -1].getmercury(), false);
                         if(desired_amount > planets[choice - 1].getmercury()){
                             std::cout<<"There is not that much mercury my lord"<<std::endl;
                         }
@@ -1557,7 +1923,7 @@ void Spaceship::planet_interaction(){
         }
         else if(planets[choice -1].getplanettype() == 4){
             int selection;
-            efficiency = std::pow(17 - _slaveslevel - 1, 17 -_slaveslevel) * (2*planets[choice-1].getmetal()); //This way when the level is 17 the exponent will be zero!
+            efficiency; //This way when the level is 17 the exponent will be zero!
             while(1){
                 std::cout<<"\n"
                 <<"<<HABITABLE OR POTENTIALLY HABITABLE PLANET>>"<<"\n"
@@ -1646,6 +2012,7 @@ void Spaceship::planet_interaction(){
                                             break;
                                         }
                                         else{
+                                            efficiency = efficiency_calculation(400, randRange(1, 2), false);
                                             usleep(efficiency);
                                             _protozoolevels -= rand()%200 + 1;
                                             _staphilococcuslevels -= rand()%100 + 1;
@@ -1794,6 +2161,7 @@ void Spaceship::planet_interaction(){
                             break;
                     }
                     planets[choice - 1].setgas(-desired_amount);
+                    efficiency = efficiency_calculation(desired_amount, randRange(1, 2), false);
                     sleep(efficiency);
                     _WARPdrive += desired_amount;
                     std::cout<<"We have obtained "<<desired_amount<<" megatons of antimatter to fill our WARP drive deposits my lord!"<<std::endl;
@@ -1836,7 +2204,6 @@ void Spaceship::interstellar_travel()
         }
         Stars = stars_interaction();
         std::cin>>starschoice;
-        generate_stars_data_base(starschoice, Stars);
         if(_fuelcapacity == 0){
             std::cout<<"My lord, we have no fuel left, it is time for us to face death like brothers!"<<"\n"
             <<"I must confess it's always been a pleasure for us to serve you"<<std::endl;
@@ -2149,20 +2516,26 @@ void Spaceship::laboratory(){
   }
 }
 
-void Spaceship::methalurgy(){
+void Spaceship::methalurgy(bool turn, bool lack_drones, bool lack_cyborgs, bool lack_bombs, bool lack_missiles){
     int choice;
     while(1){
-        std::cout<<"\n"
-        <<"\n"
-        <<"<--METHALLURGY LABORATORY-->"<<"\n"
-        <<"\n"
-        <<"Metal: "<<_metalamount<<"\n"
-        <<"\n"
-        <<"Specimens: "<<_specimens<<"\n"
-        <<"1. Drones factory"<<"\n"
-        <<"2. Cyborg's armors and weapons"<<"\n"
-        <<"3. Exit"<<std::endl;
-        std::cin>>choice;
+        if(turn){
+             std::cout<<"\n"
+            <<"\n"
+            <<"<--METHALLURGY LABORATORY-->"<<"\n"
+            <<"\n"
+            <<"Metal: "<<_metalamount<<"\n"
+            <<"\n"
+            <<"Specimens: "<<_specimens<<"\n"
+            <<"1. Drones factory"<<"\n"
+            <<"2. Cyborg's armors and weapons"<<"\n"
+            <<"3. Bombs\n"
+            <<"4. Missiles\n"
+            <<"5. Exit" <<std::endl;
+            std::cin>>choice;
+        }
+        else
+            ;
         switch(choice){
 
             case 1: std::cout<<std::endl;
@@ -2182,6 +2555,7 @@ void Spaceship::methalurgy(){
                             <<"Type in a smaller amount!"<<std::endl;
                             std::cin>>choice;
                         }
+                        usleep(efficiency_calculation(choice, 1000, false));
                         _metalamount -= choice * 25;
                         _drones += choice;
                         if(_specimens < _drones){
@@ -2199,6 +2573,7 @@ void Spaceship::methalurgy(){
                     else if(choice == 0)
                         break;
                     else if(_metalamount > choice * 25){
+                        usleep(efficiency_calculation(choice, randRange(1, 2), false));
                         _metalamount -= choice * 25;
                         _drones += choice;
                         if(_specimens < _drones){
@@ -2233,6 +2608,7 @@ void Spaceship::methalurgy(){
                             <<"Type in a smaller amount!"<<std::endl;
                             std::cin>>choice;
                         }
+                        usleep(efficiency_calculation(choice, 1000, false));
                         _metalamount -= choice * 17;
                         _armors += choice;
                         if(_specimens < _armors){
@@ -2250,6 +2626,7 @@ void Spaceship::methalurgy(){
                     else if(choice == 0)
                         break;
                     else if(_metalamount > choice * 17){
+                        usleep(efficiency_calculation(choice, 1000, false));
                         _metalamount -= choice * 17;
                         _armors += choice;
                         if(_specimens < _armors){
@@ -2263,9 +2640,68 @@ void Spaceship::methalurgy(){
                             break;
                         }
                     }
+                    break;
 
-            case 3: break;
-
+            case 3: std::cout<<std::endl;
+                    std::cout<<"Metal: "<<_metalamount<<"\n"
+                    <<"Bomb's price: "<<"10"<<"\n"
+                    <<"\n"<<std::endl;
+                    std::cout<<"How many bombs?"<<std::endl;
+                    std::cin>>choice;
+                    if(_metalamount == 0){
+                        std::cout<<"Lord! our metal reserves are fully empty we must extract minerals from a nearby planet"<<std::endl;
+                        break;
+                    }
+                    else if(_metalamount < choice * 10){
+                        while(1){
+                            if(_metalamount < choice * 10)
+                                break;
+                            std::cout<<"Lord! you don't have that much metal yet"<<"\n"
+                            <<"Type in a smaller amount!"<<std::endl;
+                            std::cin>>choice;
+                        }
+                        efficiency_calculation(choice, 1000, false);
+                        _metalamount -= choice * 10;
+                        _bombs += choice;
+                    }
+                    else if(choice == 0)
+                        break;
+                    else if(_metalamount > choice * 10){
+                        efficiency_calculation(choice, 1000, false);
+                        _metalamount -= choice * 10;
+                        _bombs += choice;
+                    }
+                    break;
+            case 4: std::cout<<std::endl;
+                    std::cout<<"Metal: "<<_metalamount<<"\n"
+                    <<"Missile's price: "<<"10"<<"\n"
+                    <<"\n"<<std::endl;
+                    std::cout<<"How many missiles?"<<std::endl;
+                    std::cin>>choice;
+                    if(_metalamount == 0){
+                        std::cout<<"Lord! our metal reserves are fully empty we must extract minerals from a nearby planet"<<std::endl;
+                        break;
+                    }
+                    else if(_metalamount < choice * 10){
+                        while(1){
+                            if(_metalamount < choice * 10)
+                                break;
+                            std::cout<<"Lord! you don't have that much metal yet"<<"\n"
+                            <<"Type in a smaller amount!"<<std::endl;
+                            std::cin>>choice;
+                        }
+                        _metalamount -= choice * 10;
+                        _missiles += choice;
+                    }
+                    else if(choice == 0)
+                        break;
+                    else if(_metalamount > choice * 10){
+                        usleep(efficiency_calculation(choice, randRange(1, 2), false));
+                        _metalamount -= choice * 10;
+                        _missiles += choice;
+                    }
+                    break;
+            case 5: break;
         }
         break;
     }
@@ -2287,6 +2723,7 @@ void Spaceship::read_story(){
     readstory.close();
 }
 
+
 std::string Spaceship::show_title(){
 return "   ___   ____  ____ ___   ___             ___   _____ ______________   ____      __                           \n"
        "  |__ \\ / __ \\/ __ <  /  /   |  ____     /   | / ___// ____/  _/  _/  / __ \\____/ /_  _______________  __  __ \n"
@@ -2299,7 +2736,6 @@ return "   ___   ____  ____ ___   ___             ___   _____ ______________   _
 int Spaceship::cabin(){
     std::cout<<show_title()<<std::endl;
     std::string choice;
-    bool back_to_solar_system = false;
     while(1){
         std::cout<<std::endl;
         std::cout<<"<<<CABIN OF THE INTERSTELLAR FALCON IV WELCOME ON BOARD MY MASTER>>>"<<"\n"
@@ -2359,7 +2795,7 @@ int Spaceship::cabin(){
            }
         }
         else if(choice == "M" || choice == "m"){
-            methalurgy();
+            methalurgy(true, false, false, false, false);
         }
         else if(choice == "P" || choice == "p"){
             purchasepoints(_diamondsamount);
@@ -2391,13 +2827,8 @@ int Spaceship::cabin(){
 
 int main()
 {
+    srand(unsigned( time(NULL) ));
     Spaceship s;
     s.cabin();
 }
-
-
-
-
-
-
 
