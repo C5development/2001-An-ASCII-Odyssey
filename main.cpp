@@ -686,7 +686,7 @@ class Spaceship
     static void damage_calculation(std::vector<std::string>, std::string, int, float, int, long, int, bool);
     static int _soldierslevel;
     static int (randRange(int, int));
-    static void methalurgy(bool, bool, bool, bool, bool);
+    static void metallurgy(bool, bool, bool, bool, bool);
     static int efficiency_calculation(int, int, bool);
     static float soldiers_fate(float);
     static long random_victim_assignment(long);
@@ -1334,7 +1334,7 @@ void Spaceship::battle_preparation(int enemies_drones, int enemies_cyborgs, int 
                         }
                     }
                     break;
-            case 3: methalurgy(turn, lack_drones, lack_cyborgs, lack_bombs, lack_missiles);
+            case 3: metallurgy(turn, lack_drones, lack_cyborgs, lack_bombs, lack_missiles);
                     break;
         }
     }
@@ -2516,13 +2516,13 @@ void Spaceship::laboratory(){
   }
 }
 
-void Spaceship::methalurgy(bool turn, bool lack_drones, bool lack_cyborgs, bool lack_bombs, bool lack_missiles){
+void Spaceship::metallurgy(bool turn, bool lack_drones, bool lack_cyborgs, bool lack_bombs, bool lack_missiles){
     int choice;
     while(1){
         if(turn){
              std::cout<<"\n"
             <<"\n"
-            <<"<--METHALLURGY LABORATORY-->"<<"\n"
+            <<"<--METALLURGY LABORATORY-->"<<"\n"
             <<"\n"
             <<"Metal: "<<_metalamount<<"\n"
             <<"\n"
