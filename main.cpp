@@ -673,20 +673,22 @@ class Spaceship
     static long _missiles;
     static long _bombs;
     static long _metalamount;
+    static int _soldierslevel;
     static int _slaveslevel;
     static long _specimens;
     static void battle_reports(int, long, int, long, int, int, bool, int);
     static void battle_preparation(long, long, long, long, long, long);
     static void damage_calculation(std::vector<std::string>, std::string, int, float, int, long, int, int);
-    static int _soldierslevel;
+    static void AI_weaponery_store(long, std::string, long, long);
+    static void AI_gradual_spend_reduction(long, int);
     static int randRange(int, int);
     static void metallurgy(int);
     static int efficiency_calculation(int, int, bool);
     static float soldiers_fate(float);
     static long random_victim_assignment(long);
     static bool turn_assignment(int);
-    static void AI(std::vector<int>,  int, long, int, int, int, int);
-    static void decision_maker(int, long, long, long, long, float, float, bool);
+    static void AI(std::vector<int>,  int, long, int, int, int, int, bool, bool);
+    static void decision_maker(int, long, long, long, long, float, float, bool, bool, bool);
     static void balance_counter(std::vector<std::string>, bool, bool);
     static void check_victory(std::vector<std::string>, long, long, long, bool, int);
     static void update_energy(int, int, int);
@@ -1235,7 +1237,7 @@ bool Spaceship::turn_assignment(int counter){
         return true;
 }
 
-void Spaceship::decision_maker(int choice, long arsenal1, long arsenal2, long enemies_metal, long enemies_energy, float relative_difference, float marginal_loss, bool arsenal1_or_arsenal2){
+void Spaceship::decision_maker(int choice, long arsenal1, long arsenal2, long enemies_metal, long enemies_energy, float relative_difference, float marginal_loss, bool arsenal1_or_arsenal2, bool lack_drones, bool lack_cyborgs){
 //The production choice that will be passed into metallurgy
     if(arsenal1 - arsenal2 <= relative_difference){   //If the difference between both arsenals is greater than the average casualties per battle
             if(arsenal1 <= relative_difference){     //If the AI has lost more men than there are elements within the arsenal
@@ -1248,7 +1250,8 @@ void Spaceship::decision_maker(int choice, long arsenal1, long arsenal2, long en
                     }
                 }
                 else{
-                    choice = 2; //More drones need to be produced, the metallurgy function will be called!
+                    choice = 3; //More drones need to be produced, the metallurgy function will be called!
+                    lack_drones = true;
                 }
             }
             else{                                //Since there is more of that item than there have been deaths, the ratio is good so the AI produces more of the other item
@@ -1261,7 +1264,12 @@ void Spaceship::decision_maker(int choice, long arsenal1, long arsenal2, long en
                     }
                 } //Else we don't want to waste energy so we will try to optimise by spending metal instead then energy will hopefully be updated positively in the next iteration
                 if(30 > marginal_loss){  //If we have more metal than the total amount of metal we lost 30 is the average price of an item in the metallurgy laboratory
-                    choice = 2;         //We can afford Drones/Cyborgs!
+                    choice = 3;
+                    switch(randRange(1, 2)){
+                        case 1: lack_drones = true;
+
+                        case 2: lack_cyborgs = true;
+                    }          //We can afford Drones/Cyborgs!
                 }
                 else{
                     choice = randRange(1, 2); //Else the AI is fucked so it will choose either one or two randomly
@@ -1344,7 +1352,7 @@ void Spaceship::update_morale(std::vector<std::string> balance, int morale, int 
         morale = std::abs(morale); //We don't want it to be negative
 }
 
-void Spaceship::AI(std::vector<int> metal_stock, int choice, long aliens, int arsenal1, int arsenal2, int enemies_metal, int enemies_energy){
+void Spaceship::AI(std::vector<int> metal_stock, int choice, long aliens, int arsenal1, int arsenal2, int enemies_metal, int enemies_energy, bool lack_drones, bool lack_cyborgs){
     metal_stock.push_back(enemies_metal);
     std::vector<int> average_loss; //Keeps track of the average losses in order to compute marginal loss as an average
     float marginal_loss; //Marginal loss gives the AI a notion of how much metal has been lost, in terms of units
@@ -1367,28 +1375,65 @@ void Spaceship::AI(std::vector<int> metal_stock, int choice, long aliens, int ar
         relative_difference = aliens/3; //This variable lets the AI know how many people must join the airforce(e.g how many airplanes must be produced) or the cyborg's army
     }                                    //Given a certain amount of aliens
     if(arsenal1 > arsenal2)  //It will use drones if there are more drones than cyborgs and viceversa
-        decision_maker(choice, enemies_metal, enemies_energy, arsenal1, arsenal2, relative_difference, marginal_loss, true);
+        decision_maker(choice, enemies_metal, enemies_energy, arsenal1, arsenal2, relative_difference, marginal_loss, true, lack_drones, lack_cyborgs);
         //true if the AI decides to attack with drones
     else //false if the AI decides to attack with cyborgs
-        decision_maker(choice, enemies_metal, enemies_energy, arsenal1, arsenal2, relative_difference, marginal_loss, false);
+        decision_maker(choice, enemies_metal, enemies_energy, arsenal1, arsenal2, relative_difference, marginal_loss, false, lack_drones, lack_cyborgs);
 }
 
+void Spaceship::AI_gradual_spend_reduction(long enemies_metal, int subtraction){
+    if(enemies_metal <= 75000)
+        subtraction = 32000;
+    else if(enemies_metal <= 32000)
+        subtraction = 15000;
+    else if(enemies_metal <= 15000)
+        subtraction = 7000;
+    else if(enemies_metal <= 7000)
+        subtraction = 3500;
+    else if(enemies_metal <= 3500)
+        subtraction = 3500; //The AI has lost after this point 
+}
 
+void Spaceship::AI_weaponery_store(long enemies_metal, std::string AI_lacks, long item, long aliens){
+    int subtraction;
+    int item_ID;
+    int new_soldiers;
+    if(enemies_metal <= 75000)
+        AI_gradual_spend_reduction(enemies_metal, subtraction);
+    else
+        subtraction = randRange(10000, 75000);
+    if(AI_lacks == "Drones") 
+        item_ID = 1;
+    else if(AI_lacks == "Cyborgs")
+        item_ID = 2;
+    enemies_metal -= subtraction;
+    switch(item_ID){
 
+            case 1: new_soldiers = subtraction / 25;
+                    item += new_soldiers;
+                    aliens -= new_soldiers;
+
+            case 2: new_soldiers = subtraction / 17;
+                    item += new_soldiers;
+                    aliens -= new_soldiers;
+    }
+}
 
 void Spaceship::battle_preparation(long enemies_drones, long enemies_cyborgs, long enemies_level, long energy, long enemy_energy, long aliens){
     std::vector<std::string> balance;
     std::vector<int> metal_stock;
     int choice;
     int amount;
-    int missiles_amount = 200000; //AI's choice of how many missiles will be dropped
-    long enemies_missiles = 2000; //Amount of missiles the enemy has at disposal
+    int missiles_amount;
+    long enemies_missiles = 2000; 
     long enemies_bombs = 20000;
-    long bombs_amount = 20000;
+    long bombs_amount; 
     long enemies_metal;
     int morale = 100;
     int enemy_morale = 100;
     int counter = 1;
+    bool lack_drones;
+    bool lack_cyborgs; 
     bool done = false;
     bool back_to_menu = false;
     bool end_battle = false;
@@ -1398,6 +1443,8 @@ void Spaceship::battle_preparation(long enemies_drones, long enemies_cyborgs, lo
     int drones_hp = 100 * 5 + morale;
     while(!end_battle){
         std::cout<<std::endl;
+        lack_drones = false;
+        lack_cyborgs = false;
         if(back_to_menu)
             ;
         else
@@ -1416,7 +1463,7 @@ void Spaceship::battle_preparation(long enemies_drones, long enemies_cyborgs, lo
             std::cin>>choice;
         }
         else{
-            AI(metal_stock, choice , aliens, enemies_drones, enemies_cyborgs, enemies_metal, enemy_energy);
+            AI(metal_stock, choice , aliens, enemies_drones, enemies_cyborgs, enemies_metal, enemy_energy, lack_drones, lack_cyborgs);
         }
         switch(choice){
 
@@ -1544,7 +1591,7 @@ void Spaceship::battle_preparation(long enemies_drones, long enemies_cyborgs, lo
                             std::cin>>choice;
                         }
                         else
-                            AI(metal_stock, choice, aliens, enemies_bombs, enemies_missiles, enemies_metal, enemy_energy);
+                            AI(metal_stock, choice, aliens, enemies_bombs, enemies_missiles, enemies_metal, enemy_energy, lack_drones, lack_cyborgs);
 
                         switch(choice){
 
@@ -1690,7 +1737,16 @@ void Spaceship::battle_preparation(long enemies_drones, long enemies_cyborgs, lo
                         }
                     }
                     break;
-            case 3: metallurgy(counter);
+            case 3: if(turn_assignment(counter))
+                        metallurgy(counter);
+                    else if(lack_drones){
+                        AI_weaponery_store(enemies_metal, "Drones", enemies_drones, aliens);
+                        done = true;
+                    }
+                    else if(lack_cyborgs){
+                        AI_weaponery_store(enemies_metal, "Cyborgs", enemies_cyborgs, aliens);
+                        done = true;
+                    }
                     break;
         }
     }
@@ -1818,14 +1874,22 @@ void Spaceship::battle_processor(std::vector<std::string> balance, long drones, 
         fighter_level2 = _soldierslevel;
     }
     std::future<int> result1(std::async(outcome_calculator, first_turn, fighter_level1, players_attack, counter));
-    int players_duration = result1.get();
-    players_attack = true ? players_attack = false : players_attack = true;
+    int attacker_duration = result1.get();
+    players_attack == true ? players_attack = false : players_attack = true;
     std::future<int> result2(std::async(outcome_calculator, second_turn, fighter_level2, players_attack, counter));
-    int enemys_duration = result2.get();
-    if(players_duration >= enemys_duration)
-        balance.push_back("Victory");
-    else if(players_duration < enemys_duration)
-        balance.push_back("Defeat");
+    int deffender_duration = result2.get();
+    if(turn_assignment(counter)){
+       if(attacker_duration >= deffender_duration)
+            balance.push_back("Victory");
+        else if(attacker_duration < deffender_duration)
+            balance.push_back("Defeat");    
+    }
+    else{
+        if(attacker_duration >= attacker_duration)
+            balance.push_back("Defeat");
+        else if(attacker_duration < deffender_duration)
+            balance.push_back("Victory");
+    }
 }
 
 
@@ -2920,9 +2984,9 @@ return "   ___   ____  ____ ___   ___             ___   _____ ______________   _
 
 
 int Spaceship::cabin(){
-    std::cout<<show_title()<<std::endl;
     std::string choice;
     while(1){
+        std::cout<<show_title()<<std::endl;
         std::cout<<std::endl;
         std::cout<<"<<<CABIN OF THE INTERSTELLAR FALCON IV WELCOME ON BOARD MY MASTER>>>"<<"\n"
         <<"I)nterstellar travel"<<"\n"
@@ -3010,4 +3074,5 @@ int main()
     Spaceship s;
     s.cabin();
 }
+
 
