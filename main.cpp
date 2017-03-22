@@ -737,6 +737,7 @@ class Spaceship
         void refill_vector(std::string);
         void to_solar_system();
         void display_planets_database();
+        void access_resources();
         void generate_solar_data_base(std::vector<Planet>);
         void display_colonies();
         std::string show_title();
@@ -750,7 +751,7 @@ std::vector<std::string> Spaceship::planetnames = {"Lok", "Erinar", "Golrath", "
 
 std::vector<std::string> Spaceship::planetnamesbuffer;
 
-std::vector<std::string> Spaceship::starnames = {"Acamar", "Adhafera", "Kornephoros", "Hoedus II", "Miaplacidus", "Procyon", "Pleione", "Rastaban", "Rotanev", "Sarir", "Cassiopeia", "Sterope", "Tabit", "Veritate", "Zaurak", "Sceptrum", "Sadachbia", "Rukbat", "Cygnus", "Capricorni", "Rotanev", "Ceasar 43", "Zeus", "Colossus", "Dranicus", "Rimbokhan", "Tiranuslae", "Criptilocus"};
+std::vector<std::string> Spaceship::starnames = {"Acamar", "Adhafera", "Kornephoros", "Hoedus II", "Miaplacidus", "Procyon", "Pleione", "Rastaban", "Rotanev", "Sarir", "Cassiopeia", "Sterope", "Tabit", "Veritate", "Zaurak", "Sceptrum", "Sadachbia", "Rukbat", "Cygnus", "Capricorni", "Ceasar 43", "Zeus", "Colossus", "Dranicus", "Rimbokhan", "Tiranuslae", "Criptilocus"};
 
 std::vector<std::string> Spaceship::starnamesbuffer;
 
@@ -1833,7 +1834,7 @@ long Spaceship::random_victim_assignment(long warriors){
 void Spaceship::battle_processor(std::vector<std::string> balance, long drones, long cyborgs, long enemies_drones, long enemies_cyborgs, int level, int _soldierslevel, int counter){    //One processor to rule them all, One processor to find them,
     //One processor to bring them all and in the darkness bind them
     std::cout<<"\n"  //REWRITE PROCESS CHECK THE FIGHTER VARIABLE ASSIGNMENT!
-    <<"Our soldiers will get ready for the glorious day my lord!\n"<<std:endl;
+    <<"Our soldiers will get ready for the glorious day my lord!\n"
     <<"Always willing to serve you and die for you!\n"<<std::endl;
     long first_turn;
     long second_turn;
@@ -1970,22 +1971,35 @@ int Spaceship::efficiency_calculation(int resources, int slaves, bool battle){
 }
 
 void Spaceship::display_colonies(){
+//Extracts colonies from the database, it will contain methods, you can type a number to extract the planets' data for a given colony 
 
 }
 
 void Spaceship::display_planets_database(){
+//This function will be called to extract it from colonies select values where realm == "realmsname"
+//Note the user types in a number to access that colony, we make a variable that counts the rows count() will allow us to do that 
+//That way we extract values one by one (from colonies select values (realm)) from database as well as the names associated with each value (value must be increased by one) and store these 
+//In an array, since we don't want to delete colonies but just access them by number this will be perfect 
+//so user input - 1 allows user to access the realms name from the array and then from colonies select values where realm == "" will help user
 
+}
+
+void Spaceship::access_resources(){
+//First we will access the planet's ID within the planets_database
+//so we extract all IDS and store them in an array, that way the user will have access to the resources by typing in his number
+//and the number will be in turn assigned to the ID 
+//Each planet has different resources, the foreign key within resources is planet's ID just from planet_resources select values where ID == ""
+//the user will set the values within resources, 
 }
 
 void Spaceship::generate_solar_data_base(std::vector<Planet>){
-
+//values will be stored in the display_planets_database TEMPORARILY to avoid duplication of data 
+//only if the user types no when being asked if he wants to make a solar system a colony, will the values be deleted from it
+//if the user truly wants to make it a colony, he will have to type in the colonies'name 
 }
 
 void Spaceship::to_solar_system(){
-
-
-    std::cout<<"Puta"<<std::endl;
-
+//It works in the same way as display_planets_database and resources 
 }
 
 
