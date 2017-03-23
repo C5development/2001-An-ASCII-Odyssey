@@ -725,7 +725,8 @@ class Spaceship
         void classify_specimens();
         void assign_points(int, std::string);
         void laboratory();
-        int genetical_modification(int, std::vector<char>, std::vector<int>);
+        int genetical_modification(int, std::vector<char>, std::vector<int>, bool);
+        void check_bacteriae_deposits(bool, bool, bool);
         void setlevel(int, std::string, int, int, int, int, int, bool, std::vector<int>, std::vector<int>);
         void purchasepoints(int);
         void pointstransaction(int);
@@ -737,7 +738,6 @@ class Spaceship
         void refill_vector(std::string);
         void to_solar_system();
         void display_planets_database();
-        void access_resources();
         void generate_solar_data_base(std::vector<Planet>);
         void display_colonies();
         std::string show_title();
@@ -751,7 +751,7 @@ std::vector<std::string> Spaceship::planetnames = {"Lok", "Erinar", "Golrath", "
 
 std::vector<std::string> Spaceship::planetnamesbuffer;
 
-std::vector<std::string> Spaceship::starnames = {"Acamar", "Adhafera", "Kornephoros", "Hoedus II", "Miaplacidus", "Procyon", "Pleione", "Rastaban", "Rotanev", "Sarir", "Cassiopeia", "Sterope", "Tabit", "Veritate", "Zaurak", "Sceptrum", "Sadachbia", "Rukbat", "Cygnus", "Capricorni", "Ceasar 43", "Zeus", "Colossus", "Dranicus", "Rimbokhan", "Tiranuslae", "Criptilocus"};
+std::vector<std::string> Spaceship::starnames = {"Acamar", "Adhafera", "Kornephoros", "Hoedus II", "Miaplacidus", "Procyon", "Pleione", "Rastaban", "Rotanev", "Sarir", "Cassiopeia", "Sterope", "Tabit", "Veritate", "Zaurak", "Sceptrum", "Sadachbia", "Rukbat", "Cygnus", "Capricorni", "Rotanev", "Ceasar 43", "Zeus", "Colossus", "Dranicus", "Rimbokhan", "Tiranuslae", "Criptilocus"};
 
 std::vector<std::string> Spaceship::starnamesbuffer;
 
@@ -834,7 +834,7 @@ std::vector<int> ORgate(bool protozoo, bool staphilloccocus, bool pseudomona){
     return missingindeces;
 }
 
-int Spaceship::genetical_modification(int choice, std::vector<char> planetsavailable, std::vector<int> planetstemperatures){
+int Spaceship::genetical_modification(int choice, std::vector<char> planetsavailable, std::vector<int> planetstemperatures, bool missing_elements){
     int desired_amount;
     std::string atmosphere;
     std::string desired_atmosphere;
@@ -895,17 +895,23 @@ int Spaceship::genetical_modification(int choice, std::vector<char> planetsavail
         slaves_radiation_resistance = desired_amount;
         std::cout<<"Now we just need to know the atmosphere composition to perform our experiments my lord"<<std::endl;
         std::getline(std::cin, desired_atmosphere);
-        sleep(4);
-        std::cout<<"This is your legion of slaves"<<"\n"
-        <<"1. Number: "<<slaves_number<<"\n"
-        <<"2. Temperature resistance: "<<slaves_temperature_resistance<<"\n"
-        <<"3. Radiation resistance: "<<slaves_radiation_resistance<<"\n"
-        <<"4. Atmosphere resistance: "<<atmosphere<<"\n"
-        <<"\n"
-        <<"We are ready to send our slaves and extract the minerals my lord!"<<std::endl;
-        slaves_radiation_resistance = 0;
-        slaves_temperature_resistance = 0;
-
+        if(_protozoolevels < 200 || _staphilococcuslevels < 200 || _pseudomonalevels < 100){
+            check_bacteriae_deposits(true, true, false);
+            slaves_number = 0;
+        }
+        else{
+             std::cout<<"Your genetical modifications are being performed on these specimens lord..."<<std::endl;
+            sleep(4);
+            std::cout<<"This is your legion of slaves"<<"\n"
+            <<"1. Number: "<<slaves_number<<"\n"
+            <<"2. Temperature resistance: "<<slaves_temperature_resistance<<"\n"
+            <<"3. Radiation resistance: "<<slaves_radiation_resistance<<"\n"
+            <<"4. Atmosphere resistance: "<<atmosphere<<"\n"
+            <<"\n"
+            <<"We are ready to send our slaves and extract the minerals my lord!"<<std::endl;
+            slaves_radiation_resistance = 0;
+            slaves_temperature_resistance = 0;
+        }
     }
     return slaves_number;
 
@@ -1511,7 +1517,7 @@ void Spaceship::battle_preparation(long enemies_drones, long enemies_cyborgs, lo
                                             break;
                                         }
                                         else{
-                                            
+
                                             amount = randRange(10000, 100000);
                                             enemy_energy -= randRange(1000, 100000);
                                             std::cout<<"Civilians attack\n"<<std::endl;
@@ -1549,7 +1555,7 @@ void Spaceship::battle_preparation(long enemies_drones, long enemies_cyborgs, lo
                                             done = true;
                                             break;
                                         }
-                                        else{                    
+                                        else{
                                             amount = randRange(100000, 300000);
                                             enemy_energy = randRange(10000, 250000);
                                             std::cout<<"Cyborgs attack\n"<<std::endl;
@@ -1971,35 +1977,22 @@ int Spaceship::efficiency_calculation(int resources, int slaves, bool battle){
 }
 
 void Spaceship::display_colonies(){
-//Extracts colonies from the database, it will contain methods, you can type a number to extract the planets' data for a given colony 
 
 }
 
 void Spaceship::display_planets_database(){
-//This function will be called to extract it from colonies select values where realm == "realmsname"
-//Note the user types in a number to access that colony, we make a variable that counts the rows count() will allow us to do that 
-//That way we extract values one by one (from colonies select values (realm)) from database as well as the names associated with each value (value must be increased by one) and store these 
-//In an array, since we don't want to delete colonies but just access them by number this will be perfect 
-//so user input - 1 allows user to access the realms name from the array and then from colonies select values where realm == "" will help user
 
-}
-
-void Spaceship::access_resources(){
-//First we will access the planet's ID within the planets_database
-//so we extract all IDS and store them in an array, that way the user will have access to the resources by typing in his number
-//and the number will be in turn assigned to the ID 
-//Each planet has different resources, the foreign key within resources is planet's ID just from planet_resources select values where ID == ""
-//the user will set the values within resources, 
 }
 
 void Spaceship::generate_solar_data_base(std::vector<Planet>){
-//values will be stored in the display_planets_database TEMPORARILY to avoid duplication of data 
-//only if the user types no when being asked if he wants to make a solar system a colony, will the values be deleted from it
-//if the user truly wants to make it a colony, he will have to type in the colonies'name 
+
 }
 
 void Spaceship::to_solar_system(){
-//It works in the same way as display_planets_database and resources 
+
+
+    std::cout<<"Puta"<<std::endl;
+
 }
 
 
@@ -2132,6 +2125,121 @@ void Spaceship::refill_vector(std::string vectortype){
     }
 }
 
+void Spaceship::check_bacteriae_deposits(bool done, bool done2, bool evolution){
+    std::string report;
+    std::string pun;
+    bool protozoo = false;
+    bool staphilloccocus = false;
+    bool pseudomona = false;
+    std::string missingelement1;
+    std::string missingelement2;
+    std::string missingelement3;
+    if(evolution){
+        report = "Before your vindictive and glorious anger is inflicted upon our condemned miserable souls\nI need to let you know that we are out of the evolutionexpressaccelerator\nHowever it can still be processed in the laboratory";
+        pun = "\nSlightly increasing the chimpancee's inteligence up to the ironically named homo-sapiens\nwill take longer than we thought...\nTime to keep on exploring the universe!";
+        std::cout<<report<<std::endl;
+        if(_evolutionexpressaccelerator == 0){
+            std::cout<<"Before your vindictive and glorious anger is inflicted upon our condemned miserable souls"<<"\n"
+            <<"I need to let you know that we are out of the our necessary components"<<"\n"
+            <<"However they can still be processed in the laboratory"<<std::endl;
+        //Wait function here
+        }
+        while(1){
+            std::cout<<"\n"
+            <<"<<--LABORATORY-->>"<<"\n"
+            <<"\n"
+            <<"Welcome to the laboratory my lord, we will process our compounds combining the necessary bacteriae"<<std::endl;
+            if(_protozoolevels == 0 && _staphilococcuslevels == 0 && _pseudomonalevels == 0){
+                std::cout<<"My lord I am begging you to punish me with the most unimaginably horrible of tortures"<<"\n"
+                <<"Our bacteriae deposits are empty\n"
+                <<"It is time to go explore the universe in search for more"<<std::endl;
+                done = true;
+                done2 = true;
+                break;
+            }
+            else if(_protozoolevels < 200 || _staphilococcuslevels < 100 || _pseudomonalevels < 50){
+                int missing_element_calculation = _protozoolevels - 200;
+                if(missing_element_calculation <= 0)
+                        protozoo = true;
+                missing_element_calculation = _staphilococcuslevels - 100;
+                if(missing_element_calculation <= 0)
+                        staphilloccocus = true;
+                missing_element_calculation = _pseudomonalevels - 50;
+                if(missing_element_calculation <= 0)
+                        pseudomona = true;
+
+                for(int i = 0; i < 3; i++){   //Checking the abscence of three elements involves too many if statements, this function makes it faster but not simpler unfortunately
+                    if(ORgate(protozoo, staphilloccocus, pseudomona)[i] > 0){
+                        if(ORgate(protozoo, staphilloccocus, pseudomona)[i] == 1)
+                            missingelement1 = "Protozoo";
+                        else if(ORgate(protozoo, staphilloccocus, pseudomona)[i] == 2)
+                            missingelement2 = "Staphilloccocus";
+                        else if(ORgate(protozoo, staphilloccocus, pseudomona)[i] == 3)
+                            missingelement3 = "Pseudomona";
+
+                    }
+                }
+                std::cout<<"We are out of "<<"\n"
+                <<"\n"
+                <<missingelement1<<"\n"
+                <<missingelement2<<"\n"
+                <<missingelement3<<"\n"
+                <<pun<<std::endl;
+                done = true;
+                done2 = true;
+                break;
+            }
+        }
+    }
+    else{
+        while(1){
+            std::cout<<"\n"
+            <<"<<--LABORATORY-->>"<<"\n"
+            <<"\n"<<std::endl;
+            if(_protozoolevels < 200 || _staphilococcuslevels < 100 || _pseudomonalevels < 50){
+                int missing_element_calculation = _protozoolevels - 200;
+                if(missing_element_calculation <= 0)
+                        protozoo = true;
+                missing_element_calculation = _staphilococcuslevels - 100;
+                if(missing_element_calculation <= 0)
+                        staphilloccocus = true;
+                missing_element_calculation = _pseudomonalevels - 50;
+                if(missing_element_calculation <= 0)
+                        pseudomona = true;
+
+                for(int i = 0; i < 3; i++){   //Checking the abscence of three elements involves too many if statements, this function makes it faster but not simpler unfortunately
+                    if(ORgate(protozoo, staphilloccocus, pseudomona)[i] > 0){
+                        if(ORgate(protozoo, staphilloccocus, pseudomona)[i] == 1)
+                            missingelement1 = "Protozoo";
+                        else if(ORgate(protozoo, staphilloccocus, pseudomona)[i] == 2)
+                            missingelement2 = "Staphilloccocus";
+                        else if(ORgate(protozoo, staphilloccocus, pseudomona)[i] == 3)
+                            missingelement3 = "Pseudomona";
+
+                    }
+                }
+                std::cout<<"Lord, the genetical modifications cannot be performed\n"
+                <<"We are out of "<<"\n"
+                <<"\n"
+                <<missingelement1<<"\n"
+                <<missingelement2<<"\n"
+                <<missingelement3<<"\n"
+                <<pun<<std::endl;
+                done = true;
+                done2 = true;
+                break;
+            }
+            else{
+                std::cout<<"Your genetical modifications are being performed on these specimens lord..."<<std::endl;
+                usleep(4);
+                std::cout<<"Our robo-slaves are ready to extract the minerals lord!"<<std::endl;
+                done = true;
+                done2 = true;
+                break;
+            }
+        }
+    }
+}
 void Spaceship::planet_interaction(){
     if(planetnames.size() <= 8){
         refill_vector("Planets");
@@ -2139,6 +2247,7 @@ void Spaceship::planet_interaction(){
     int choice;
     bool potential_colony = true; //We start by assuming the solar system can be colonised
     bool dead_solar_system = true;
+    bool missing_elements = false;
     int slaves;
     std::string colony_approbation;
     unsigned int efficiency;
@@ -2239,26 +2348,30 @@ void Spaceship::planet_interaction(){
                     break;
                 else if(selection == 1){
                     int desired_amount;
-                    slaves = genetical_modification(choice , planets_available, planetstemperatures);
-                    std::cout<<"\n"
-                    <<"\n"<<std::endl;
-                    while(1){
-                        std::cout<<"Tell us the amount of metal that you want my lord"<<std::endl;
-                        std::cin>>desired_amount;
-                        efficiency = efficiency_calculation(planets[choice - 1].getmetal(), slaves, false);
-                        std::cout<<efficiency<<std::endl;
-                        if(desired_amount > planets[choice - 1].getmetal()){
-                            std::cout<<"Try typing in the amount again"<<std::endl;
+                    slaves = genetical_modification(choice , planets_available, planetstemperatures, missing_elements);
+                    if(slaves == 0)
+                        break;
+                    else{
+                        std::cout<<"\n"
+                        <<"\n"<<std::endl;
+                        while(1){
+                            std::cout<<"Tell us the amount of metal that you want my lord"<<std::endl;
+                            std::cin>>desired_amount;
+                            efficiency = efficiency_calculation(planets[choice - 1].getmetal(), slaves, false);
+                            std::cout<<efficiency<<std::endl;
+                            if(desired_amount > planets[choice - 1].getmetal()){
+                                std::cout<<"Try typing in the amount again"<<std::endl;
+                            }
+                            else
+                                break;
                         }
-                        else
-                            break;
+                        std::cout<<"Your wishes are our commands, my lord!"<<std::endl; //WAIT FUNCTION INCLUDED HERE
+                        sleep(efficiency);
+                        planets[choice - 1].setmetal(-desired_amount);
+                        _metalamount += desired_amount;
+                        std::cout<<"We have obtained "<<desired_amount<<" kg of metal my lord"<<std::endl;
+                        break;
                     }
-                    std::cout<<"Your wishes are our commands, my lord!"<<std::endl; //WAIT FUNCTION INCLUDED HERE
-                    sleep(efficiency);
-                    planets[choice - 1].setmetal(-desired_amount);
-                    _metalamount += desired_amount;
-                    std::cout<<"We have obtained "<<desired_amount<<" kg of metal my lord"<<std::endl;
-                    break;
                 }
                 else if(selection == 2){
                     if(_antimatterweapon < 3000){
@@ -2268,8 +2381,8 @@ void Spaceship::planet_interaction(){
                         planet_destroyer(desired_respect);
                         _antimatterweapon -= 3000;
                 }
-            }
 
+            }
         }
 
 
@@ -2283,25 +2396,29 @@ void Spaceship::planet_interaction(){
                 std::cin>>selection;
                 if(selection == 1){
                     int desired_amount;
-                    slaves = genetical_modification(choice, planets_available, planetstemperatures);
-                    std::cout<<"\n"
-                    <<"\n"<<std::endl;
-                    while(1){
-                        std::cout<<"Please, tell us the amount of diamonds that you want my lord"<<std::endl;
-                        std::cin>>desired_amount;
-                        efficiency = efficiency_calculation(slaves, planets[choice -1].getdiamonds(), false);
-                        if(desired_amount > planets[choice - 1].getdiamonds()){
-                            std::cout<<"There is not that many diamonds my lord"<<std::endl;
+                    slaves = genetical_modification(choice, planets_available, planetstemperatures, missing_elements);
+                    if(slaves == 0)
+                        break;
+                    else{
+                        std::cout<<"\n"
+                        <<"\n"<<std::endl;
+                        while(1){
+                            std::cout<<"Please, tell us the amount of diamonds that you want my lord"<<std::endl;
+                            std::cin>>desired_amount;
+                            efficiency = efficiency_calculation(slaves, planets[choice -1].getdiamonds(), false);
+                            if(desired_amount > planets[choice - 1].getdiamonds()){
+                                std::cout<<"There is not that many diamonds my lord"<<std::endl;
+                            }
+                            else
+                                break;
                         }
-                        else
-                            break;
+                        std::cout<<"Your wishes are our commands, my lord"<<std::endl; //WAIT FUNCTION INCLUDED HERE
+                        sleep(efficiency);
+                        planets[choice - 1].setdiamonds(-desired_amount);
+                        _diamondsamount += desired_amount;
+                        std::cout<<"We have obtained "<<desired_amount<<" kg of diamonds to fill your archs my lord"<<std::endl;
+                        break;
                     }
-                    std::cout<<"Your wishes are our commands, my lord"<<std::endl; //WAIT FUNCTION INCLUDED HERE
-                    sleep(efficiency);
-                    planets[choice - 1].setdiamonds(-desired_amount);
-                    _diamondsamount += desired_amount;
-                    std::cout<<"We have obtained "<<desired_amount<<" kg of diamonds to fill your archs my lord"<<std::endl;
-                    break;
                 }
                 else if(selection == 0)
                     break;
@@ -2326,25 +2443,29 @@ void Spaceship::planet_interaction(){
                 std::cin>>selection;
                 if(selection== 1){
                     int desired_amount;
-                    slaves = genetical_modification(choice, planets_available, planetstemperatures);
-                    std::cout<<"\n"
-                    <<"\n"<<std::endl;
-                    while(1){
-                        std::cout<<"Let us know how many megatons you want my lord"<<std::endl;
-                        std::cin>>desired_amount;
-                        efficiency = efficiency_calculation(slaves, planets[choice -1].getmercury(), false);
-                        if(desired_amount > planets[choice - 1].getmercury()){
-                            std::cout<<"There is not that much mercury my lord"<<std::endl;
+                    slaves = genetical_modification(choice, planets_available, planetstemperatures, missing_elements);
+                    if(slaves == 0)
+                        break;
+                    else{
+                        std::cout<<"\n"
+                        <<"\n"<<std::endl;
+                        while(1){
+                            std::cout<<"Let us know how many megatons you want my lord"<<std::endl;
+                            std::cin>>desired_amount;
+                            efficiency = efficiency_calculation(slaves, planets[choice -1].getmercury(), false);
+                            if(desired_amount > planets[choice - 1].getmercury()){
+                                std::cout<<"There is not that much mercury my lord"<<std::endl;
+                            }
+                            else
+                                break;
                         }
-                        else
-                            break;
+                        std::cout<<"Your wishes are our commands my lord!"<<std::endl;//wAIT FUNCTION INCLUDED HERE
+                        sleep(efficiency);
+                        planets[choice - 1].setmercury(-desired_amount);
+                        _fuelcapacity += desired_amount;
+                        std::cout<<"We have obtained "<<desired_amount<<" megatons of fuel to propell our gigantic space ship my lord"<<std::endl;
+                        break;
                     }
-                    std::cout<<"Your wishes are our commands my lord!"<<std::endl;//wAIT FUNCTION INCLUDED HERE
-                    sleep(efficiency);
-                    planets[choice - 1].setmercury(-desired_amount);
-                    _fuelcapacity += desired_amount;
-                    std::cout<<"We have obtained "<<desired_amount<<" megatons of fuel to propell our gigantic space ship my lord"<<std::endl;
-                    break;
                 }
                 else if(selection == 0)
                     break;
@@ -2356,6 +2477,7 @@ void Spaceship::planet_interaction(){
         }
         else if(planets[choice -1].getplanettype() == 4){
             int selection;
+            bool done2 = false;
             while(1){
                 std::cout<<"\n"
                 <<"<<HABITABLE OR POTENTIALLY HABITABLE PLANET>>"<<"\n"
@@ -2365,9 +2487,6 @@ void Spaceship::planet_interaction(){
                 if(selection == 1){
                     int variableadjustment;
                     bool done = false;
-                    std::string missingelement1;
-                    std::string missingelement2;
-                    std::string missingelement3;
                     long aliens = randRange(1000000, 5000000);
                     if(planets[choice - 1].gethabitability() == false){
                         if(planets[choice - 1].getbreathableatmosphere() == true){
@@ -2382,7 +2501,7 @@ void Spaceship::planet_interaction(){
                                     planets[choice - 1].turn_into_habitable();
                                 }
 
-                            }
+                              }
 
                             while(!done){
                                 std::cout<<"My lord, we will need to accelerate the evolution process to get our specimens as soon as possible"<<"\n"
@@ -2394,86 +2513,19 @@ void Spaceship::planet_interaction(){
                                     <<"I need to let you know that we are out of the evolutionexpressaccelerator"<<"\n"
                                     <<"However it can still be processed in the laboratory"<<std::endl;
                                     //Wait function here
-                                    while(1){
-                                        bool protozoo = false;
-                                        bool staphilloccocus = false;
-                                        bool pseudomona = false;
-                                        std::cout<<"\n"
-                                        <<"<<--LABORATORY-->>"<<"\n"
-                                        <<"\n"
-                                        <<"Welcome to the laboratory my lord, we will process the evolutionexpressaccelerator combining the necessary bacteriae"<<std::endl;
-                                        if(_protozoolevels == 0 && _staphilococcuslevels == 0 && _pseudomonalevels == 0){
-                                            std::cout<<"My lord I am begging you to punish me with the most unimaginably horrible of tortures"<<"\n"
-                                            <<"Our bacteriae deposits are empty"<<"\n"
-                                            <<"It is time to go explore the universe in search for more"<<std::endl;
-                                            done = true;
-                                            break;
-                                        }
-                                        else if(_protozoolevels < 200 || _staphilococcuslevels < 100 || _pseudomonalevels < 50){
-                                            int missing_element_calculation = _protozoolevels - 200;
-                                            if(missing_element_calculation <= 0)
-                                                    protozoo = true;
-                                            missing_element_calculation = _staphilococcuslevels - 100;
-                                            if(missing_element_calculation <= 0)
-                                                    staphilloccocus = true;
-                                            missing_element_calculation = _pseudomonalevels - 50;
-                                            if(missing_element_calculation <= 0)
-                                                    pseudomona = true;
-
-                                            for(int i = 0; i < 3; i++){   //Checking the abscence of three elements involves too many if statements, this function makes it faster but not simpler unfortunately
-                                                if(ORgate(protozoo, staphilloccocus, pseudomona)[i] > 0){
-                                                    if(ORgate(protozoo, staphilloccocus, pseudomona)[i] == 1)
-                                                        missingelement1 = "Protozoo";
-                                                    else if(ORgate(protozoo, staphilloccocus, pseudomona)[i] == 2)
-                                                        missingelement2 = "Staphilloccocus";
-                                                    else if(ORgate(protozoo, staphilloccocus, pseudomona)[i] == 3)
-                                                        missingelement3 = "Pseudomona";
-
-                                                }
-                                            }
-                                            std::cout<<"We are out of "<<"\n"
-                                            <<"\n"
-                                            <<missingelement1<<"\n"
-                                            <<missingelement2<<"\n"
-                                            <<missingelement3<<"\n"
-                                            <<"\n"
-                                            <<"Slightly increasing the chimpancee's inteligence up to the ironically named homo-sapiens"<<"\n"
-                                            <<"will take longer than we thought..."<<"\n"
-                                            <<"Time to keep on exploring the universe!"<<std::endl;
-                                            done = true;
-                                            break;
-                                        }
-                                        else{
-                                            efficiency = efficiency_calculation(400, randRange(1, 2), false);
-                                            usleep(efficiency);
-                                            _protozoolevels -= rand()%200 + 1;
-                                            _staphilococcuslevels -= rand()%100 + 1;
-                                            _pseudomonalevels -= rand()%100 + 1;
-                                            _evolutionexpressaccelerator += 1;
-                                            std::cout<<"We just increased the amount of evolution express accelerator by one my lord"<<"\n"
-                                            <<"God save the lord!"<<"\n"
-                                            <<"Shall the ancient gods worship you my lord for no other than thee can defy their magnanimous and ubiquitus power"<<std::endl;
-                                            _specimens += aliens;
-                                            _evolutionexpressaccelerator -= 1;
-                                            std::cout<<"\n"
-                                            <<"Our crew has been increased by "<<aliens<<" specimens"<<std::endl;
-                                            done = true;
-                                            break;
-
-
-                                    }
+                                    check_bacteriae_deposits(done, done2, true);
+                                    _evolutionexpressaccelerator += randRange(3, 5);
+                                    break;
 
                                 }
-
-
+                                std::cout<<"It is time to accelerate the evolution process on this planet..."<<std::endl;
+                                sleep(4);
+                                std::cout<<"Let there be life and wisdom!\n"
+                                <<"Shall the gods worship this soul, for no other than thee can defy their magnanimous and ubiquitous power!"<<std::endl;
+                                _evolutionexpressaccelerator -= 1;
                             }
 
-                         }
-
-
-                      }
-
-
+                        }
 
                     }
                     else if(planets[choice -1].gethabitability() == true)
