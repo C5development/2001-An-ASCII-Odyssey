@@ -12,6 +12,7 @@
 #include <chrono>
 #include <functional>
 #include <future>
+#include "libsqlite.hpp"
 
 using namespace std::chrono;
 
@@ -2086,12 +2087,69 @@ void Spaceship::civilisation_interaction(int desired_respect, int aliens){
     }
 }
 
+int callback(void* NotUsed, int argc, char** argv, char** azColName)
+{
+    // Callback for executing SQL statements
+    int i;
+    std::string output = "";
+    // Generate output string from arguments
+    for (i = 0; i < argc; i++) {
+        output += (std::string)azColName[i];
+        output += " = ";
+        output += (std::string)(argv[i] ? argv[i] : "NULL");
+        output += "\n";
+    }
+    const char* output_chars = output.c_str();
+    printf("%s", output_chars);
+    return 0;
+}
+
+char* run_sql(std::string query)
+{
+    sqlite3* db;
+    char* zErrMsg = 0;
+    int rc;
+    char* nothing = (char*)"";
+    
+    std::string databaseName = "ASCIIdatabase.db";
+    
+    rc = sqlite3_open(databaseName.c_str(), &db);
+    if (rc) {
+        fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+        return nothing;
+    } else {
+        printf("opened database\n");
+    }
+
+    sqlite3_stmt* stmt;
+    const char* sql = query.c_str();
+    
+    rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+    if (rc != SQLITE_OK) {
+        printf("error: %s\n", sqlite3_errmsg(db));
+        return nothing;
+    }
+    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
+        std::string col1 = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+        printf("%s", col1.c_str());
+    }
+    if (rc != SQLITE_DONE) {
+        printf("error: %s\n", sqlite3_errmsg(db));
+    }
+    sqlite3_finalize(stmt);
+
+    sqlite3_close(db);
+    return nothing;
+}
+
 void Spaceship::save_game(){
-//This will save the amount of each resource that has been accumulated(fuel, WARPdrive, diamonds, metal, protozoo, pseudomona, staphilloccocus)
-//Number of colonies
-//Number of civilisations that have been dominated
-//Player's level!! (including soldierslevel, slaveslevel and scientistslevel)
-//
+    //This will save the amount of each resource that has been accumulated(fuel, WARPdrive, diamonds, metal, protozoo, pseudomona, staphilloccocus)
+    //Number of colonies
+    //Number of civilisations that have been dominated
+    //Player's level!! (including soldierslevel, slaveslevel and scientistslevel)
+    std::string sql_query = "INSERT INTO USERS_DATA (USERNAME, PASSWORD)"
+        "VALUES ('james', 'datboi')";
+    run_sql(sql_query);
 }
 
 void Spaceship::game_over(){
