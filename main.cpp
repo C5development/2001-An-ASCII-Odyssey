@@ -694,6 +694,7 @@ class Spaceship
     static void update_energy(int, int, int);
     static void update_morale(std::vector<std::string>, int, int);
     static void battle_end(int, std::string);
+    static std::vector<int> ORgate(bool, bool, bool);
 
     private:
 
@@ -712,12 +713,15 @@ class Spaceship
         int _scientistspoints = 0;
         int _slavespoints = 5;
         int _scientistslevel = 5;
+        int _colonies = 3;
         int _points;
+        int _defeats;
+        int _victories;
         int _overalllevel;
 
-
     public:
-
+        
+        void welcome();
         void civilisation_interaction(int, int);
         void planet_interaction();
         std::vector<Star> stars_interaction();
@@ -742,6 +746,8 @@ class Spaceship
         void generate_solar_data_base(std::vector<Planet>);
         void display_colonies();
         std::string show_title();
+        int callback(void*, int, char**, char**);
+        char* run_sql(std::string);
         void read_story();
         void save_game(); //DATABASE
         void game_over(); //DATABASE
@@ -768,11 +774,10 @@ int Spaceship:: _missiles = 10000;
 
 long Spaceship::_specimens = 19482109;
 
-int Spaceship::_slaveslevel;
+int Spaceship::_slaveslevel = 1;
 
-int Spaceship::starsnumber; //IMPORTANT We might need to create a function that updates the value using the database
-//The reason for this is that once the program is initialised again the variable will also be initialised and set to zero!
-int Spaceship::_soldierslevel = 0;
+int Spaceship::_soldierslevel = 1;
+
 
 int Spaceship::randRange(int low, int high)
 {
@@ -819,7 +824,7 @@ std::string Spaceship::define_planets_name(){
     return *it;
 }
 
-std::vector<int> ORgate(bool protozoo, bool staphilloccocus, bool pseudomona){
+std::vector<int> Spaceship::ORgate(bool protozoo, bool staphilloccocus, bool pseudomona){
     std::vector<bool> booleanvalues;
     std::vector<int> missingindeces;
     booleanvalues.push_back(protozoo);
@@ -997,6 +1002,19 @@ void Spaceship::surrender_treaty(std::string social_structure, std::string civil
     }
 }
 
+void load_game(){
+    
+    
+}
+
+void Spaceship::welcome(){
+    int choice;
+    std::cout<<"<--WELCOME CAPTAIN-->\n"
+    <<"1. New game\n"
+    <<"2. Load game\n"
+    <<"3. Exit\n"<<std::endl;
+    std::cin>>choice;
+}
 
 void Spaceship::metallurgy(){
     int choice;
@@ -1978,7 +1996,21 @@ int Spaceship::efficiency_calculation(int resources, int slaves, bool battle){
 }
 
 void Spaceship::display_colonies(){
-
+    int choice;
+    std::vector<std::string> colonies = {"Isengard", "Hogwarts"};
+    std::string sql_query = "SELECT * FROM COLONIES";
+    run_sql(sql_query);
+    std::cout<<std::endl;
+    std::cout<<"Type in the colony number that you want to visit my lord"<<std::endl;
+    std::cin>>choice;
+    if(choice == 1){
+        sql_query = "SELECT * FROM PLANETS WHERE REALM == 'Isengard'";
+        run_sql(sql_query);
+    }
+    else if(choice == 2){
+        sql_query = "SELECT * FROM PLANETS WHERE REALM == 'Hogwarts'";
+        run_sql(sql_query);
+    }
 }
 
 void Spaceship::display_planets_database(){
@@ -2087,7 +2119,7 @@ void Spaceship::civilisation_interaction(int desired_respect, int aliens){
     }
 }
 
-int callback(void* NotUsed, int argc, char** argv, char** azColName)
+int Spaceship::callback(void* NotUsed, int argc, char** argv, char** azColName)
 {
     // Callback for executing SQL statements
     int i;
@@ -2104,15 +2136,13 @@ int callback(void* NotUsed, int argc, char** argv, char** azColName)
     return 0;
 }
 
-char* run_sql(std::string query)
+char* Spaceship::run_sql(std::string query)
 {
     sqlite3* db;
     char* zErrMsg = 0;
     int rc;
     char* nothing = (char*)"";
-    
     std::string databaseName = "ASCIIdatabase.db";
-    
     rc = sqlite3_open(databaseName.c_str(), &db);
     if (rc) {
         fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
@@ -2120,10 +2150,8 @@ char* run_sql(std::string query)
     } else {
         printf("opened database\n");
     }
-
     sqlite3_stmt* stmt;
     const char* sql = query.c_str();
-    
     rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
     if (rc != SQLITE_OK) {
         printf("error: %s\n", sqlite3_errmsg(db));
@@ -2137,29 +2165,26 @@ char* run_sql(std::string query)
         printf("error: %s\n", sqlite3_errmsg(db));
     }
     sqlite3_finalize(stmt);
-
     sqlite3_close(db);
     return nothing;
 }
+
 
 void Spaceship::save_game(){
     //This will save the amount of each resource that has been accumulated(fuel, WARPdrive, diamonds, metal, protozoo, pseudomona, staphilloccocus)
     //Number of colonies
     //Number of civilisations that have been dominated
     //Player's level!! (including soldierslevel, slaveslevel and scientistslevel)
-    std::string sql_query = "INSERT INTO USERS_DATA (USERNAME, PASSWORD)"
-        "VALUES ('james', 'datboi')";
+    std::string ID = "player";
+    std::string sql_query = "INSERT INTO GAME_DATA (ID, LEVEL, SOLDIERS_LEVEL, SCIENTISTS_LEVEL, SLAVES_LEVEL, DIAMONDS, FUEL, WARP_DRIVE, PROTOZOO, PSEUDOMONA, STAPHILLOCCOCUS, METAL, DRONES, CYBORGS, POINTS, DEFEATS, VICTORIES, COLONIES)"
+    "VALUES ('player', 5, 3, 8, 2, 4, 7, 15400, 4000,  2000, 57026, 76930, 65893 , 130000, 200000, 50000 , 5, 4)";
     run_sql(sql_query);
 }
 
+    
 void Spaceship::game_over(){
-//This function must pick up a database and display the following values
-//Distance travelled in light years
-//Planets destroyed
-//Colonies created
-//Dominated civilisations
-//Amount of diamonds collected
-//Level reached
+    std::string sql_query = "SELECT * FROM GAME_DATA";
+    run_sql(sql_query);
 }
 
 
@@ -2372,8 +2397,47 @@ void Spaceship::planet_interaction(){
         }
         if(potential_colony){
             if(dead_solar_system){
+                std::string colony_name;
                 std::cout<<"This solar system can be colonised"<<"\n"
-                <<"Since all of its planets are dead"<<std::endl;
+                <<"Since all of its planets are dead\n"<<std::endl;
+                std::cout<<"Give a name to your colony"<<std::endl;
+                std::cin>>colony_name;
+                if(_colonies == 0){
+                    std::string sql_query = "INSERT INTO COLONIES (REALM, NUMBER)"
+                        "VALUES('Isengard', 1)";
+                    _colonies += 1;
+                    run_sql(sql_query);
+                    sql_query = "INSERT INTO PLANETS (NUMBER, LETTER, NAME, TYPE, TEMPERATURE, ATMOSPHERE, SURFACE, DISTANCE, ECCENTRICITY, ROTATION)"
+                        "VALUES(1, 'A', 'Celades', 'Lava Planet', 875, 'Carbon dioxide', 198746.9, 397832, 0.893, 163)";
+                    run_sql(sql_query);
+                    sql_query = "INSERT INTO PLANETS (NUMBER, LETTER, NAME, TYPE, TEMPERATURE, ATMOSPHERE,SURFACE, DISTANCE, ECCENTRICITY, ROTATION)"
+                        "VALUES(1, 'B', 'Tripsilum', 'Frozen Planet', -182, 'Cosmic rays' 167746.5, 176500, 0.349, 170)";
+                    run_sql(sql_query);
+                    sql_query = "INSERT INTO PLANETS (NUMBER, LETTER, NAME, TYPE, TEMPERATURE, ATMOSPHERE,SURFACE, DISTANCE, ECCENTRICITY, ROTATION)"
+                        "VALUES(1, 'C', 'HP-1542', 'Diamond planet', 543, 'Kriptonite', 219322.7, 176500, 0.598, 114)";
+                    run_sql(sql_query);
+                    sql_query = "INSERT INTO PLANETS (NUMBER, LETTER, NAME, TYPE, TEMPERATURE, ATMOSPHERE,SURFACE, DISTANCE, ECCENTRICITY, ROTATION)"
+                        "VALUES(1, 'D', 'Cristilopus', 'Mercury planet', 674, 'Cyanide', 653800.5, 176500, 0.763, 167)";
+                    run_sql(sql_query);
+                }
+                else if(_colonies == 1){
+                    std::string sql_query = "INSERT INTO COLONIES (REALM, NUMBER)"
+                        "VALUES('Hogwarts', 2)";
+                    _colonies += 1;
+                    run_sql(sql_query);    
+                      sql_query = "INSERT INTO PLANETS (NUMBER, LETTER, NAME, TYPE, TEMPERATURE, ATMOSPHERE, SURFACE, DISTANCE, ECCENTRICITY, ROTATION)"
+                        "VALUES(2, 'A', 'Rukbat', 'Gas giant', 600, 'Nitrogen', 598746.5, 397832, 0.893, 163)";
+                    run_sql(sql_query);
+                    sql_query = "INSERT INTO PLANETS (NUMBER, LETTER, NAME, TYPE, TEMPERATURE, ATMOSPHERE, SURFACE, DISTANCE, ECCENTRICITY, ROTATION)"
+                        "VALUES(2, 'B', 'Tristilae', 'Mercury planet', 495, '' , 167746.5, 176500, 0.349, 170)";
+                    run_sql(sql_query);
+                    sql_query = "INSERT INTO PLANETS (NUMBER, LETTER, NAME, TYPE, TEMPERATURE, ATMOSPHERE, SURFACE, DISTANCE, ECCENTRICITY, ROTATION)"
+                        "VALUES(2, 'C', 'Hoth', 'Diamond planet', 543, 'Kriptonite', 219322.7, 176500, 0.598, 114)";
+                    run_sql(sql_query);
+                    sql_query = "INSERT INTO PLANETS (NUMBER, LETTER, NAME, TYPE, TEMPERATURE, ATMOSPHERE, SURFACE, DISTANCE, ECCENTRICITY, ROTATION)"
+                        "VALUES(2, 'D', 'Zask-187', 'Lava planet', 988, 'Carbon dioxide' 167746.5, 176500, 0.486, 198)";
+                    run_sql(sql_query);
+                }
             }
             else if(!dead_solar_system)  //Planettype can still be four but potentially habitable
                 std::cout<<"There might be one or more potentially habitable planets in this solar system"<<std::endl;
@@ -3169,7 +3233,6 @@ int Spaceship::cabin(){
             }
     }
 }
-
 
 int main()
 {
