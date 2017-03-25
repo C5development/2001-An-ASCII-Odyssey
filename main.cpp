@@ -746,11 +746,12 @@ class Spaceship
         void generate_solar_data_base(std::vector<Planet>);
         void display_colonies();
         std::string show_title();
-        int run_sql_save_game(const char*, std::string);
         void read_story();
-        void save_game(); //DATABASE
-        void game_over(); //DATABASE
-
+        int run_sql_save_game(const char*, std::string); //DATABASE
+        int callback(void*, int, char**, char**);
+        char* run_sql(std::string);
+        void save_game();
+        void game_over(void);
 };
 
 std::vector<std::string> Spaceship::planetnames = {"Lok", "Erinar", "Golrath", "Imrooso", "Maryx Minor", "Qat Chrystac", "RZ7-6113-23", "Taspir III", "55 Cancri e", "Zachayphus", "Iewhoutis", "Foclillon", "Weplov", "Reter", "Crevugan", "Obloethea", "Ethuetera", "Asnypso", "Ciocury", "Glabuwei", "Spiri 29N4", "Grypso Y1J", "Slequhiri", "Tasloaclite", "Dragatan", "Sethurilia", "Hadrion", "Geuliv","Celaris", "Adrara", "Upruna", "Fraxetis", "Cuprillon", "Woilara", "Stuzaria", "Xiotune", "Hafloth", "Pludaphus", "Glarvis 10", "Vespin", "Oclore", "Oaphus", "Clugonus", "Veskaiter", "Godriuturn"};
@@ -1994,6 +1995,8 @@ int Spaceship::efficiency_calculation(int resources, int slaves, bool battle){
     return time;
 }
 
+
+
 int Spaceship::run_sql_save_game(const char *sql, std::string ID){
         sqlite3 *db;
         char *err_msg = 0;
@@ -2031,6 +2034,11 @@ int Spaceship::run_sql_save_game(const char *sql, std::string ID){
             sqlite3_bind_int(res, 16, _defeats);
             sqlite3_bind_int(res, 17, _victories);
             sqlite3_bind_int(res, 18, _colonies);
+            sqlite3_bind_int(res, 19, _antimatterweapon);
+            sqlite3_bind_int(res, 20, _evolutionexpressaccelerator);
+            sqlite3_bind_int(res, 21, _soldierspoints);
+            sqlite3_bind_int(res, 22, _scientistspoints);
+            sqlite3_bind_int(res, 23, _slavespoints);
             
         } else {
 
@@ -2164,21 +2172,72 @@ void Spaceship::civilisation_interaction(int desired_respect, int aliens){
 }
 
 
+
 void Spaceship::save_game(){
     std::string ID = "Captain Fox";
     //This will save the amount of each resource that has been accumulated(fuel, WARPdrive, diamonds, metal, protozoo, pseudomona, staphilloccocus)
     //Number of colonies
     //Number of civilisations that have been dominated
     //Player's level!! (including soldierslevel, slaveslevel and scientistslevel)
-    run_sql_save_game("INSERT INTO GAME_DATA (ID, LEVEL, SOLDIERS_LEVEL, SCIENTISTS_LEVEL, SLAVES_LEVEL, DIAMONDS, FUEL, WARP_DRIVE, PROTOZOO, PSEUDOMONA, STAPHILLOCCOCUS, METAL, DRONES, CYBORGS, POINTS, DEFEATS, VICTORIES, COLONIES)"
-                      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", ID);
+    run_sql_save_game("INSERT INTO GAME_DATA (ID, LEVEL, SOLDIERS_LEVEL, SCIENTISTS_LEVEL, SLAVES_LEVEL, DIAMONDS, FUEL, WARP_DRIVE, PROTOZOO, PSEUDOMONA, STAPHILLOCCOCUS, METAL, DRONES, CYBORGS, POINTS, DEFEATS, VICTORIES, COLONIES, ANTIMATTERWEAPON, EVOLUTIONEXPRESSACCELERATOR, SOLDIERSPOINTS, SCIENTISTSPOINTS, SLAVESPOINTS)"
+                      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", ID);
 }
 
     
-void Spaceship::game_over(){
+
+int Spaceship::callback(void* NotUsed, int argc, char** argv, char** azColName)
+{
+    // Callback for executing SQL statements
+    int i;
+    std::string output = "";
+    // Generate output string from arguments
+    for (i = 0; i < argc; i++) {
+        output += (std::string)azColName[i];
+        output += " = ";
+        output += (std::string)(argv[i] ? argv[i] : "NULL");
+        output += "\n";
+    }
+    const char* output_chars = output.c_str();
+    printf("%s", output_chars);
+    return 0;
 }
 
-
+char* Spaceship::run_sql(std::string query)
+{
+    sqlite3* db;
+    char* zErrMsg = 0;
+    int rc;
+    char* nothing = (char*)"";
+    std::string databaseName = "ASCIIdatabase.db";
+    rc = sqlite3_open(databaseName.c_str(), &db);
+    if (rc) {
+        fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+        return nothing;
+    } else {
+        printf("opened database\n");
+    }
+    sqlite3_stmt* stmt;
+    const char* sql = query.c_str();
+    rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+    if (rc != SQLITE_OK) {
+        printf("error: %s\n", sqlite3_errmsg(db));
+        return nothing;
+    }
+    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
+        std::string col1 = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+        printf("%s", col1.c_str());
+    }
+    if (rc != SQLITE_DONE) {
+        printf("error: %s\n", sqlite3_errmsg(db));
+    }
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+    return nothing;
+}
+void Spaceship::game_over(){
+    std::string sql = "SELECT * FROM GAME_DATA";
+    run_sql(sql);
+}
 
 void Spaceship::planet_destroyer(int desired_respect){
     desired_respect += 1; //THIS FUNCTION SHOULD DELETE THE CHOSEN ROW FROM THE DATABASE MORE SPECIFICALLY THE SOLAR SYSTEM DATABASE
