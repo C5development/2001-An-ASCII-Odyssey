@@ -714,7 +714,7 @@ class Spaceship
         int _slavespoints = 5;
         int _scientistslevel = 5;
         int _colonies = 3;
-        int _points;
+        int _points = 300;
         int _defeats;
         int _victories;
         int _overalllevel;
@@ -746,8 +746,7 @@ class Spaceship
         void generate_solar_data_base(std::vector<Planet>);
         void display_colonies();
         std::string show_title();
-        int callback(void*, int, char**, char**);
-        char* run_sql(std::string);
+        int run_sql_save_game(const char*, std::string);
         void read_story();
         void save_game(); //DATABASE
         void game_over(); //DATABASE
@@ -1995,22 +1994,67 @@ int Spaceship::efficiency_calculation(int resources, int slaves, bool battle){
     return time;
 }
 
+int Spaceship::run_sql_save_game(const char *sql, std::string ID){
+        sqlite3 *db;
+        char *err_msg = 0;
+        sqlite3_stmt *res;
+
+        int rc = sqlite3_open("ASCIIdatabase.db", &db);
+
+        if (rc != SQLITE_OK) {
+
+            fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db));
+            sqlite3_close(db);
+
+            return 1;
+        }
+
+        rc = sqlite3_prepare_v2(db, sql, -1, &res, 0);
+
+        if (rc == SQLITE_OK) {
+
+            sqlite3_bind_text(res, 1, ID.c_str(), ID.length(), SQLITE_STATIC);
+            sqlite3_bind_int(res, 2, _overalllevel);
+            sqlite3_bind_int(res, 3, _soldierslevel);
+            sqlite3_bind_int(res, 4, _scientistslevel);
+            sqlite3_bind_int(res, 5, _slaveslevel);
+            sqlite3_bind_int(res, 6, _diamondsamount);
+            sqlite3_bind_int(res, 7, _fuelcapacity);
+            sqlite3_bind_int(res, 8, _WARPdrive);
+            sqlite3_bind_int(res, 9, _protozoolevels);
+            sqlite3_bind_int(res, 10, _pseudomonalevels);
+            sqlite3_bind_int(res, 11, _staphilococcuslevels);
+            sqlite3_bind_int(res, 12, _metalamount);
+            sqlite3_bind_int(res, 13, _points);
+            sqlite3_bind_int(res, 14, _drones);
+            sqlite3_bind_int(res, 15, _armors);
+            sqlite3_bind_int(res, 16, _defeats);
+            sqlite3_bind_int(res, 17, _victories);
+            sqlite3_bind_int(res, 18, _colonies);
+            
+        } else {
+
+            fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
+        }
+
+        int step = sqlite3_step(res);
+
+        if (step == SQLITE_ROW) {
+
+            printf("%s: ", sqlite3_column_text(res, 0));
+            printf("%s\n", sqlite3_column_text(res, 1));
+
+        } 
+
+        sqlite3_finalize(res);
+        sqlite3_close(db);
+
+}
+
+
 void Spaceship::display_colonies(){
     int choice;
-    std::vector<std::string> colonies = {"Isengard", "Hogwarts"};
-    std::string sql_query = "SELECT * FROM COLONIES";
-    run_sql(sql_query);
-    std::cout<<std::endl;
-    std::cout<<"Type in the colony number that you want to visit my lord"<<std::endl;
-    std::cin>>choice;
-    if(choice == 1){
-        sql_query = "SELECT * FROM PLANETS WHERE REALM == 'Isengard'";
-        run_sql(sql_query);
-    }
-    else if(choice == 2){
-        sql_query = "SELECT * FROM PLANETS WHERE REALM == 'Hogwarts'";
-        run_sql(sql_query);
-    }
+    
 }
 
 void Spaceship::display_planets_database(){
@@ -2119,72 +2163,19 @@ void Spaceship::civilisation_interaction(int desired_respect, int aliens){
     }
 }
 
-int Spaceship::callback(void* NotUsed, int argc, char** argv, char** azColName)
-{
-    // Callback for executing SQL statements
-    int i;
-    std::string output = "";
-    // Generate output string from arguments
-    for (i = 0; i < argc; i++) {
-        output += (std::string)azColName[i];
-        output += " = ";
-        output += (std::string)(argv[i] ? argv[i] : "NULL");
-        output += "\n";
-    }
-    const char* output_chars = output.c_str();
-    printf("%s", output_chars);
-    return 0;
-}
-
-char* Spaceship::run_sql(std::string query)
-{
-    sqlite3* db;
-    char* zErrMsg = 0;
-    int rc;
-    char* nothing = (char*)"";
-    std::string databaseName = "ASCIIdatabase.db";
-    rc = sqlite3_open(databaseName.c_str(), &db);
-    if (rc) {
-        fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
-        return nothing;
-    } else {
-        printf("opened database\n");
-    }
-    sqlite3_stmt* stmt;
-    const char* sql = query.c_str();
-    rc = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
-    if (rc != SQLITE_OK) {
-        printf("error: %s\n", sqlite3_errmsg(db));
-        return nothing;
-    }
-    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
-        std::string col1 = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
-        printf("%s", col1.c_str());
-    }
-    if (rc != SQLITE_DONE) {
-        printf("error: %s\n", sqlite3_errmsg(db));
-    }
-    sqlite3_finalize(stmt);
-    sqlite3_close(db);
-    return nothing;
-}
-
 
 void Spaceship::save_game(){
+    std::string ID = "Captain Fox";
     //This will save the amount of each resource that has been accumulated(fuel, WARPdrive, diamonds, metal, protozoo, pseudomona, staphilloccocus)
     //Number of colonies
     //Number of civilisations that have been dominated
     //Player's level!! (including soldierslevel, slaveslevel and scientistslevel)
-    std::string ID = "player";
-    std::string sql_query = "INSERT INTO GAME_DATA (ID, LEVEL, SOLDIERS_LEVEL, SCIENTISTS_LEVEL, SLAVES_LEVEL, DIAMONDS, FUEL, WARP_DRIVE, PROTOZOO, PSEUDOMONA, STAPHILLOCCOCUS, METAL, DRONES, CYBORGS, POINTS, DEFEATS, VICTORIES, COLONIES)"
-    "VALUES ('player', 5, 3, 8, 2, 4, 7, 15400, 4000,  2000, 57026, 76930, 65893 , 130000, 200000, 50000 , 5, 4)";
-    run_sql(sql_query);
+    run_sql_save_game("INSERT INTO GAME_DATA (ID, LEVEL, SOLDIERS_LEVEL, SCIENTISTS_LEVEL, SLAVES_LEVEL, DIAMONDS, FUEL, WARP_DRIVE, PROTOZOO, PSEUDOMONA, STAPHILLOCCOCUS, METAL, DRONES, CYBORGS, POINTS, DEFEATS, VICTORIES, COLONIES)"
+                      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", ID);
 }
 
     
 void Spaceship::game_over(){
-    std::string sql_query = "SELECT * FROM GAME_DATA";
-    run_sql(sql_query);
 }
 
 
@@ -2401,43 +2392,7 @@ void Spaceship::planet_interaction(){
                 std::cout<<"This solar system can be colonised"<<"\n"
                 <<"Since all of its planets are dead\n"<<std::endl;
                 std::cout<<"Give a name to your colony"<<std::endl;
-                std::cin>>colony_name;
-                if(_colonies == 0){
-                    std::string sql_query = "INSERT INTO COLONIES (REALM, NUMBER)"
-                        "VALUES('Isengard', 1)";
-                    _colonies += 1;
-                    run_sql(sql_query);
-                    sql_query = "INSERT INTO PLANETS (NUMBER, LETTER, NAME, TYPE, TEMPERATURE, ATMOSPHERE, SURFACE, DISTANCE, ECCENTRICITY, ROTATION)"
-                        "VALUES(1, 'A', 'Celades', 'Lava Planet', 875, 'Carbon dioxide', 198746.9, 397832, 0.893, 163)";
-                    run_sql(sql_query);
-                    sql_query = "INSERT INTO PLANETS (NUMBER, LETTER, NAME, TYPE, TEMPERATURE, ATMOSPHERE,SURFACE, DISTANCE, ECCENTRICITY, ROTATION)"
-                        "VALUES(1, 'B', 'Tripsilum', 'Frozen Planet', -182, 'Cosmic rays' 167746.5, 176500, 0.349, 170)";
-                    run_sql(sql_query);
-                    sql_query = "INSERT INTO PLANETS (NUMBER, LETTER, NAME, TYPE, TEMPERATURE, ATMOSPHERE,SURFACE, DISTANCE, ECCENTRICITY, ROTATION)"
-                        "VALUES(1, 'C', 'HP-1542', 'Diamond planet', 543, 'Kriptonite', 219322.7, 176500, 0.598, 114)";
-                    run_sql(sql_query);
-                    sql_query = "INSERT INTO PLANETS (NUMBER, LETTER, NAME, TYPE, TEMPERATURE, ATMOSPHERE,SURFACE, DISTANCE, ECCENTRICITY, ROTATION)"
-                        "VALUES(1, 'D', 'Cristilopus', 'Mercury planet', 674, 'Cyanide', 653800.5, 176500, 0.763, 167)";
-                    run_sql(sql_query);
-                }
-                else if(_colonies == 1){
-                    std::string sql_query = "INSERT INTO COLONIES (REALM, NUMBER)"
-                        "VALUES('Hogwarts', 2)";
-                    _colonies += 1;
-                    run_sql(sql_query);    
-                      sql_query = "INSERT INTO PLANETS (NUMBER, LETTER, NAME, TYPE, TEMPERATURE, ATMOSPHERE, SURFACE, DISTANCE, ECCENTRICITY, ROTATION)"
-                        "VALUES(2, 'A', 'Rukbat', 'Gas giant', 600, 'Nitrogen', 598746.5, 397832, 0.893, 163)";
-                    run_sql(sql_query);
-                    sql_query = "INSERT INTO PLANETS (NUMBER, LETTER, NAME, TYPE, TEMPERATURE, ATMOSPHERE, SURFACE, DISTANCE, ECCENTRICITY, ROTATION)"
-                        "VALUES(2, 'B', 'Tristilae', 'Mercury planet', 495, '' , 167746.5, 176500, 0.349, 170)";
-                    run_sql(sql_query);
-                    sql_query = "INSERT INTO PLANETS (NUMBER, LETTER, NAME, TYPE, TEMPERATURE, ATMOSPHERE, SURFACE, DISTANCE, ECCENTRICITY, ROTATION)"
-                        "VALUES(2, 'C', 'Hoth', 'Diamond planet', 543, 'Kriptonite', 219322.7, 176500, 0.598, 114)";
-                    run_sql(sql_query);
-                    sql_query = "INSERT INTO PLANETS (NUMBER, LETTER, NAME, TYPE, TEMPERATURE, ATMOSPHERE, SURFACE, DISTANCE, ECCENTRICITY, ROTATION)"
-                        "VALUES(2, 'D', 'Zask-187', 'Lava planet', 988, 'Carbon dioxide' 167746.5, 176500, 0.486, 198)";
-                    run_sql(sql_query);
-                }
+                
             }
             else if(!dead_solar_system)  //Planettype can still be four but potentially habitable
                 std::cout<<"There might be one or more potentially habitable planets in this solar system"<<std::endl;
