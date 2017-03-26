@@ -2017,21 +2017,17 @@ void Spaceship::display_planets_database(){
 
 void Spaceship::generate_solar_data_base(std::string planetname, std::string atmosphere, int distancefromstar, std::string type, int temperature, std::vector<int> resources, int magneticfieldvsradiation, bool habitability, bool defeat, bool potentialhabitability, bool breathableatmosphere, int counter){
     counter += 1;
-    int index = 7;
-    float pi = 3.14; 
+    int index = 6;
     int rotation_angle = randRange(150, 270);
-    float eccentricity = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-    float surface = (4*pi*_planetsradius) / 3;
     sqlite3* db;
     int rc = sqlite3_open("ASCIIdatabase.db", &db);
     sqlite3_stmt* stmt;
     rc = sqlite3_prepare(db, "INSERT INTO PLANETS VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", -1, &stmt, NULL);
     rc = sqlite3_bind_text(stmt, 1, "Solar system", 12, SQLITE_STATIC);
     rc = sqlite3_bind_int(stmt, 2, counter);
-    rc = sqlite3_bind_text(stmt, 3, planetname, planetname.length(), SQLITE_STATIC);
-    rc = sqlite3_bind_text(stmt, 4, type, type.length(), SQLITE_STATIC);
+    rc = sqlite3_bind_text(stmt, 3, planetname.c_str(), planetname.length(), SQLITE_STATIC);
+    rc = sqlite3_bind_text(stmt, 4, type.c_str(), type.length(), SQLITE_STATIC);
     rc = sqlite3_bind_int(stmt, 5, temperature);
-    rc = sqlite3_bind_blob(stmt, 6, surface);
     if(resources.size() == 1){
         rc = sqlite3_bind_int(stmt, index, resources[0]);
     }
@@ -2043,8 +2039,6 @@ void Spaceship::generate_solar_data_base(std::string planetname, std::string atm
     }
     index += 1;
     rc = sqlite3_bind_int(stmt, index, distancefromstar);
-    index += 1;
-    rc = sqlite3_bind_blob(stmt, index, eccentricity, SQLITE_STATIC);
     index += 1;
     rc = sqlite3_bind_int(stmt, index, rotation_angle);
     rc = sqlite3_step(stmt);
