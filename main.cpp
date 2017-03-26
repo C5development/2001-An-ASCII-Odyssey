@@ -670,8 +670,8 @@ class Spaceship
     static std::vector<std::string> planetnamesbuffer;
     static std::vector<std::string> starnamesbuffer;
     static int starsnumber;
-    static int outcome_calculator(long, int, bool, int);
-    static void casualties(long, int, bool, int);
+    static int outcome_calculator(int, int, bool, int);
+    static void casualties(int, int, bool, int);
     static void battle_processor(std::vector<std::string>, long, long, long, long, int, int, int);
     static int _drones;
     static int _armors;
@@ -681,7 +681,7 @@ class Spaceship
     static int _soldierslevel;
     static int _slaveslevel;
     static long _specimens;
-    static void battle_reports(int, long, int, long, int, int, bool, int);
+    static void battle_reports(int, int, int, int, int, int, bool, int);
     static void battle_preparation(long, long, long, long, long, long);
     static void damage_calculation(std::vector<std::string>, std::string, int, float, int, long, int, int);
     static void AI_weaponery_store(long, std::string, long, long);
@@ -690,7 +690,7 @@ class Spaceship
     static void metallurgy();
     static int efficiency_calculation(int, int, bool);
     static float soldiers_fate(float);
-    static long random_victim_assignment(long);
+    static long random_victim_assignment(int);
     static bool turn_assignment(int);
     static void AI(std::vector<int>,  int, long, int, int, int, int, bool, bool);
     static void decision_maker(int, long, long, long, long, float, float, bool, bool, bool);
@@ -1750,7 +1750,7 @@ void Spaceship::battle_preparation(long enemies_drones, long enemies_cyborgs, lo
     }
 }
 
-void Spaceship::battle_reports(int warriors, long surrender_limit, int deaths, long arbitrary_stop, int adjustment, int nanoseconds, bool players_attack, int counter){
+void Spaceship::battle_reports(int warriors, int surrender_limit, int deaths, int arbitrary_stop, int adjustment, int nanoseconds, bool players_attack, int counter){
     int results;
     bool single_report = true;
     std::string report;
@@ -1795,9 +1795,9 @@ void Spaceship::battle_reports(int warriors, long surrender_limit, int deaths, l
     }
 }
 
-void Spaceship::casualties(long warriors, int level, bool players_attack, int counter){
+void Spaceship::casualties(int warriors, int level, bool players_attack, int counter){
     int nanoseconds = 17 - level;
-    long surrender_limit;
+    int surrender_limit;
     int deaths;
     int arbitrary_stop;
     int adjustment = 13;
@@ -1812,7 +1812,7 @@ void Spaceship::casualties(long warriors, int level, bool players_attack, int co
     t1.join();
 }
 
-int Spaceship::outcome_calculator(long warriors, int level, bool players_attack, int counter){
+int Spaceship::outcome_calculator(int warriors, int level, bool players_attack, int counter){
     high_resolution_clock::time_point p1 = high_resolution_clock::now();
     std::thread t2(casualties, warriors, level, players_attack, counter);
     t2.join();
@@ -1826,7 +1826,7 @@ float Spaceship::soldiers_fate(float ceilling){
     return addition;
 }
 
-long Spaceship::random_victim_assignment(long warriors){
+long Spaceship::random_victim_assignment(int warriors){
     float pivot;
     float fate;
     float ceilling;
@@ -1851,11 +1851,11 @@ void Spaceship::battle_processor(std::vector<std::string> balance, long drones, 
     std::cout<<"\n"  //REWRITE PROCESS CHECK THE FIGHTER VARIABLE ASSIGNMENT!
     <<"Our soldiers will get ready for the glorious day my lord!\n"
     <<"Always willing to serve you and die for you!\n"<<std::endl;
-    long first_turn;
-    long second_turn;
-    long player_warriors = drones + cyborgs;
-    long enemy_warriors = enemies_drones + enemies_cyborgs;
-    long strike_back_victims;
+    int first_turn;
+    int second_turn;
+    int player_warriors = drones + cyborgs;
+    int enemy_warriors = enemies_drones + enemies_cyborgs;
+    int strike_back_victims;
     int fighter_level1;
     int fighter_level2;
     bool players_attack;
@@ -2011,27 +2011,93 @@ void Spaceship::display_planets_database(){
 void Spaceship::generate_solar_data_base(std::string planetname, std::string atmosphere, int distancefromstar, std::string type, int temperature, std::vector<int> resources, int magneticfieldvsradiation, bool habitability, bool defeat, bool potentialhabitability, bool breathableatmosphere, int counter){
     counter += 1;
     int rotation_angle = randRange(150, 270);
+    std::string realm = "Solar system";
     sqlite3* db;
     int rc = sqlite3_open("ASCIIdatabase.db", &db);
     sqlite3_stmt* stmt;
-    rc = sqlite3_prepare(db, "INSERT INTO PLANETS VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", -1, &stmt, NULL);
-    rc = sqlite3_bind_text(stmt, 1, "Solar system", 12, SQLITE_STATIC);
+    rc = sqlite3_prepare(db, "INSERT INTO PLANETS VALUES (?, ?, ?, ?, ?, ?, ?, ?);", -1, &stmt, NULL);
+    rc = sqlite3_bind_text(stmt, 1, realm.c_str(), realm.length(), SQLITE_STATIC);
     rc = sqlite3_bind_int(stmt, 2, counter);
     rc = sqlite3_bind_text(stmt, 3, planetname.c_str(), planetname.length(), SQLITE_STATIC);
     rc = sqlite3_bind_text(stmt, 4, type.c_str(), type.length(), SQLITE_STATIC);
     rc = sqlite3_bind_int(stmt, 5, temperature);
     if(resources.size() == 1){
         rc = sqlite3_bind_int(stmt, 6, resources[0]);
+        rc = sqlite3_bind_int(stmt, 7, distancefromstar);
+        rc = sqlite3_bind_int(stmt, 8, rotation_angle);
+        rc = sqlite3_step(stmt);
+        if(type == "Lava planet"){
+            rc = sqlite3_prepare(db, "INSERT INTO RESOURCES (METAL) VALUES(?);", -1, &stmt, NULL);
+            rc = sqlite3_bind_int(stmt, resources[0], 6);
+            rc = sqlite3_step(stmt);
+            sqlite3_finalize(stmt);
+            sqlite3_close(db); 
+        }
+        else if(type == "Diamond planet"){
+            rc = sqlite3_prepare(db, "INSERT INTO RESOURCES (DIAMONDS) VALUES(?);", -1, &stmt, NULL);
+            rc = sqlite3_bind_int(stmt, resources[0], 9);
+            rc = sqlite3_step(stmt);
+            sqlite3_finalize(stmt);
+            sqlite3_close(db);
+        }
+        else if(type == "Mercury planet"){
+            rc = sqlite3_prepare(db, "INSERT INTO RESOURCES (MERCURY) VALUES(?);", -1, &stmt, NULL);
+            rc = sqlite3_bind_int(stmt, resources[0], 7);
+            rc = sqlite3_step(stmt);
+            sqlite3_finalize(stmt);
+            sqlite3_close(db);
+        }
+        else if(type == "Habitable planet"){
+            if(habitability){
+                rc = sqlite3_prepare(db, "INSERT INTO RESOURCES (SPECIMENS) VALUES (?);",-1, &stmt, NULL);
+                rc = sqlite3_bind_int(stmt, resources[0], 10);
+                rc = sqlite3_step(stmt);
+                sqlite3_finalize(stmt);
+                sqlite3_close(db);
+            }
+            else if(potentialhabitability){
+                rc = sqlite3_prepare(db, "INSERT INTO RESOURCES (SPECIMENS) VALUES (0);", -1, &stmt, NULL);
+                rc = sqlite3_step(stmt);
+                sqlite3_finalize(stmt);
+                sqlite3_close(db);
+            }
+            else 
+                rc = sqlite3_prepare(db, "INSERT INTO RESOURCES (SPECIMENS) VALUES (0);", -1, &stmt, NULL);
+                rc = sqlite3_step(stmt);
+                sqlite3_finalize(stmt);
+                sqlite3_close(db);
+        }
+        else if(type == "Frozen planet"){
+            rc = sqlite3_prepare(db, "INSERT INTO RESOURCES (PROTOZOO, PSEUDOMONA, STAPHILLOCCOCUS) VALUES (?, ?, ?);", -1, &stmt, NULL);
+            sqlite3_bind_int(stmt, resources[0], 2);
+            sqlite3_bind_int(stmt, resources[1], 3);
+            sqlite3_bind_int(stmt, resources[2], 4);
+            rc = sqlite3_step(stmt);
+            sqlite3_finalize(stmt);
+            sqlite3_close(db);
+        }
+        else if(type == "Gas giant"){
+            rc = sqlite3_prepare(db, "INSERT INTO RESOURCES (GAS) VALUES (?);", -1, &stmt, NULL);
+            sqlite3_bind_int(stmt, resources[0], 8);
+            rc = sqlite3_step(stmt);
+            sqlite3_finalize(stmt);
+            sqlite3_close(db);
+        }
     }
     else if(resources.size() == 3){
        int resources_amount = std::accumulate(resources.begin(), resources.end(), 0);
        rc = sqlite3_bind_int(stmt, 6, resources_amount);
+       rc = sqlite3_bind_int(stmt, 7, distancefromstar);
+       rc = sqlite3_bind_int(stmt, 8, rotation_angle);
+       rc = sqlite3_step(stmt);
+       rc = sqlite3_prepare(db, "INSERT INTO RESOURCES VALUES (?, ?, ?);", -1, &stmt, NULL);
+       rc = sqlite3_bind_int(stmt, resources[0], 2);
+       rc = sqlite3_bind_int(stmt, resources[1], 3);
+       rc = sqlite3_bind_int(stmt, resources[2], 4);
+       rc = sqlite3_step(stmt);
+       sqlite3_finalize(stmt);
+       sqlite3_close(db);  
     }
-    rc = sqlite3_bind_int(stmt, 7, distancefromstar);
-    rc = sqlite3_bind_int(stmt, 8, rotation_angle);
-    rc = sqlite3_step(stmt);
-    sqlite3_finalize(stmt);
-    sqlite3_close(db); 
 }
 
 void Spaceship::to_solar_system(){
@@ -2485,29 +2551,40 @@ void Spaceship::planet_interaction(){
         <<std::endl;
         adjustment += adjustment + randRange(150, 347);
         adjustment1 += adjustment1 + randRange(150, 347);
-        switch(planets[j].getplanettype()){
-                
-            case 1: resources.push_back(planets[j].getmetal());
-                    type = "Lava planet";
-                    atmosphere = "Carbon dioxide";
-            case 2: resources.push_back(planets[j].getdiamonds());
-                    type = "Diamond planet";
-                    atmosphere = "Kriptonite";
-            case 3: resources.push_back(planets[j].getmercury());
-                    type = "Mercury planet";
-                    atmosphere = "Cyanide";
-            case 4: ;
-            
-            case 5:  resources.push_back(planets[j].getprotozoo());
-                     resources.push_back(planets[j].getstaphilloccocus());
-                     resources.push_back(planets[j].getpseudomona());
-                     type = "Frozen planet";
-                     atmosphere = "Cosmic rays";
-            case 6: resources.push_back(planets[j].getgas());
-                    type = "Gas giant";
-                    atmosphere = "Nitrogen";
+        if(planets[j].getplanettype() == 1){
+            resources.push_back(planets[j].getmetal());
+            type = "Lava planet";
+            atmosphere = "Carbon dioxide"; 
+        }
+        else if(planets[j].getplanettype() == 2){
+            resources.push_back(planets[j].getdiamonds());
+            type = "Diamond planet";
+            atmosphere = "Kriptonite";
+        }
+       else if(planets[j].getplanettype() == 3){
+          resources.push_back(planets[j].getmercury());
+          type = "Mercury planet";
+          atmosphere = "Cyanide"; 
+       }
+        else if(planets[j].getplanettype() == 4){
+           resources.push_back(randRange(100000, 750000));   
+        }
+        else if(planets[j].getplanettype() == 5){
+            resources.push_back(planets[j].getprotozoo());
+            resources.push_back(planets[j].getstaphilloccocus());
+            resources.push_back(planets[j].getpseudomona());
+            type = "Frozen planet";
+            atmosphere = "Cosmic rays";
+        }  
+        else if(planets[j].getplanettype() == 6){
+            resources.push_back(planets[j].getgas());
+            type = "Gas giant";
+            atmosphere = "Nitrogen";
         }
         generate_solar_data_base(planetname, atmosphere, distancefromstar, type, planets[j].gettemperature(), resources, planets[j].getmagneticfieldvsradiation(), planets[j].gethabitability(), planets[j].getdefeat(), planets[j].getpotentialhabitability(), planets[j].getbreathableatmosphere(), counter);
+    }
+    for(int i : resources){
+            std::cout<<i<<std::endl;
     }
     std::cout<<std::endl;
     std::cout<<"Do you want to make this solar system a colony?"<<std::endl;
@@ -2724,7 +2801,6 @@ void Spaceship::planet_interaction(){
                                     <<"The amount by which we must adjust it is "<<"\n"
                                     <<planets[choice-1].getmagneticfieldvsradiation()<<std::endl;
                                     std::cin>>variableadjustment; //WAIT FUNCTION HERE
-                                    planets[choice - 1].turn_into_habitable();
                                 }
 
                               }
@@ -2744,11 +2820,13 @@ void Spaceship::planet_interaction(){
                                     break;
 
                                 }
+                                planets[choice - 1].turn_into_habitable();
                                 std::cout<<"It is time to accelerate the evolution process on this planet..."<<std::endl;
                                 sleep(4);
                                 std::cout<<"Let there be life and wisdom!\n"
                                 <<"Shall the gods worship this soul, for no other than thee can defy their magnanimous and ubiquitous power!"<<std::endl;
                                 _evolutionexpressaccelerator -= 1;
+                                done = true;
                             }
 
                         }
