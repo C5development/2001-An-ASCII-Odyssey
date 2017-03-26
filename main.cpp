@@ -12,6 +12,7 @@
 #include <chrono>
 #include <functional>
 #include <future>
+#include <numeric> 
 #include "libsqlite.hpp"
 
 using namespace std::chrono;
@@ -2005,7 +2006,6 @@ void Spaceship::display_planets_database(){
 
 void Spaceship::generate_solar_data_base(std::string planetname, std::string atmosphere, int distancefromstar, std::string type, int temperature, std::vector<int> resources, int magneticfieldvsradiation, bool habitability, bool defeat, bool potentialhabitability, bool breathableatmosphere, int counter){
     counter += 1;
-    int index = 6;
     int rotation_angle = randRange(150, 270);
     sqlite3* db;
     int rc = sqlite3_open("ASCIIdatabase.db", &db);
@@ -2017,18 +2017,14 @@ void Spaceship::generate_solar_data_base(std::string planetname, std::string atm
     rc = sqlite3_bind_text(stmt, 4, type.c_str(), type.length(), SQLITE_STATIC);
     rc = sqlite3_bind_int(stmt, 5, temperature);
     if(resources.size() == 1){
-        rc = sqlite3_bind_int(stmt, index, resources[0]);
+        rc = sqlite3_bind_int(stmt, 6, resources[0]);
     }
     else if(resources.size() == 3){
-        for( int i : resources){
-            rc = sqlite3_bind_int(stmt, index, resources[i]);
-            index += 1;
-        }
+       int resources_amount = std::accumulate(resources.begin(), resources.end(), 0);
+       rc = sqlite3_bind_int(stmt, 6, resources_amount);
     }
-    index += 1;
-    rc = sqlite3_bind_int(stmt, index, distancefromstar);
-    index += 1;
-    rc = sqlite3_bind_int(stmt, index, rotation_angle);
+    rc = sqlite3_bind_int(stmt, 7, distancefromstar);
+    rc = sqlite3_bind_int(stmt, 8, rotation_angle);
     rc = sqlite3_step(stmt);
     sqlite3_finalize(stmt);
     sqlite3_close(db); 
@@ -2139,10 +2135,15 @@ void Spaceship::save_game(){
     int rc = sqlite3_open("ASCIIdatabase.db", &db);
     sqlite3_stmt* stmt;
     rc = sqlite3_prepare(db, "SELECT * FROM GAME_DATA;", -1, &stmt, NULL);
-    rc = sqlite3_column_count(stmt);
+    rc = sqlite3_step(stmt);
     if (rc == SQLITE_DONE){   
-        
-        rc = sqlite3_prepare(db, "INSERT INTO GAME_DATA VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", -1, &stmt, NULL);
+        sqlite3_finalize(stmt);
+        sqlite3_close(db);
+        std::cout<<"saving game"<<std::endl;
+        sqlite3* db;
+        sqlite3_open("ASCIIdatabase.db", &db);
+        sqlite3_stmt* stmt;
+        rc = sqlite3_prepare(db, "INSERT INTO GAME_DATA VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", -1, &stmt, NULL);
         rc = sqlite3_bind_text(stmt, 1, ID.c_str(), ID.length(), SQLITE_STATIC);
         rc = sqlite3_bind_int(stmt, 2, 1);
         rc = sqlite3_bind_int(stmt, 3, _overalllevel);
@@ -2168,36 +2169,40 @@ void Spaceship::save_game(){
         rc = sqlite3_bind_int(stmt, 23, _scientistspoints);
         rc = sqlite3_bind_int(stmt, 24, _slavespoints); 
         rc = sqlite3_step(stmt);
+        std::cout<<"Game saved"<<std::endl;
         sqlite3_finalize(stmt);
         sqlite3_close(db);
     } 
-    else{ 
+    else if(rc != SQLITE_DONE){ 
+         sqlite3* db;
+         int rc = sqlite3_open("ASCIIdatabase.db", &db);
+         sqlite3_stmt* stmt;
          rc = sqlite3_prepare(db, "DELETE FROM GAME_DATA;", -1, &stmt, NULL);
-         rc = sqlite3_step(stmt);
-         rc = sqlite3_prepare(db, "INSERT INTO GAME_DATA VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", -1, &stmt, NULL);
+         rc = sqlite3_prepare(db, "INSERT INTO GAME_DATA VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", -1, &stmt, NULL);
          rc = sqlite3_bind_text(stmt, 1, ID.c_str(), ID.length(), SQLITE_STATIC);
-         rc = sqlite3_bind_int(stmt, 2, _overalllevel);
-         rc = sqlite3_bind_int(stmt, 3, _soldierslevel);
-         rc = sqlite3_bind_int(stmt, 4, _scientistslevel);
-         rc = sqlite3_bind_int(stmt, 5, _slaveslevel);
-         rc = sqlite3_bind_int(stmt, 6, _diamondsamount);
-         rc = sqlite3_bind_int(stmt, 7, _fuelcapacity);
-         rc = sqlite3_bind_int(stmt, 8, _WARPdrive);
-         rc = sqlite3_bind_int(stmt, 9, _protozoolevels);
-         rc = sqlite3_bind_int(stmt, 10, _pseudomonalevels);
-         rc = sqlite3_bind_int(stmt, 11, _staphilococcuslevels);
-         rc = sqlite3_bind_int(stmt, 12, _metalamount);
-         rc = sqlite3_bind_int(stmt, 13, _points);
-         rc = sqlite3_bind_int(stmt, 14, _drones);
-         rc = sqlite3_bind_int(stmt, 15, _armors);
-         rc = sqlite3_bind_int(stmt, 16, _defeats);
-         rc = sqlite3_bind_int(stmt, 17, _victories);
-         rc = sqlite3_bind_int(stmt, 18, _colonies);
-         rc = sqlite3_bind_int(stmt, 19, _antimatterweapon);
-         rc = sqlite3_bind_int(stmt, 20, _evolutionexpressaccelerator);
-         rc = sqlite3_bind_int(stmt, 21, _soldierspoints);
-         rc = sqlite3_bind_int(stmt, 22, _scientistspoints);
-         rc = sqlite3_bind_int(stmt, 23, _slavespoints); 
+         rc = sqlite3_bind_int(stmt, 2, 1);
+         rc = sqlite3_bind_int(stmt, 3, _overalllevel);
+         rc = sqlite3_bind_int(stmt, 4, _soldierslevel);
+         rc = sqlite3_bind_int(stmt, 5, _scientistslevel);
+         rc = sqlite3_bind_int(stmt, 6, _slaveslevel);
+         rc = sqlite3_bind_int(stmt, 7, _diamondsamount);
+         rc = sqlite3_bind_int(stmt, 8, _fuelcapacity);
+         rc = sqlite3_bind_int(stmt, 9, _WARPdrive);
+         rc = sqlite3_bind_int(stmt, 10, _protozoolevels);
+         rc = sqlite3_bind_int(stmt, 11, _pseudomonalevels);
+         rc = sqlite3_bind_int(stmt, 12, _staphilococcuslevels);
+         rc = sqlite3_bind_int(stmt, 13, _metalamount);
+         rc = sqlite3_bind_int(stmt, 14, _points);
+         rc = sqlite3_bind_int(stmt, 15, _drones);
+         rc = sqlite3_bind_int(stmt, 16, _armors);
+         rc = sqlite3_bind_int(stmt, 17, _defeats);
+         rc = sqlite3_bind_int(stmt, 18, _victories);
+         rc = sqlite3_bind_int(stmt, 19, _colonies);
+         rc = sqlite3_bind_int(stmt, 20, _antimatterweapon);
+         rc = sqlite3_bind_int(stmt, 21, _evolutionexpressaccelerator);
+         rc = sqlite3_bind_int(stmt, 22, _soldierspoints);
+         rc = sqlite3_bind_int(stmt, 23, _scientistspoints);
+         rc = sqlite3_bind_int(stmt, 24, _slavespoints); 
          rc = sqlite3_step(stmt);
          sqlite3_finalize(stmt);
          sqlite3_close(db);
@@ -3249,13 +3254,12 @@ int Spaceship::cabin(){
     int rc = sqlite3_open("ASCIIdatabase.db", &db);
     sqlite3_stmt* stmt;
     rc = sqlite3_prepare(db, "SELECT * FROM GAME_DATA;", -1, &stmt, NULL);
-    rc = sqlite3_column_count(stmt);
     rc = sqlite3_step(stmt);
     if(rc == SQLITE_DONE){
         sqlite3_finalize(stmt);
         sqlite3_close(db);
     }
-    else{
+    else if(rc != SQLITE_DONE){
         sqlite3_finalize(stmt);
         sqlite3_close(db);
         load_game();
