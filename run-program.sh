@@ -1,6 +1,6 @@
 #!/bin/bash
 
-g++ -std=c++11 main.cpp -o an-ascii-odyssey.o -lpthread -lsqlite3
+g++ -std=c++11 main.cpp -o an-ascii-odyssey.o -lpthread -lsqlite3 -lglut -lGLU -lGL
 
 rc=$?; if [[ $rc != 0 ]];
 then
