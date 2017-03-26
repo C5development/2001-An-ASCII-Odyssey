@@ -2021,6 +2021,7 @@ void Spaceship::generate_solar_data_base(std::string planetname, std::string atm
         rc = sqlite3_bind_int(stmt, 6, resources[0]);
         rc = sqlite3_bind_int(stmt, 7, distancefromstar);
         rc = sqlite3_bind_int(stmt, 8, rotation_angle);
+        rc = sqlite3_step(stmt);
         if(type == "Lava planet"){
             rc = sqlite3_prepare(db, "INSERT INTO RESOURCES (METAL) VALUES(?);", -1, &stmt, NULL);
             rc = sqlite3_bind_int(stmt, resources[0], 6);
@@ -2051,10 +2052,16 @@ void Spaceship::generate_solar_data_base(std::string planetname, std::string atm
                 sqlite3_close(db);
             }
             else if(potentialhabitability){
+                rc = sqlite3_prepare(db, "INSERT INTO RESOURCES (SPECIMENS) VALUES (0);", -1, &stmt, NULL);
                 rc = sqlite3_step(stmt);
                 sqlite3_finalize(stmt);
                 sqlite3_close(db);
             }
+            else 
+                rc = sqlite3_prepare(db, "INSERT INTO RESOURCES (SPECIMENS) VALUES (0);", -1, &stmt, NULL);
+                rc = sqlite3_step(stmt);
+                sqlite3_finalize(stmt);
+                sqlite3_close(db);
         }
         else if(type == "Frozen planet"){
             rc = sqlite3_prepare(db, "INSERT INTO RESOURCES (PROTOZOO, PSEUDOMONA, STAPHILLOCCOCUS) VALUES (?, ?, ?);", -1, &stmt, NULL);
@@ -2540,29 +2547,40 @@ void Spaceship::planet_interaction(){
         <<std::endl;
         adjustment += adjustment + randRange(150, 347);
         adjustment1 += adjustment1 + randRange(150, 347);
-        switch(planets[j].getplanettype()){
-                
-            case 1: resources.push_back(planets[j].getmetal());
-                    type = "Lava planet";
-                    atmosphere = "Carbon dioxide";
-            case 2: resources.push_back(planets[j].getdiamonds());
-                    type = "Diamond planet";
-                    atmosphere = "Kriptonite";
-            case 3: resources.push_back(planets[j].getmercury());
-                    type = "Mercury planet";
-                    atmosphere = "Cyanide";
-            case 4: ;
-            
-            case 5:  resources.push_back(planets[j].getprotozoo());
-                     resources.push_back(planets[j].getstaphilloccocus());
-                     resources.push_back(planets[j].getpseudomona());
-                     type = "Frozen planet";
-                     atmosphere = "Cosmic rays";
-            case 6: resources.push_back(planets[j].getgas());
-                    type = "Gas giant";
-                    atmosphere = "Nitrogen";
+        if(planets[j].getplanettype() == 1){
+            resources.push_back(planets[j].getmetal());
+            type = "Lava planet";
+            atmosphere = "Carbon dioxide"; 
+        }
+        else if(planets[j].getplanettype() == 2){
+            resources.push_back(planets[j].getdiamonds());
+            type = "Diamond planet";
+            atmosphere = "Kriptonite";
+        }
+       else if(planets[j].getplanettype() == 3){
+          resources.push_back(planets[j].getmercury());
+          type = "Mercury planet";
+          atmosphere = "Cyanide"; 
+       }
+        else if(planets[j].getplanettype() == 4){
+           resources.push_back(randRange(100000, 750000));   
+        }
+        else if(planets[j].getplanettype() == 5){
+            resources.push_back(planets[j].getprotozoo());
+            resources.push_back(planets[j].getstaphilloccocus());
+            resources.push_back(planets[j].getpseudomona());
+            type = "Frozen planet";
+            atmosphere = "Cosmic rays";
+        }  
+        else if(planets[j].getplanettype() == 6){
+            resources.push_back(planets[j].getgas());
+            type = "Gas giant";
+            atmosphere = "Nitrogen";
         }
         generate_solar_data_base(planetname, atmosphere, distancefromstar, type, planets[j].gettemperature(), resources, planets[j].getmagneticfieldvsradiation(), planets[j].gethabitability(), planets[j].getdefeat(), planets[j].getpotentialhabitability(), planets[j].getbreathableatmosphere(), counter);
+    }
+    for(int i : resources){
+            std::cout<<i<<std::endl;
     }
     std::cout<<std::endl;
     std::cout<<"Do you want to make this solar system a colony?"<<std::endl;
