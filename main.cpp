@@ -793,26 +793,30 @@ std::string Spaceship::define_stars_name(){
 
 
 std::vector<Star> Spaceship::stars_interaction(){
+    while(1){
         if(starnames.size() <= 25){
             refill_vector("Stars");
         }
-        std::string starsname;
-        int stars_number = randRange(5, 15);
-        std::vector<Star> stars(stars_number);
-        std::cout<<"\n"
+        else 
+            break;
+    }  
+    std::string starsname;
+    int stars_number = randRange(5, 10);
+    std::vector<Star> stars(stars_number);
+    std::cout<<"\n"
         <<"\n"
         <<"<<<STARS>>>"<<"\n"
         <<"\n"
         <<"\n"<<std::endl;
-        for(int i = 0; i < stars_number; i++){
-            starsname = define_stars_name();
-            std::cout<<"\n"
+    for(int i = 0; i < stars_number; i++){
+        starsname = define_stars_name();
+        std::cout<<"\n"
             <<"Type "<<i + 1<<" to explore this solar system"<<"\n"
             <<"\n"<<std::endl;
-            stars[i].display_stars_data(starsname);
-            std::cout<<std::endl;
-        }
-        return stars;
+        stars[i].display_stars_data(starsname);
+        std::cout<<std::endl;
+    }
+    return stars;
 }
 
 std::string Spaceship::define_planets_name(){
@@ -2579,9 +2583,6 @@ void Spaceship::planet_interaction(){
         }
         generate_solar_data_base(planetname, atmosphere, distancefromstar, type, planets[j].gettemperature(), resources, planets[j].getmagneticfieldvsradiation(), planets[j].gethabitability(), planets[j].getdefeat(), planets[j].getpotentialhabitability(), planets[j].getbreathableatmosphere(), counter);
     }
-    for(int i : resources){
-            std::cout<<i<<std::endl;
-    }
     std::cout<<std::endl;
     std::cout<<"Do you want to make this solar system a colony?"<<std::endl;
     std::cin>>colony_approbation;
@@ -2797,8 +2798,8 @@ void Spaceship::planet_interaction(){
                                     <<"The amount by which we must adjust it is "<<"\n"
                                     <<planets[choice-1].getmagneticfieldvsradiation()<<std::endl;
                                     std::cin>>variableadjustment; //WAIT FUNCTION HERE
+                                    break;
                                 }
-
                               }
 
                             while(!done){
@@ -2813,8 +2814,7 @@ void Spaceship::planet_interaction(){
                                     //Wait function here
                                     check_bacteriae_deposits(done, done2, true);
                                     _evolutionexpressaccelerator += randRange(3, 5);
-                                    break;
-
+                                    done = true;
                                 }
                                 planets[choice - 1].turn_into_habitable();
                                 std::cout<<"It is time to accelerate the evolution process on this planet..."<<std::endl;
@@ -2823,6 +2823,7 @@ void Spaceship::planet_interaction(){
                                 <<"Shall the gods worship this soul, for no other than thee can defy their magnanimous and ubiquitous power!"<<std::endl;
                                 _evolutionexpressaccelerator -= 1;
                                 done = true;
+                                break;
                             }
 
                         }
