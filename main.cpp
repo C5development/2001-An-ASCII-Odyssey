@@ -2008,7 +2008,6 @@ void Spaceship::display_planets_database(){
 }
 
 void Spaceship::generate_solar_data_base(std::string planetname, std::string atmosphere, int distancefromstar, std::string type, int temperature, std::vector<int> resources, int magneticfieldvsradiation, bool habitability, bool defeat, bool potentialhabitability, bool breathableatmosphere, int counter){
-    counter += 1;
     int rotation_angle = randRange(150, 270);
     std::string realm = "Solar system";
     sqlite3* db;
@@ -2534,6 +2533,7 @@ void Spaceship::planet_interaction(){
     <<"\n"
     "\n"<<std::endl;
     for(int j = 0; j < planets_number; j++){
+        counter += 1;
         adjustment1 = adjustment + 2 * j;
         adjustment2 = adjustment1 + 4 * j;
         planetname = define_planets_name();
@@ -2554,19 +2554,23 @@ void Spaceship::planet_interaction(){
             resources.push_back(planets[j].getmetal());
             type = "Lava planet";
             atmosphere = "Carbon dioxide"; 
+            generate_solar_data_base(planetname, atmosphere, distancefromstar, type, planets[j].gettemperature(), resources, planets[j].getmagneticfieldvsradiation(), planets[j].gethabitability(), planets[j].getdefeat(), planets[j].getpotentialhabitability(), planets[j].getbreathableatmosphere(), counter);
         }
         else if(planets[j].getplanettype() == 2){
             resources.push_back(planets[j].getdiamonds());
             type = "Diamond planet";
             atmosphere = "Kriptonite";
+            generate_solar_data_base(planetname, atmosphere, distancefromstar, type, planets[j].gettemperature(), resources, planets[j].getmagneticfieldvsradiation(), planets[j].gethabitability(), planets[j].getdefeat(), planets[j].getpotentialhabitability(), planets[j].getbreathableatmosphere(), counter);
         }
        else if(planets[j].getplanettype() == 3){
           resources.push_back(planets[j].getmercury());
           type = "Mercury planet";
-          atmosphere = "Cyanide"; 
+          atmosphere = "Cyanide";
+          generate_solar_data_base(planetname, atmosphere, distancefromstar, type, planets[j].gettemperature(), resources, planets[j].getmagneticfieldvsradiation(), planets[j].gethabitability(), planets[j].getdefeat(), planets[j].getpotentialhabitability(), planets[j].getbreathableatmosphere(), counter);
        }
-        else if(planets[j].getplanettype() == 4){
-           resources.push_back(randRange(100000, 750000));   
+       else if(planets[j].getplanettype() == 4){
+           resources.push_back(randRange(100000, 750000));  
+           generate_solar_data_base(planetname, atmosphere, distancefromstar, type, planets[j].gettemperature(), resources, planets[j].getmagneticfieldvsradiation(), planets[j].gethabitability(), planets[j].getdefeat(), planets[j].getpotentialhabitability(), planets[j].getbreathableatmosphere(), counter);
         }
         else if(planets[j].getplanettype() == 5){
             resources.push_back(planets[j].getprotozoo());
@@ -2574,13 +2578,16 @@ void Spaceship::planet_interaction(){
             resources.push_back(planets[j].getpseudomona());
             type = "Frozen planet";
             atmosphere = "Cosmic rays";
+            generate_solar_data_base(planetname, atmosphere, distancefromstar, type, planets[j].gettemperature(), resources, planets[j].getmagneticfieldvsradiation(), planets[j].gethabitability(), planets[j].getdefeat(), planets[j].getpotentialhabitability(), planets[j].getbreathableatmosphere(), counter);
         }  
         else if(planets[j].getplanettype() == 6){
             resources.push_back(planets[j].getgas());
             type = "Gas giant";
             atmosphere = "Nitrogen";
+            generate_solar_data_base(planetname, atmosphere, distancefromstar, type, planets[j].gettemperature(), resources, planets[j].getmagneticfieldvsradiation(), planets[j].gethabitability(), planets[j].getdefeat(), planets[j].getpotentialhabitability(), planets[j].getbreathableatmosphere(), counter);
         }
-        generate_solar_data_base(planetname, atmosphere, distancefromstar, type, planets[j].gettemperature(), resources, planets[j].getmagneticfieldvsradiation(), planets[j].gethabitability(), planets[j].getdefeat(), planets[j].getpotentialhabitability(), planets[j].getbreathableatmosphere(), counter);
+        resources.clear();
+        
     }
     std::cout<<std::endl;
     std::cout<<"Do you want to make this solar system a colony?"<<std::endl;
