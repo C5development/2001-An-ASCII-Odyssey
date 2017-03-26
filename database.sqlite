@@ -1,21 +1,7 @@
 
 
-CREATE TABLE SOLAR_SYSTEM(NUMBER                  INT                     NOT NULL,
-LETTER                  TEXT                    NOT NULL,
-NAME                    TEXT                    NOT NULL,
-TYPE                    TEXT                    NOT NULL,
-TEMPERATURE             INT                     NOT NULL,
-SURFACE                 REAL                    NOT NULL,
-MAGNETIC_FIELD          INT                     NOT NULL,
-RESOURCES               INT                     NOT NULL,
-DISTANCE                INT                     NOT NULL,
-ECCENTRICITY            REAL                    NOT NULL,
-ROTATION                INT                     NOT NULL
-);
-
 CREATE TABLE PLANETS(REALM TEXT PRIMARY KEY NOT NULL,
 NUMBER  INT NOT NULL,
-LETTER TEXT NOT NULL,
 NAME TEXT NOT NULL,
 TYPE TEXT NOT NULL,
 TEMPERATURE INT NOT NULL,
