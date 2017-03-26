@@ -758,7 +758,6 @@ std::vector<std::string> Spaceship::planetnames = {"Lok", "Erinar", "Golrath", "
 std::vector<std::string> Spaceship::planetnamesbuffer;
 
 std::vector<std::string> Spaceship::starnames = {"Acamar", "Adhafera", "Kornephoros", "Hoedus II", "Miaplacidus", "Procyon", "Pleione", "Rastaban", "Rotanev", "Sarir", "Cassiopeia", "Sterope", "Tabit", "Veritate", "Zaurak", "Sceptrum", "Sadachbia", "Rukbat", "Cygnus", "Capricorni", "Rotanev", "Ceasar 43", "Zeus", "Colossus", "Dranicus", "Rimbokhan", "Tiranuslae", "Criptilocus"};
-
 std::vector<std::string> Spaceship::starnamesbuffer;
 
 long Spaceship::_metalamount = 150000;
@@ -794,7 +793,7 @@ std::string Spaceship::define_stars_name(){
 
 std::vector<Star> Spaceship::stars_interaction(){
     while(1){
-        if(starnames.size() <= 25){
+        if(starnames.size() <= 8){
             refill_vector("Stars");
         }
         else 
@@ -2814,7 +2813,6 @@ void Spaceship::planet_interaction(){
                                     //Wait function here
                                     check_bacteriae_deposits(done, done2, true);
                                     _evolutionexpressaccelerator += randRange(3, 5);
-                                    done = true;
                                 }
                                 planets[choice - 1].turn_into_habitable();
                                 std::cout<<"It is time to accelerate the evolution process on this planet..."<<std::endl;
