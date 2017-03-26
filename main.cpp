@@ -14,6 +14,10 @@
 #include <future>
 #include <numeric> 
 #include "libsqlite.hpp"
+#include <GL/glut.h>
+
+//#include<Windows.h>
+//#include<MMSystem.h>
 
 using namespace std::chrono;
 
@@ -3430,8 +3434,37 @@ int Spaceship::cabin(){
     }
 }
 
-int main()
+
+//void backgroundmusic()
+//{
+//    PlaySound("gamesoundtrack.wav", NULL, SND_FILENAME|SND_LOOP);
+//
+//}
+
+
+//void window(void) 
+//{
+//    glClearColor(0.0, 0.0, 0.0, 1.0);
+//    glClear(GL_COLOR_BUFFER_BIT);
+//    glLoadIdentity();
+//    gluLookAt (0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+//    glFlush();
+//}   
+
+
+
+int main(int argc, char *argv[])
 {
+//  std::thread t(backgroundmusic);
+//    glutInit(&argc, argv);
+//    glutInitDisplayMode(GLUT_DOUBLE);
+//    glutInitWindowSize(400, 400);
+//    glutInitWindowPosition(100, 100);
+//    glutCreateWindow("2001 An ASCII Odyssey");
+//    glutDisplayFunc(window);
+//    glutMainLoop();
+//    return 0;
+  
     srand(unsigned( time(NULL) ));
     Spaceship s;
     s.cabin();
