@@ -682,7 +682,7 @@ class Spaceship
     static int _slaveslevel;
     static long _specimens;
     static void battle_reports(int, int, int, int, int, int, bool, int);
-    static void battle_preparation(long, long, long, long, long, long);
+    static void battle_preparation(int, int, long, long, long, int);
     static void damage_calculation(std::vector<std::string>, std::string, int, float, int, long, int, int);
     static void AI_weaponery_store(long, std::string, long, long);
     static void AI_gradual_spend_reduction(long, int);
@@ -746,6 +746,8 @@ class Spaceship
         void civilisation_history(std::string, std::string, int);
         void surrender_treaty(std::string, std::string);
         void refill_vector(std::string);
+        void to_planet(std::string, std::string, int, int, int);
+        void genetical_modification_database(std::string, std::string, int, int);
         void to_solar_system();
         void generate_colonies_database();
         void display_planets_database();
@@ -1438,7 +1440,7 @@ void Spaceship::AI_weaponery_store(long enemies_metal, std::string AI_lacks, lon
     }
 }
 
-void Spaceship::battle_preparation(long enemies_drones, long enemies_cyborgs, long enemies_level, long energy, long enemy_energy, long aliens){
+void Spaceship::battle_preparation(int enemies_drones, int enemies_cyborgs, long enemies_level, long energy, long enemy_energy, int aliens){
     std::vector<std::string> balance;
     std::vector<int> metal_stock;
     int choice;
@@ -2130,7 +2132,67 @@ void Spaceship::generate_solar_data_base(std::string planetname, std::string atm
     }
 }
 
+void Spaceship::genetical_modification_database(std::string atmosphere, std::string planettype, int temperature, int radiation){
+        int desired_amount;
+        int slaves_number;
+        int slaves_temperature_resistance;
+        int slaves_radiation_resistance;
+        std::cout<<"The following number of specimens are ready to become your slaves my lord: "<<desired_amount<<"\n"
+        <<"Please, choose what variables you want to modify"<<"\n"
+        <<"What is the temperature level your slaves will have to resist?"<<std::endl;
+        std::cin>>desired_amount;
+        slaves_temperature_resistance += desired_amount;
+        std::cout<<std::endl;
+        std::cout<<"Perfect my lord, now just give us the level of radiation they will be exposed to"<<std::endl;
+        std::cin>>desired_amount;
+        slaves_radiation_resistance = desired_amount;
+        if(_protozoolevels < 200 || _staphilococcuslevels < 200 || _pseudomonalevels < 100){
+            check_bacteriae_deposits(true, true, false);
+            slaves_number = 0;
+        }
+        else{
+             std::cout<<"Your genetical modifications are being performed on these specimens lord..."<<std::endl;
+            sleep(4);
+            std::cout<<"This is your legion of slaves"<<"\n"
+            <<"1. Number: "<<slaves_number<<"\n"
+            <<"2. Temperature resistance: "<<slaves_temperature_resistance<<"\n"
+            <<"3. Radiation resistance: "<<slaves_radiation_resistance<<"\n"
+            <<"4. Atmosphere resistance: "<<atmosphere<<"\n"
+            <<"\n"
+            <<"We are ready to send our slaves and extract the minerals my lord!"<<std::endl;
+            slaves_radiation_resistance = 0;
+            slaves_temperature_resistance = 0;
+        }
+        std::cout<<"We will have to adapt to the following conditions"<<"\n"
+        <<"Temperature: "<<temperature<<"\n"
+        <<"Atmosphere: "<<atmosphere<<"\n"
+        <<"Radiation: "<<radiation<<"\n"
+        <<"Let's go to the laboratory to modify our specimens accordingly"<<"\n"
+        <<"\n"
+        <<"<<<LABORATORY>>>"<<"\n"
+        <<"\n"
+        <<"This is how many specimens you have at disposal my lord"<<"\n"
+        <<_specimens<<"\n"
+        <<"Please choose how many you would like to send to this planet"<<std::endl;
+        std::cin>>desired_amount;
+        if(desired_amount > _specimens){
+            while(1){
+               std::cout<<"My lord, I must inform you that we still do not have that many specimens left"<<std::endl; 
+               std::cout<<"Type in your desired amount again"<<std::endl;
+               std::cin>>desired_amount;
+               if(desired_amount <= _specimens)
+                   _specimens -= desired_amount;
+                   slaves_number = desired_amount;
+                   break;
+            }
+        }
+        else if(desired_amount <= _specimens){
+            _specimens -= desired_amount;
+            slaves_number = desired_amount;
+        }
+}
 
+<<<<<<< HEAD
 
 
     
@@ -2211,6 +2273,261 @@ void Spaceship::to_solar_system()
         rc=sqlite3_step(stmt);
         sqlite3_finalize(stmt);
         sqlite3_close(db);
+=======
+void Spaceship::to_planet(std::string planettype, std::string atmosphere, int temperature, int magneticfield, int resources){
+    int radiation = magneticfield - randRange(1, magneticfield);
+    int selection;
+    if(planettype == "Lava planet"){
+        while(1){
+            std::cout<<"<--LAVA PLANET-->\n"
+                <<"1. Extract metal\n"
+                <<"2. Destroy planet"<<std::endl;
+                std::cin>>selection;
+                if(selection == 1){
+                    genetical_modification_database(atmosphere, planettype, temperature, radiation);
+                    std::cout<<"Perfect my lord, now just type in how much you need and we will gladly serve you!"<<std::endl;
+                    std::cin>>selection;
+                    if(selection > resources){
+                        while(1){
+                            if(selection <= resources)
+                                break;
+                            else{
+                                std::cout<<"Sorry my lord there are not that many resources"<<std::endl;
+                                std::cout<<"Type in your amount again"<<std::endl;
+                                std::cin>>selection;     
+                            }    
+                        }
+                    }
+                }
+        }
+    }
+    else if(planettype == "Diamond planet"){
+        while(1){
+            std::cout<<"<--DIAMOND PLANET-->\n"
+                <<"1. Extract diamonds\n"
+                <<"2. Destroy planet"<<std::endl; 
+                std::cin>>selection;
+                if(selection == 1){
+                    genetical_modification_database(atmosphere, planettype, temperature, radiation);
+                    std::cout<<"Perfect my lord, now just type in how much you need and we will gladly serve you!"<<std::endl;
+                    std::cin>>selection;
+                    if(selection > resources){
+                        while(1){
+                            if(selection <= resources)
+                                break;
+                            else{
+                                std::cout<<"Sorry my lord there are not that many resources"<<std::endl;
+                                std::cout<<"Type in your amount again"<<std::endl;
+                                std::cin>>selection;     
+                            }    
+                        }
+                    }
+                }
+        }
+    }
+    else if(planettype == "Mercury planet"){
+        while(1){
+            std::cout<<"<--MERCURY PLANET-->\n"
+                <<"1. Extract mercury\n"
+                <<"2. Destroy planet"<<std::endl;  
+                std::cin>>selection;
+                if(selection == 1){
+                    genetical_modification_database(atmosphere, planettype, temperature, radiation);
+                    std::cout<<"Perfect my lord, now just type in how much you need and we will gladly serve you!"<<std::endl;
+                    std::cin>>selection;
+                    if(selection > resources){
+                        while(1){
+                            if(selection <= resources)
+                                break;
+                            else{
+                                std::cout<<"Sorry my lord there are not that many resources"<<std::endl;
+                                std::cout<<"Type in your amount again"<<std::endl;
+                                std::cin>>selection;     
+                            }    
+                        }
+                    }
+                }
+        }
+    }
+    else if(planettype == "Habitable planet" || planettype == "Potentially habitable"){
+        while(1){
+            int enemies_drones = randRange(50000, 200000);
+            int enemies_cyborgs = randRange(50000, 200000);
+            long enemies_level = randRange(1, 17);
+            long enemies_energy = 1000000;
+            long energy = 1000000;
+            std::cout<<"<--HABITABLE/POTENTIALLY HABITABLE PLANET-->\n"
+                <<"1. Interact with civilisation/turn into habitable planet"
+                <<"2. Destroy planet"<<std::endl;
+                std::cin>>selection;
+                if(selection == 1){
+                    battle_preparation(enemies_drones, enemies_cyborgs, enemies_level, enemies_energy, energy, randRange(100000, 750000));
+                }
+        }
+    }
+    else if(planettype == "Frozen"){
+        while(1){
+            std::cout<<"<--FROZEN PLANET-->\n"
+                <<"1. Extract bacteriae\n"
+                <<"2. Destroy planet"<<std::endl;  
+                std::cin>>selection;
+                if(selection == 1){
+                    genetical_modification_database(atmosphere, planettype, temperature, radiation);
+                    std::cout<<"Perfect my lord, now just type in how much you need and we will gladly serve you!"<<std::endl;
+                    std::cin>>selection;
+                    if(selection > resources){
+                        while(1){
+                            if(selection <= resources)
+                                break;
+                            else{
+                                std::cout<<"Sorry my lord there are not that many resources"<<std::endl;
+                                std::cout<<"Type in your amount again"<<std::endl;
+                                std::cin>>selection;     
+                            }    
+                        }
+                    }
+                }
+        }
+    }
+    else if(planettype == "Gas giant"){
+        while(1){
+            std::cout<<"<--GAS GIANT-->\n"
+                <<"1. Extract gas\n"
+                <<"2. Destroy planet"<<std::endl;
+                std::cin>>selection;
+                if(selection == 1){
+                    genetical_modification_database(atmosphere, planettype, temperature, radiation);
+                    std::cout<<"Perfect my lord, now just type in how much you need and we will gladly serve you!"<<std::endl;
+                    std::cin>>selection;
+                    if(selection > resources){
+                        while(1){
+                            if(selection <= resources)
+                                break;
+                            else{
+                                std::cout<<"Sorry my lord there are not that many resources"<<std::endl;
+                                std::cout<<"Type in your amount again"<<std::endl;
+                                std::cin>>selection;     
+                            }    
+                        }
+                    }
+                }
+        }
+    }
+    else{
+        while(1){
+            std::cout<<"<--POST APOCALYPTIC PLANET-->\n"
+                <<"1. Read story\n"
+                <<"2. Destroy planet"<<std::endl;    
+                std::cin>>selection;
+                if(selection == 1){
+                    genetical_modification_database(atmosphere, planettype, temperature, radiation);
+                    std::cout<<"Perfect my lord, now just type in how much you need and we will gladly serve you!"<<std::endl;
+                    std::cin>>selection;
+                    if(selection > resources){
+                        while(1){
+                            if(selection <= resources)
+                                break;
+                            else{
+                                std::cout<<"Sorry my lord there are not that many resources"<<std::endl;
+                                std::cout<<"Type in your amount again"<<std::endl;
+                                std::cin>>selection;     
+                            }    
+                        }
+                    }
+                }
+        }
+    }
+}
+
+void Spaceship::to_solar_system()
+{
+  
+    int number;
+    int temperature;
+    int rotation;
+    int distance;
+    float surface = 100000 + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(500000-1000000)));
+    float eccentricity = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+    int counter=0;  
+    std::string atmosphere;
+    std::string planettype;
+    int resources;
+    sqlite3* db;
+    int rc = sqlite3_open("ASCIIdatabase.db", &db);
+    sqlite3_stmt* stmt;
+    rc=sqlite3_prepare(db, "SELECT count(*) FROM PLANETS WHERE REALM = 'Solar system';",-1, &stmt, NULL );
+    rc=sqlite3_step(stmt);
+    int result = sqlite3_column_int(stmt, 0);
+    for(int i=0;i <= result;i++)
+      counter+=1;
+      rc=sqlite3_prepare(db, "SELECT * FROM PLANETS WHERE REALM = 'Solar system' AND number = ?;",-1,&stmt,NULL);
+      rc=sqlite3_bind_int(stmt, 1, counter);
+      
+      number = sqlite3_column_int(stmt, 2);
+      int type = sqlite3_column_int(stmt, 4);
+      temperature = sqlite3_column_int(stmt, 5);
+      if(type == 0)
+      {
+          planettype = "Lava planet";
+          atmosphere = "Carbon dioxide";
+          resources = sqlite3_column_int(stmt, 6);  
+          
+      }
+      else if(type == 1)
+      {   
+          planettype = "Diamond planet";
+          atmosphere = "Kriptonite";
+          resources = sqlite3_column_int(stmt, 6);
+      }
+      else if(type == 2)
+      {
+          planettype = "Mercury planet";
+          atmosphere = "Cyanide";
+          resources = sqlite3_column_int(stmt, 6);
+      }
+      else if(type == 3)
+      {
+          planettype = "Habitable planet";
+          atmosphere = "Oxygen";
+          resources = sqlite3_column_int(stmt, 6);
+      }
+      else if(type == 4)
+      {
+          planettype = "Potentially habitable";
+          atmosphere = "Oxygen";
+          resources = sqlite3_column_int(stmt, 6);
+      }
+      else if(type == 5)
+      {   planettype = "Frozen planet";
+          atmosphere = "Cosmic rays";
+          resources = sqlite3_column_int(stmt, 6);
+      }
+      else if(type == 6)
+      {
+          planettype = "Gas giant";
+          atmosphere = "Nitrogen";
+          resources = sqlite3_column_int(stmt, 6);
+      }
+      else if(type == 7)
+      {   
+          planettype = "Apocalyptic planet";
+          atmosphere = "Vranium";
+          resources = sqlite3_column_int(stmt, 6); 
+      }
+      else if(type == 8)
+      {
+           resources = sqlite3_column_int(stmt, 6);
+      }
+      distance = sqlite3_column_int(stmt, 7);
+      rotation = sqlite3_column_int(stmt, 8);
+        
+      rc=sqlite3_step(stmt);
+      sqlite3_finalize(stmt);
+      sqlite3_close(db);
+      
+      
+      std::cout<<"***************************************************************************************************************************************************************"<<std::endl;
+>>>>>>> 41701fb6f1d96d1ca5b75aa500789c78ed90c2c7
 
         std::cout<<"Type "<<counter<<" to visit this planet"<<std::endl;
         std::cout<<" "<<std::endl;
@@ -2237,8 +2554,8 @@ void Spaceship::civilisation_interaction(int desired_respect, int aliens){
     int random_constant = rand() % 4;
     int earned_respect;
     int surrender_calculation;
-    long enemies_drones;
-    long enemies_cyborgs;
+    int enemies_drones;
+    int enemies_cyborgs;
     int selection;
     long energy;
     long enemy_energy;
@@ -2308,7 +2625,7 @@ void Spaceship::civilisation_interaction(int desired_respect, int aliens){
             <<"2. Confidential reports from intelligence agency"<<std::endl;
             std::cin>>selection;
             switch(selection){
-                    case 1: battle_preparation(enemies_drones, enemies_cyborgs, enemies_level, 1000000, 1000000, aliens);
+                    case 1: battle_preparation(enemies_drones, enemies_cyborgs, enemies_level, 1000000, 1000000, randRange(100000, 750000));
                             //Function switching turns
                             break;
 
@@ -3502,9 +3819,15 @@ int Spaceship::cabin(){
     while(1){
         std::cout<<show_title()<<std::endl;
         std::cout<<std::endl;
+<<<<<<< HEAD
         std::cout<<"           ________________________________***___________________________________"<<"\n"
         <<"            <<<CABIN OF THE INTERSTELLAR FALCON IV WELCOME ON BOARD MY MASTER>>>"<<"\n"
         <<"            ===============================***=================================="<<"\n"
+=======
+        std::cout<<"            ________________________________***___________________________________\n"
+        <<"            <<<CABIN OF THE INTERSTELLAR FALCON IV WELCOME ON BOARD MY MASTER>>>\n"
+        <<"           ================================***==================================\n"
+>>>>>>> 41701fb6f1d96d1ca5b75aa500789c78ed90c2c7
         <<" "<<"\n"
         <<"                                   I)nterstellar travel"<<"\n"
         <<"                                   A)ccess laboratory"<<"\n"
