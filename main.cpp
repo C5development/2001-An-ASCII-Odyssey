@@ -2023,21 +2023,21 @@ void Spaceship::generate_solar_data_base(std::string planetname, std::string atm
     rc = sqlite3_bind_int(stmt, 2, counter);
     rc = sqlite3_bind_text(stmt, 3, planetname.c_str(), planetname.length(), SQLITE_STATIC);
     if(type == "Lava planet")
-      rc=sqlite3_bind_int(stmt, 4, 1);
+      rc=sqlite3_bind_int(stmt, 4, 0);
     else if(type == "Diamond planet")
-      rc=sqlite3_bind_int(stmt, 4, 2);
+      rc=sqlite3_bind_int(stmt, 4, 1);
     else if(type == "Mercury planet")
-      rc=sqlite3_bind_int(stmt, 4, 3);
+      rc=sqlite3_bind_int(stmt, 4, 2);
     else if(type == "Habitable planet")
-      rc=sqlite3_bind_int(stmt, 4, 4);
+      rc=sqlite3_bind_int(stmt, 4, 3);
     else if(potentialhabitability)
-      rc=sqlite3_bind_int(stmt, 4, 5);
+      rc=sqlite3_bind_int(stmt, 4, 4);
     else if(type == "Frozen planet")
-      rc=sqlite3_bind_int(stmt, 4, 6);
+      rc=sqlite3_bind_int(stmt, 4, 5);
     else if(type == "Gas giant")
-      rc=sqlite3_bind_int(stmt, 4, 7);
+      rc=sqlite3_bind_int(stmt, 4, 6);
     else 
-      rc=sqlite3_bind_int(stmt, 4, 8);
+      rc=sqlite3_bind_int(stmt, 4, 7);
       
       
     
@@ -2131,11 +2131,14 @@ void Spaceship::generate_solar_data_base(std::string planetname, std::string atm
 }
 
 
+<<<<<<< HEAD
 
     
 
 
 
+=======
+>>>>>>> aa7d3e37c0c7c4c82671b46079f675cf685fffe8
 void Spaceship::to_solar_system()
 {
   
@@ -2143,8 +2146,11 @@ void Spaceship::to_solar_system()
     int temperature;
     int rotation;
     int distance;
-    
+    float surface = 100000 + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(500000-1000000)));
+    float eccentricity = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
     int counter=0;  
+    std::string atmosphere;
+    std::string planettype;
     int resources;
     sqlite3* db;
     int rc = sqlite3_open("ASCIIdatabase.db", &db);
@@ -2160,39 +2166,55 @@ void Spaceship::to_solar_system()
       number = sqlite3_column_int(stmt, 2);
       int type = sqlite3_column_int(stmt, 4);
       temperature = sqlite3_column_int(stmt, 5);
-      if(type == 1)
+      if(type == 0)
       {
+          planettype = "Lava planet";
+          atmosphere = "Carbon dioxide";
           resources = sqlite3_column_int(stmt, 6);  
+          
+      }
+      else if(type == 1)
+      {   
+          planettype = "Diamond planet";
+          atmosphere = "Kriptonite";
+          resources = sqlite3_column_int(stmt, 6);
       }
       else if(type == 2)
       {
+          planettype = "Mercury planet";
+          atmosphere = "Cyanide";
           resources = sqlite3_column_int(stmt, 6);
       }
       else if(type == 3)
       {
+          planettype = "Habitable planet";
+          atmosphere = "Oxygen";
           resources = sqlite3_column_int(stmt, 6);
       }
       else if(type == 4)
       {
+          planettype = "Potentially habitable";
+          atmosphere = "Oxygen";
           resources = sqlite3_column_int(stmt, 6);
       }
       else if(type == 5)
-      {
-           resources = sqlite3_column_int(stmt, 6);
+      {   planettype = "Frozen planet";
+          atmosphere = "Cosmic rays";
+          resources = sqlite3_column_int(stmt, 6);
       }
       else if(type == 6)
       {
-           resources = sqlite3_column_int(stmt, 6);
+          planettype = "Gas giant";
+          atmosphere = "Nitrogen";
+          resources = sqlite3_column_int(stmt, 6);
       }
       else if(type == 7)
-      {
-           resources = sqlite3_column_int(stmt, 6);
+      {   
+          planettype = "Apocalyptic planet";
+          atmosphere = "Vranium";
+          resources = sqlite3_column_int(stmt, 6); 
       }
       else if(type == 8)
-      {
-           resources = sqlite3_column_int(stmt, 6); 
-      }
-      else if(type == 9)
       {
            resources = sqlite3_column_int(stmt, 6);
       }
@@ -2200,19 +2222,11 @@ void Spaceship::to_solar_system()
       rotation = sqlite3_column_int(stmt, 8);
         
       rc=sqlite3_step(stmt);
- 
+      sqlite3_finalize(stmt);
+      sqlite3_close(db);
       
       
-     
-  
-  
-  
-      
-      
-      
-
-
-    std::cout<<"***************************************************************************************************************************************************************"<<std::endl;
+      std::cout<<"***************************************************************************************************************************************************************"<<std::endl;
 
 
 }
@@ -3462,8 +3476,8 @@ void Spaceship::read_story(){
 std::string Spaceship::show_title(){
 return "   ___   ____  ____ ___   ___             ___   _____ ______________   ____      __                           \n"
        "  |__ \\ / __ \\/ __ <  /  /   |  ____     /   | / ___// ____/  _/  _/  / __ \\____/ /_  _______________  __  __ \n"
-       "      _/ / / / / / / /  / // | / | /\\   / /| | \\__ \\/ /    / / / /   / / / / __  / / / / ___/ ___/ _ \\/ / / / \n"
-       " / __// / / / /_/_/ /  / /  _|/ / / /  / /   | __/ / /____/ /_/ /   / /_/ / /_/ / /_/ (__  |__  )  __/ /_/ /  \n"
+       "   __| / / / / / / / /  / /| | / | /\\   / /| | \\__ \\/ /    / / / /   / / / / __  / / / / ___/ ___/ _ \\/ / / / \n"
+       " / __// /_/ / /_/ / /  / __  |/ / / /  / /   | __/ / /____/ /_/ /   / /_/ / /_/ / /_/ (__  |__  )  __/ /_/ /  \n"
        "/____/\\____/\\____/_/  /_/  |_/_/ /_/  /_/  |_/____/\\____/___/___/   \\____/\\__,_/\\__, /____/____/\\___/\\__, /   \n"
        "                                                                               /____/               /____/ ";
 }
@@ -3488,16 +3502,18 @@ int Spaceship::cabin(){
     while(1){
         std::cout<<show_title()<<std::endl;
         std::cout<<std::endl;
-        std::cout<<"<<<CABIN OF THE INTERSTELLAR FALCON IV WELCOME ON BOARD MY MASTER>>>"<<"\n"
-        <<"I)nterstellar travel"<<"\n"
-        <<"A)ccess laboratory"<<"\n"
-        <<"D)eposits and WARP initialiser"<<"\n"
-        <<"M)ethallurgy"<<"\n"
-        <<"P)urchase points!"<<"\n" //Yeah, we need revenue for our business XDDD
-        <<"S)ave game"<<"\n"
-        <<"C)olonies"<<"\n"
-        <<"R)ead story"<<"\n"
-        <<"E)xit"<<std::endl;
+        std::cout<<"            <<<CABIN OF THE INTERSTELLAR FALCON IV WELCOME ON BOARD MY MASTER>>>"<<"\n"
+        <<"                                   I)nterstellar travel"<<"\n"
+        <<"                                   A)ccess laboratory"<<"\n"
+        <<"                                   D)eposits and WARP initialiser"<<"\n"
+        <<"                                   M)ethallurgy"<<"\n"
+        <<"                                   P)urchase points!"<<"\n" //Yeah, we need revenue for our business XDDD
+        <<"                                   S)ave game"<<"\n"
+        <<"                                   C)olonies"<<"\n"
+        <<"                                   R)ead story"<<"\n"
+        <<"                                   E)xit"<<"\n"
+        <<"                             "<<"\n"          
+        <<"                                   Your choice: ";
         std::cin>>choice;
 
         if(choice == "I" || choice == "i"){
