@@ -3492,6 +3492,7 @@ int Spaceship::cabin(){
         std::cout<<show_title()<<std::endl;
         std::cout<<std::endl;
         std::cout<<"            <<<CABIN OF THE INTERSTELLAR FALCON IV WELCOME ON BOARD MY MASTER>>>"<<"\n"
+        <<" "<<"\n"
         <<"                                   I)nterstellar travel"<<"\n"
         <<"                                   A)ccess laboratory"<<"\n"
         <<"                                   D)eposits and WARP initialiser"<<"\n"
@@ -3501,7 +3502,7 @@ int Spaceship::cabin(){
         <<"                                   C)olonies"<<"\n"
         <<"                                   R)ead story"<<"\n"
         <<"                                   E)xit"<<"\n"
-        <<"                             "<<"\n"          
+        <<" "<<"\n"          
         <<"                                   Your choice: ";
         std::cin>>choice;
 
