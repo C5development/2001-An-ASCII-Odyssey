@@ -14,7 +14,7 @@
 #include <future>
 #include <numeric> 
 #include "libsqlite.hpp"
-#include <GL/glut.h>
+
 
 //#include<Windows.h>
 //#include<MMSystem.h>
@@ -2131,8 +2131,11 @@ void Spaceship::generate_solar_data_base(std::string planetname, std::string atm
 }
 
 
+<<<<<<< HEAD
     
 
+=======
+>>>>>>> 5850d86369ddb2df6f528a316460062c2a8d6d0f
 void Spaceship::to_solar_system()
 {
   
@@ -2742,14 +2745,14 @@ void Spaceship::planet_interaction(){
                 while(1){
                     std::cout<<"Give a name to your colony"<<std::endl;
                     std::cin>>colony_name;
-                    sqlite* db;
+                    sqlite3* db;
                     int rc = sqlite3_open("ASCIIdatabase.db", &db);
                     sqlite3_stmt* stmt;
                     rc = sqlite3_prepare(db, "SELECT * FROM COLONIES WHERE REALM = ?;", -1, &stmt, NULL);
                     rc = sqlite3_step(stmt);
                     if(rc == SQLITE_DONE){
-                        rc = sqlite3_prepare("INSERT INTO COLONIES (REALM) VALUES (?);", -1, &stmt, NULL);
-                        rc = sqlite3_bind_text(stmt, colony_name.c_str(), colony_name.length(), SQLITE_STATIC);
+                        rc = sqlite3_prepare(db, "INSERT INTO COLONIES (REALM) VALUES (?);", -1, &stmt, NULL);
+                        rc = sqlite3_bind_text(stmt, 1, colony_name.c_str(), colony_name.length(), SQLITE_STATIC);
                         rc = sqlite3_step(stmt);
                         sqlite3_finalize(stmt);
                         sqlite3_close(db);
@@ -3148,10 +3151,16 @@ void Spaceship::interstellar_travel()
             to_solar_system();
             break;
         }
-        else if(solarsystemchoice ==2)
-            break;
-
-
+        else if(solarsystemchoice == 2){
+            sqlite3* db;
+            int rc = sqlite3_open("ASCIIdatabase.db", &db);
+            sqlite3_stmt* stmt;
+            rc = sqlite3_prepare(db, "DELETE FROM PLANETS WHERE REALM = 'Solar system';", -1, &stmt, NULL);
+            rc = sqlite3_step(stmt);
+            sqlite3_finalize(stmt);
+            sqlite3_close(db);
+            break;    
+        }
     }
 
 }
