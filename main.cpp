@@ -2131,6 +2131,14 @@ void Spaceship::generate_solar_data_base(std::string planetname, std::string atm
 }
 
 
+<<<<<<< HEAD
+
+    
+
+
+
+=======
+>>>>>>> aa7d3e37c0c7c4c82671b46079f675cf685fffe8
 void Spaceship::to_solar_system()
 {
   
@@ -2625,6 +2633,7 @@ void Spaceship::planet_interaction(){
     bool potential_colony = true; //We start by assuming the solar system can be colonised
     bool dead_solar_system = true;
     bool missing_elements = false;
+    bool colony_creation = false;
     std::vector<int> resources;
     std::string atmosphere;
     int slaves;
@@ -2747,15 +2756,17 @@ void Spaceship::planet_interaction(){
             if(dead_solar_system){
                 std::string colony_name;
                 std::cout<<"This solar system can be colonised"<<"\n"
-                <<"Since all of its planets are dead\n"<<std::endl;
+                <<"Since all of its planets are dead\n"
+                <<"Please give a name to your colony"<<std::endl;
+                std::cin>>colony_name;
                 sqlite3* db;
                 int rc = sqlite3_open("ASCIIdatabase.db", &db);
                 sqlite3_stmt* stmt;
-                rc = sqlite3_prepare(db, "INSERT INTO COLONIES (REALM) VALUES (?);", -1, &stmt, NULL);
+                rc = sqlite3_prepare(db, "INSERT INTO COLONIES VALUES (?);", -1, &stmt, NULL);
                 rc = sqlite3_bind_text(stmt, 1, colony_name.c_str(), colony_name.length(), SQLITE_STATIC);
                 rc = sqlite3_step(stmt);
                 sqlite3_finalize(stmt);
-                sqlite3_close(db);   
+                sqlite3_close(db);  
             }
             else if(!dead_solar_system)  //Planettype can still be four but potentially habitable
                 std::cout<<"There might be one or more potentially habitable planets in this solar system"<<std::endl;
