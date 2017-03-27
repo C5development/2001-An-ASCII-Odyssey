@@ -2714,26 +2714,14 @@ void Spaceship::planet_interaction(){
                 std::string colony_name;
                 std::cout<<"This solar system can be colonised"<<"\n"
                 <<"Since all of its planets are dead\n"<<std::endl;
-                while(1){
-                    std::cout<<"Give a name to your colony"<<std::endl;
-                    std::cin>>colony_name;
-                    sqlite3* db;
-                    int rc = sqlite3_open("ASCIIdatabase.db", &db);
-                    sqlite3_stmt* stmt;
-                    rc = sqlite3_prepare(db, "SELECT * FROM COLONIES WHERE REALM = ?;", -1, &stmt, NULL);
-                    rc = sqlite3_step(stmt);
-                    if(rc == SQLITE_DONE){
-                        rc = sqlite3_prepare(db, "INSERT INTO COLONIES (REALM) VALUES (?);", -1, &stmt, NULL);
-                        rc = sqlite3_bind_text(stmt, 1, colony_name.c_str(), colony_name.length(), SQLITE_STATIC);
-                        rc = sqlite3_step(stmt);
-                        sqlite3_finalize(stmt);
-                        sqlite3_close(db);
-                        break;
-                    }
-                    else
-                        std::cout<<"That name is already in our database my lord"<<std::endl;
-                        continue;
-                }   
+                sqlite3* db;
+                int rc = sqlite3_open("ASCIIdatabase.db", &db);
+                sqlite3_stmt* stmt;
+                rc = sqlite3_prepare(db, "INSERT INTO COLONIES (REALM) VALUES (?);", -1, &stmt, NULL);
+                rc = sqlite3_bind_text(stmt, 1, colony_name.c_str(), colony_name.length(), SQLITE_STATIC);
+                rc = sqlite3_step(stmt);
+                sqlite3_finalize(stmt);
+                sqlite3_close(db);   
             }
             else if(!dead_solar_system)  //Planettype can still be four but potentially habitable
                 std::cout<<"There might be one or more potentially habitable planets in this solar system"<<std::endl;
