@@ -2726,7 +2726,7 @@ void Spaceship::planet_interaction(){
                     rc = sqlite3_prepare(db, "SELECT * FROM COLONIES WHERE REALM = ?;", -1, &stmt, NULL);
                     rc = sqlite3_step(stmt);
                     if(rc == SQLITE_DONE){
-                        rc = sqlite3_prepare("SELECT INTO COLONIES (REALM) VALUES (?);", -1, &stmt, NULL);
+                        rc = sqlite3_prepare("INSERT INTO COLONIES (REALM) VALUES (?);", -1, &stmt, NULL);
                         rc = sqlite3_bind_text(stmt, colony_name.c_str(), colony_name.length(), SQLITE_STATIC);
                         rc = sqlite3_step(stmt);
                         sqlite3_finalize(stmt);
@@ -2734,7 +2734,7 @@ void Spaceship::planet_interaction(){
                         break;
                     }
                     else
-                        std::cout<<"That name is already in our database mylord"<<std::endl;
+                        std::cout<<"That name is already in our database my lord"<<std::endl;
                         continue;
                 }   
             }
