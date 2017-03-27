@@ -3493,6 +3493,7 @@ int Spaceship::cabin(){
         std::cout<<std::endl;
         std::cout<<"            ________________________________***___________________________________"<<"\n"
         <<"            <<<CABIN OF THE INTERSTELLAR FALCON IV WELCOME ON BOARD MY MASTER>>>"<<"\n"
+        <<""
         <<" "<<"\n"
         <<"                                   I)nterstellar travel"<<"\n"
         <<"                                   A)ccess laboratory"<<"\n"
