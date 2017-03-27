@@ -747,6 +747,7 @@ class Spaceship
         void surrender_treaty(std::string, std::string);
         void refill_vector(std::string);
         void to_solar_system();
+        void generate_colonies_database();
         void display_planets_database();
         void generate_solar_data_base(std::string, std::string, int, std::string, int, std::vector<int>, int, bool, bool, bool, bool, int);
         void display_colonies();
@@ -2103,13 +2104,8 @@ void Spaceship::generate_solar_data_base(std::string planetname, std::string atm
 }
 
 void Spaceship::to_solar_system(){
-
-
-    std::cout<<"Puta"<<std::endl;
-
+    
 }
-
-
 
 void Spaceship::civilisation_interaction(int desired_respect, int aliens){
     std::vector<std::string> civilisationsnames = {"Epthot", "Quni", "Gowan", "Geeceind", "Srekloa", "Smorthue", "Absu", "Oimnere", "Lizul", "Thelzahue", "Qolush", "Vlesruom", "Twakten", "Vantoh", "Qefill", "Druzguo"};
@@ -2624,8 +2620,26 @@ void Spaceship::planet_interaction(){
                 std::string colony_name;
                 std::cout<<"This solar system can be colonised"<<"\n"
                 <<"Since all of its planets are dead\n"<<std::endl;
-                std::cout<<"Give a name to your colony"<<std::endl;
-                
+                while(1){
+                    std::cout<<"Give a name to your colony"<<std::endl;
+                    std::cin>>colony_name;
+                    sqlite* db;
+                    int rc = sqlite3_open("ASCIIdatabase.db", &db);
+                    sqlite3_stmt* stmt;
+                    rc = sqlite3_prepare(db, "SELECT * FROM COLONIES WHERE REALM = ?;", -1, &stmt, NULL);
+                    rc = sqlite3_step(stmt);
+                    if(rc == SQLITE_DONE){
+                        rc = sqlite3_prepare("SELECT INTO COLONIES (REALM) VALUES (?);", -1, &stmt, NULL);
+                        rc = sqlite3_bind_text(stmt, colony_name.c_str(), colony_name.length(), SQLITE_STATIC);
+                        rc = sqlite3_step(stmt);
+                        sqlite3_finalize(stmt);
+                        sqlite3_close(db);
+                        break;
+                    }
+                    else
+                        std::cout<<"That name is already in our database mylord"<<std::endl;
+                        continue;
+                }   
             }
             else if(!dead_solar_system)  //Planettype can still be four but potentially habitable
                 std::cout<<"There might be one or more potentially habitable planets in this solar system"<<std::endl;
