@@ -2021,7 +2021,25 @@ void Spaceship::generate_solar_data_base(std::string planetname, std::string atm
     rc = sqlite3_bind_text(stmt, 1, realm.c_str(), realm.length(), SQLITE_STATIC);
     rc = sqlite3_bind_int(stmt, 2, counter);
     rc = sqlite3_bind_text(stmt, 3, planetname.c_str(), planetname.length(), SQLITE_STATIC);
-    rc = sqlite3_bind_text(stmt, 4, type.c_str(), type.length(), SQLITE_STATIC);
+    if(type == "Lava planet")
+      rc=sqlite3_bind_int(stmt, 4, 1);
+    else if(type == "Diamond planet")
+      rc=sqlite3_bind_int(stmt, 4, 2);
+    else if(type == "Mercury planet")
+      rc=sqlite3_bind_int(stmt, 4, 3);
+    else if(type == "Habitable planet")
+      rc=sqlite3_bind_int(stmt, 4, 4);
+    else if(potentialhabitability)
+      rc=sqlite3_bind_int(stmt, 4, 5);
+    else if(type == "Frozen planet")
+      rc=sqlite3_bind_int(stmt, 4, 6);
+    else if(type == "Gas giant")
+      rc=sqlite3_bind_int(stmt, 4, 7);
+    else 
+      rc=sqlite3_bind_int(stmt, 4, 8);
+      
+      
+    
     rc = sqlite3_bind_int(stmt, 5, temperature);
     if(resources.size() == 1){
         rc = sqlite3_bind_int(stmt, 6, resources[0]);
@@ -2031,6 +2049,7 @@ void Spaceship::generate_solar_data_base(std::string planetname, std::string atm
         if(type == "Lava planet"){
             rc = sqlite3_prepare(db, "INSERT INTO RESOURCES (METAL) VALUES(?);", -1, &stmt, NULL);
             rc = sqlite3_bind_int(stmt, resources[0], 6);
+            
             rc = sqlite3_step(stmt);
             sqlite3_finalize(stmt);
             sqlite3_close(db); 
@@ -2038,6 +2057,7 @@ void Spaceship::generate_solar_data_base(std::string planetname, std::string atm
         else if(type == "Diamond planet"){
             rc = sqlite3_prepare(db, "INSERT INTO RESOURCES (DIAMONDS) VALUES(?);", -1, &stmt, NULL);
             rc = sqlite3_bind_int(stmt, resources[0], 9);
+            
             rc = sqlite3_step(stmt);
             sqlite3_finalize(stmt);
             sqlite3_close(db);
@@ -2045,6 +2065,7 @@ void Spaceship::generate_solar_data_base(std::string planetname, std::string atm
         else if(type == "Mercury planet"){
             rc = sqlite3_prepare(db, "INSERT INTO RESOURCES (MERCURY) VALUES(?);", -1, &stmt, NULL);
             rc = sqlite3_bind_int(stmt, resources[0], 7);
+            
             rc = sqlite3_step(stmt);
             sqlite3_finalize(stmt);
             sqlite3_close(db);
@@ -2053,18 +2074,21 @@ void Spaceship::generate_solar_data_base(std::string planetname, std::string atm
             if(habitability){
                 rc = sqlite3_prepare(db, "INSERT INTO RESOURCES (SPECIMENS) VALUES (?);",-1, &stmt, NULL);
                 rc = sqlite3_bind_int(stmt, resources[0], 10);
+                
                 rc = sqlite3_step(stmt);
                 sqlite3_finalize(stmt);
                 sqlite3_close(db);
             }
             else if(potentialhabitability){
                 rc = sqlite3_prepare(db, "INSERT INTO RESOURCES (SPECIMENS) VALUES (0);", -1, &stmt, NULL);
+                
                 rc = sqlite3_step(stmt);
                 sqlite3_finalize(stmt);
                 sqlite3_close(db);
             }
             else 
                 rc = sqlite3_prepare(db, "INSERT INTO RESOURCES (SPECIMENS) VALUES (0);", -1, &stmt, NULL);
+                
                 rc = sqlite3_step(stmt);
                 sqlite3_finalize(stmt);
                 sqlite3_close(db);
@@ -2074,6 +2098,7 @@ void Spaceship::generate_solar_data_base(std::string planetname, std::string atm
             sqlite3_bind_int(stmt, resources[0], 2);
             sqlite3_bind_int(stmt, resources[1], 3);
             sqlite3_bind_int(stmt, resources[2], 4);
+            
             rc = sqlite3_step(stmt);
             sqlite3_finalize(stmt);
             sqlite3_close(db);
@@ -2081,6 +2106,7 @@ void Spaceship::generate_solar_data_base(std::string planetname, std::string atm
         else if(type == "Gas giant"){
             rc = sqlite3_prepare(db, "INSERT INTO RESOURCES (GAS) VALUES (?);", -1, &stmt, NULL);
             sqlite3_bind_int(stmt, resources[0], 8);
+            
             rc = sqlite3_step(stmt);
             sqlite3_finalize(stmt);
             sqlite3_close(db);
@@ -2096,6 +2122,7 @@ void Spaceship::generate_solar_data_base(std::string planetname, std::string atm
        rc = sqlite3_bind_int(stmt, resources[0], 2);
        rc = sqlite3_bind_int(stmt, resources[1], 3);
        rc = sqlite3_bind_int(stmt, resources[2], 4);
+       rc = sqlite3_bind_int(stmt, 4, 9);
        rc = sqlite3_step(stmt);
        sqlite3_finalize(stmt);
        sqlite3_close(db);  
@@ -2104,9 +2131,9 @@ void Spaceship::generate_solar_data_base(std::string planetname, std::string atm
 
 void Spaceship::to_solar_system()
 {
+    
     int counter=0;  
     int resources;
-    std::string planettype;
     sqlite3* db;
     int rc = sqlite3_open("ASCIIdatabase.db", &db);
     sqlite3_stmt* stmt;
@@ -2117,33 +2144,40 @@ void Spaceship::to_solar_system()
       counter+=1;
       rc=sqlite3_prepare(db, "SELECT * FROM PLANETS WHERE REALM = 'Solar system' AND number = ?;",-1,&stmt,NULL);
       rc=sqlite3_bind_int(stmt, 1, counter);
-      char *sht = (char *)sqlite3_column_text(stmt, 4);
-      std::cout<<sht<<std::endl;
-      if(planettype == "Lava planet"){
+      
+      int type = sqlite3_column_int(stmt, 4);
+      if(type == 1){
           resources = sqlite3_column_int(stmt, 6);  
       }
-      else if(planettype == "Mercury planet"){
+      else if(type == 2){
           resources = sqlite3_column_int(stmt, 6);
       }
-      else if(planettype == "Diamond planet"){
+      else if(type == 3){
           resources = sqlite3_column_int(stmt, 6);
       }
-      else if(planettype == "Habitable planet"){
+      else if(type == 4){
           resources = sqlite3_column_int(stmt, 6);
       }
-      else if(planettype == "Potentially habitable planet"){
+      else if(type == 5){
            resources = sqlite3_column_int(stmt, 6);
       }
-      else if(planettype == "Apocalyptic planet"){
+      else if(type == 6){
            resources = sqlite3_column_int(stmt, 6);
       }
-      else if(planettype == "Frozen planet"){
+      else if(type == 7){
            resources = sqlite3_column_int(stmt, 6);
       }
-      else if(planettype == "Gas giant"){
+      else if(type == 8){
            resources = sqlite3_column_int(stmt, 6); 
       }
+      else if(type == 9){
+           resources = sqlite3_column_int(stmt, 6);
+      }
       rc=sqlite3_step(stmt);
+  
+  
+  
+      
       
       
 
