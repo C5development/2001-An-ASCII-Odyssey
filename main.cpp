@@ -2131,8 +2131,18 @@ void Spaceship::generate_solar_data_base(std::string planetname, std::string atm
 }
 
 
+<<<<<<< HEAD
+    
+
+=======
+>>>>>>> 5850d86369ddb2df6f528a316460062c2a8d6d0f
 void Spaceship::to_solar_system()
 {
+  
+    int number;
+    int temperature;
+    int rotation;
+    int distance;
     
     int counter=0;  
     int resources;
@@ -2147,35 +2157,53 @@ void Spaceship::to_solar_system()
       rc=sqlite3_prepare(db, "SELECT * FROM PLANETS WHERE REALM = 'Solar system' AND number = ?;",-1,&stmt,NULL);
       rc=sqlite3_bind_int(stmt, 1, counter);
       
+      number = sqlite3_column_int(stmt, 2);
       int type = sqlite3_column_int(stmt, 4);
-      if(type == 1){
+      temperature = sqlite3_column_int(stmt, 5);
+      if(type == 1)
+      {
           resources = sqlite3_column_int(stmt, 6);  
       }
-      else if(type == 2){
+      else if(type == 2)
+      {
           resources = sqlite3_column_int(stmt, 6);
       }
-      else if(type == 3){
+      else if(type == 3)
+      {
           resources = sqlite3_column_int(stmt, 6);
       }
-      else if(type == 4){
+      else if(type == 4)
+      {
           resources = sqlite3_column_int(stmt, 6);
       }
-      else if(type == 5){
+      else if(type == 5)
+      {
            resources = sqlite3_column_int(stmt, 6);
       }
-      else if(type == 6){
+      else if(type == 6)
+      {
            resources = sqlite3_column_int(stmt, 6);
       }
-      else if(type == 7){
+      else if(type == 7)
+      {
            resources = sqlite3_column_int(stmt, 6);
       }
-      else if(type == 8){
+      else if(type == 8)
+      {
            resources = sqlite3_column_int(stmt, 6); 
       }
-      else if(type == 9){
+      else if(type == 9)
+      {
            resources = sqlite3_column_int(stmt, 6);
       }
+      distance = sqlite3_column_int(stmt, 7);
+      rotation = sqlite3_column_int(stmt, 8);
+        
       rc=sqlite3_step(stmt);
+ 
+      
+      
+     
   
   
   
