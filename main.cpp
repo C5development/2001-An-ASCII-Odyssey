@@ -2102,10 +2102,53 @@ void Spaceship::generate_solar_data_base(std::string planetname, std::string atm
     }
 }
 
-void Spaceship::to_solar_system(){
+void Spaceship::to_solar_system()
+{
+    int counter=0;  
+    int resources;
+    std::string planettype;
+    sqlite3* db;
+    int rc = sqlite3_open("ASCIIdatabase.db", &db);
+    sqlite3_stmt* stmt;
+    rc=sqlite3_prepare(db, "SELECT count(*) FROM PLANETS WHERE REALM = 'Solar system';",-1, &stmt, NULL );
+    rc=sqlite3_step(stmt);
+    int result = sqlite3_column_int(stmt, 0);
+    for(int i=0;i <= result;i++)
+      counter+=1;
+      rc=sqlite3_prepare(db, "SELECT * FROM PLANETS WHERE REALM = 'Solar system' AND number = ?;",-1,&stmt,NULL);
+      rc=sqlite3_bind_int(stmt, 1, counter);
+      char *sht = (char *)sqlite3_column_text(stmt, 4);
+      std::cout<<sht<<std::endl;
+      if(planettype == "Lava planet"){
+          resources = sqlite3_column_int(stmt, 6);  
+      }
+      else if(planettype == "Mercury planet"){
+          resources = sqlite3_column_int(stmt, 6);
+      }
+      else if(planettype == "Diamond planet"){
+          resources = sqlite3_column_int(stmt, 6);
+      }
+      else if(planettype == "Habitable planet"){
+          resources = sqlite3_column_int(stmt, 6);
+      }
+      else if(planettype == "Potentially habitable planet"){
+           resources = sqlite3_column_int(stmt, 6);
+      }
+      else if(planettype == "Apocalyptic planet"){
+           resources = sqlite3_column_int(stmt, 6);
+      }
+      else if(planettype == "Frozen planet"){
+           resources = sqlite3_column_int(stmt, 6);
+      }
+      else if(planettype == "Gas giant"){
+           resources = sqlite3_column_int(stmt, 6); 
+      }
+      rc=sqlite3_step(stmt);
+      
+      
 
 
-    std::cout<<"Puta"<<std::endl;
+    std::cout<<"***************************************************************************************************************************************************************"<<std::endl;
 
 }
 
@@ -2573,8 +2616,20 @@ void Spaceship::planet_interaction(){
           generate_solar_data_base(planetname, atmosphere, distancefromstar, type, planets[j].gettemperature(), resources, planets[j].getmagneticfieldvsradiation(), planets[j].gethabitability(), planets[j].getdefeat(), planets[j].getpotentialhabitability(), planets[j].getbreathableatmosphere(), counter);
        }
        else if(planets[j].getplanettype() == 4){
-           resources.push_back(randRange(100000, 750000));  
-           generate_solar_data_base(planetname, atmosphere, distancefromstar, type, planets[j].gettemperature(), resources, planets[j].getmagneticfieldvsradiation(), planets[j].gethabitability(), planets[j].getdefeat(), planets[j].getpotentialhabitability(), planets[j].getbreathableatmosphere(), counter);
+           if(planets[j].getpotentialhabitability()){
+              planettype = "Potentially habitable";
+              generate_solar_data_base(planetname, atmosphere, distancefromstar, type, planets[j].gettemperature(), resources, planets[j].getmagneticfieldvsradiation(), planets[j].gethabitability(), planets[j].getdefeat(), planets[j].getpotentialhabitability(), planets[j].getbreathableatmosphere(), counter);
+           }
+           else if(planets[j].gethabitability()){
+              planettype = "Fully habitable planet";
+              resources.push_back(randRange(100000, 750000));
+              generate_solar_data_base(planetname, atmosphere, distancefromstar, type, planets[j].gettemperature(), resources, planets[j].getmagneticfieldvsradiation(), planets[j].gethabitability(), planets[j].getdefeat(), planets[j].getpotentialhabitability(), planets[j].getbreathableatmosphere(), counter);
+           }
+           else{
+             resources.push_back(randRange(100000, 750000));  
+             generate_solar_data_base(planetname, atmosphere, distancefromstar, type, planets[j].gettemperature(), resources, planets[j].getmagneticfieldvsradiation(), planets[j].gethabitability(), planets[j].getdefeat(), planets[j].getpotentialhabitability(), planets[j].getbreathableatmosphere(), counter);
+           }
+           
         }
         else if(planets[j].getplanettype() == 5){
             resources.push_back(planets[j].getprotozoo());
