@@ -1992,10 +1992,14 @@ int Spaceship::efficiency_calculation(int resources, int slaves, bool battle){
 }
 
 
-
-
 void Spaceship::display_colonies(){
-    int choice;
+    sqlite3* db;
+    int rc = sqlite3_open("ASCIIdatabase.db", &db);
+    rc = sqlite3_stmt* stmt;
+    rc = sqlite3_prepare(db, "SELECT * FROM COLONIES)", -1, &stmt, NULL);
+    rc = sqlite3_step(stmt);
+    sqlite3_finalize(stmmt);
+    sqlite3_close(db);
     
 }
 
