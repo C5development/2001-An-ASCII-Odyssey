@@ -3491,7 +3491,8 @@ int Spaceship::cabin(){
     while(1){
         std::cout<<show_title()<<std::endl;
         std::cout<<std::endl;
-        std::cout<<"            <<<CABIN OF THE INTERSTELLAR FALCON IV WELCOME ON BOARD MY MASTER>>>"<<"\n"
+        std::cout<<"            ________________________________***___________________________________"<<"\n"
+        <<"            <<<CABIN OF THE INTERSTELLAR FALCON IV WELCOME ON BOARD MY MASTER>>>"<<"\n"
         <<" "<<"\n"
         <<"                                   I)nterstellar travel"<<"\n"
         <<"                                   A)ccess laboratory"<<"\n"
