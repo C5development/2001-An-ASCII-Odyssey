@@ -14,7 +14,7 @@
 #include <future>
 #include <numeric> 
 #include "libsqlite.hpp"
-#include <GL/glut.h>
+
 
 //#include<Windows.h>
 //#include<MMSystem.h>
@@ -747,6 +747,7 @@ class Spaceship
         void surrender_treaty(std::string, std::string);
         void refill_vector(std::string);
         void to_solar_system();
+        void generate_colonies_database();
         void display_planets_database();
         void generate_solar_data_base(std::string, std::string, int, std::string, int, std::vector<int>, int, bool, bool, bool, bool, int);
         void display_colonies();
@@ -762,7 +763,6 @@ std::vector<std::string> Spaceship::planetnames = {"Lok", "Erinar", "Golrath", "
 std::vector<std::string> Spaceship::planetnamesbuffer;
 
 std::vector<std::string> Spaceship::starnames = {"Acamar", "Adhafera", "Kornephoros", "Hoedus II", "Miaplacidus", "Procyon", "Pleione", "Rastaban", "Rotanev", "Sarir", "Cassiopeia", "Sterope", "Tabit", "Veritate", "Zaurak", "Sceptrum", "Sadachbia", "Rukbat", "Cygnus", "Capricorni", "Rotanev", "Ceasar 43", "Zeus", "Colossus", "Dranicus", "Rimbokhan", "Tiranuslae", "Criptilocus"};
-
 std::vector<std::string> Spaceship::starnamesbuffer;
 
 long Spaceship::_metalamount = 150000;
@@ -797,26 +797,30 @@ std::string Spaceship::define_stars_name(){
 
 
 std::vector<Star> Spaceship::stars_interaction(){
-        if(starnames.size() <= 25){
+    while(1){
+        if(starnames.size() <= 8){
             refill_vector("Stars");
         }
-        std::string starsname;
-        int stars_number = randRange(5, 15);
-        std::vector<Star> stars(stars_number);
-        std::cout<<"\n"
+        else 
+            break;
+    }  
+    std::string starsname;
+    int stars_number = randRange(5, 10);
+    std::vector<Star> stars(stars_number);
+    std::cout<<"\n"
         <<"\n"
         <<"<<<STARS>>>"<<"\n"
         <<"\n"
         <<"\n"<<std::endl;
-        for(int i = 0; i < stars_number; i++){
-            starsname = define_stars_name();
-            std::cout<<"\n"
+    for(int i = 0; i < stars_number; i++){
+        starsname = define_stars_name();
+        std::cout<<"\n"
             <<"Type "<<i + 1<<" to explore this solar system"<<"\n"
             <<"\n"<<std::endl;
-            stars[i].display_stars_data(starsname);
-            std::cout<<std::endl;
-        }
-        return stars;
+        stars[i].display_stars_data(starsname);
+        std::cout<<std::endl;
+    }
+    return stars;
 }
 
 std::string Spaceship::define_planets_name(){
@@ -2009,7 +2013,6 @@ void Spaceship::display_planets_database(){
 }
 
 void Spaceship::generate_solar_data_base(std::string planetname, std::string atmosphere, int distancefromstar, std::string type, int temperature, std::vector<int> resources, int magneticfieldvsradiation, bool habitability, bool defeat, bool potentialhabitability, bool breathableatmosphere, int counter){
-    counter += 1;
     int rotation_angle = randRange(150, 270);
     std::string realm = "Solar system";
     sqlite3* db;
@@ -2019,7 +2022,25 @@ void Spaceship::generate_solar_data_base(std::string planetname, std::string atm
     rc = sqlite3_bind_text(stmt, 1, realm.c_str(), realm.length(), SQLITE_STATIC);
     rc = sqlite3_bind_int(stmt, 2, counter);
     rc = sqlite3_bind_text(stmt, 3, planetname.c_str(), planetname.length(), SQLITE_STATIC);
-    rc = sqlite3_bind_text(stmt, 4, type.c_str(), type.length(), SQLITE_STATIC);
+    if(type == "Lava planet")
+      rc=sqlite3_bind_int(stmt, 4, 1);
+    else if(type == "Diamond planet")
+      rc=sqlite3_bind_int(stmt, 4, 2);
+    else if(type == "Mercury planet")
+      rc=sqlite3_bind_int(stmt, 4, 3);
+    else if(type == "Habitable planet")
+      rc=sqlite3_bind_int(stmt, 4, 4);
+    else if(potentialhabitability)
+      rc=sqlite3_bind_int(stmt, 4, 5);
+    else if(type == "Frozen planet")
+      rc=sqlite3_bind_int(stmt, 4, 6);
+    else if(type == "Gas giant")
+      rc=sqlite3_bind_int(stmt, 4, 7);
+    else 
+      rc=sqlite3_bind_int(stmt, 4, 8);
+      
+      
+    
     rc = sqlite3_bind_int(stmt, 5, temperature);
     if(resources.size() == 1){
         rc = sqlite3_bind_int(stmt, 6, resources[0]);
@@ -2029,6 +2050,7 @@ void Spaceship::generate_solar_data_base(std::string planetname, std::string atm
         if(type == "Lava planet"){
             rc = sqlite3_prepare(db, "INSERT INTO RESOURCES (METAL) VALUES(?);", -1, &stmt, NULL);
             rc = sqlite3_bind_int(stmt, resources[0], 6);
+            
             rc = sqlite3_step(stmt);
             sqlite3_finalize(stmt);
             sqlite3_close(db); 
@@ -2036,6 +2058,7 @@ void Spaceship::generate_solar_data_base(std::string planetname, std::string atm
         else if(type == "Diamond planet"){
             rc = sqlite3_prepare(db, "INSERT INTO RESOURCES (DIAMONDS) VALUES(?);", -1, &stmt, NULL);
             rc = sqlite3_bind_int(stmt, resources[0], 9);
+            
             rc = sqlite3_step(stmt);
             sqlite3_finalize(stmt);
             sqlite3_close(db);
@@ -2043,6 +2066,7 @@ void Spaceship::generate_solar_data_base(std::string planetname, std::string atm
         else if(type == "Mercury planet"){
             rc = sqlite3_prepare(db, "INSERT INTO RESOURCES (MERCURY) VALUES(?);", -1, &stmt, NULL);
             rc = sqlite3_bind_int(stmt, resources[0], 7);
+            
             rc = sqlite3_step(stmt);
             sqlite3_finalize(stmt);
             sqlite3_close(db);
@@ -2051,18 +2075,21 @@ void Spaceship::generate_solar_data_base(std::string planetname, std::string atm
             if(habitability){
                 rc = sqlite3_prepare(db, "INSERT INTO RESOURCES (SPECIMENS) VALUES (?);",-1, &stmt, NULL);
                 rc = sqlite3_bind_int(stmt, resources[0], 10);
+                
                 rc = sqlite3_step(stmt);
                 sqlite3_finalize(stmt);
                 sqlite3_close(db);
             }
             else if(potentialhabitability){
                 rc = sqlite3_prepare(db, "INSERT INTO RESOURCES (SPECIMENS) VALUES (0);", -1, &stmt, NULL);
+                
                 rc = sqlite3_step(stmt);
                 sqlite3_finalize(stmt);
                 sqlite3_close(db);
             }
             else 
                 rc = sqlite3_prepare(db, "INSERT INTO RESOURCES (SPECIMENS) VALUES (0);", -1, &stmt, NULL);
+                
                 rc = sqlite3_step(stmt);
                 sqlite3_finalize(stmt);
                 sqlite3_close(db);
@@ -2072,6 +2099,7 @@ void Spaceship::generate_solar_data_base(std::string planetname, std::string atm
             sqlite3_bind_int(stmt, resources[0], 2);
             sqlite3_bind_int(stmt, resources[1], 3);
             sqlite3_bind_int(stmt, resources[2], 4);
+            
             rc = sqlite3_step(stmt);
             sqlite3_finalize(stmt);
             sqlite3_close(db);
@@ -2079,6 +2107,7 @@ void Spaceship::generate_solar_data_base(std::string planetname, std::string atm
         else if(type == "Gas giant"){
             rc = sqlite3_prepare(db, "INSERT INTO RESOURCES (GAS) VALUES (?);", -1, &stmt, NULL);
             sqlite3_bind_int(stmt, resources[0], 8);
+            
             rc = sqlite3_step(stmt);
             sqlite3_finalize(stmt);
             sqlite3_close(db);
@@ -2094,20 +2123,99 @@ void Spaceship::generate_solar_data_base(std::string planetname, std::string atm
        rc = sqlite3_bind_int(stmt, resources[0], 2);
        rc = sqlite3_bind_int(stmt, resources[1], 3);
        rc = sqlite3_bind_int(stmt, resources[2], 4);
+       rc = sqlite3_bind_int(stmt, 4, 9);
        rc = sqlite3_step(stmt);
        sqlite3_finalize(stmt);
        sqlite3_close(db);  
     }
 }
 
-void Spaceship::to_solar_system(){
+
+<<<<<<< HEAD
+    
+
+=======
+>>>>>>> 5850d86369ddb2df6f528a316460062c2a8d6d0f
+void Spaceship::to_solar_system()
+{
+  
+    int number;
+    int temperature;
+    int rotation;
+    int distance;
+    
+    int counter=0;  
+    int resources;
+    sqlite3* db;
+    int rc = sqlite3_open("ASCIIdatabase.db", &db);
+    sqlite3_stmt* stmt;
+    rc=sqlite3_prepare(db, "SELECT count(*) FROM PLANETS WHERE REALM = 'Solar system';",-1, &stmt, NULL );
+    rc=sqlite3_step(stmt);
+    int result = sqlite3_column_int(stmt, 0);
+    for(int i=0;i <= result;i++)
+      counter+=1;
+      rc=sqlite3_prepare(db, "SELECT * FROM PLANETS WHERE REALM = 'Solar system' AND number = ?;",-1,&stmt,NULL);
+      rc=sqlite3_bind_int(stmt, 1, counter);
+      
+      number = sqlite3_column_int(stmt, 2);
+      int type = sqlite3_column_int(stmt, 4);
+      temperature = sqlite3_column_int(stmt, 5);
+      if(type == 1)
+      {
+          resources = sqlite3_column_int(stmt, 6);  
+      }
+      else if(type == 2)
+      {
+          resources = sqlite3_column_int(stmt, 6);
+      }
+      else if(type == 3)
+      {
+          resources = sqlite3_column_int(stmt, 6);
+      }
+      else if(type == 4)
+      {
+          resources = sqlite3_column_int(stmt, 6);
+      }
+      else if(type == 5)
+      {
+           resources = sqlite3_column_int(stmt, 6);
+      }
+      else if(type == 6)
+      {
+           resources = sqlite3_column_int(stmt, 6);
+      }
+      else if(type == 7)
+      {
+           resources = sqlite3_column_int(stmt, 6);
+      }
+      else if(type == 8)
+      {
+           resources = sqlite3_column_int(stmt, 6); 
+      }
+      else if(type == 9)
+      {
+           resources = sqlite3_column_int(stmt, 6);
+      }
+      distance = sqlite3_column_int(stmt, 7);
+      rotation = sqlite3_column_int(stmt, 8);
+        
+      rc=sqlite3_step(stmt);
+ 
+      
+      
+     
+  
+  
+  
+      
+      
+      
 
 
-    std::cout<<"Puta"<<std::endl;
+    std::cout<<"***************************************************************************************************************************************************************"<<std::endl;
+
 
 }
-
-
 
 void Spaceship::civilisation_interaction(int desired_respect, int aliens){
     std::vector<std::string> civilisationsnames = {"Epthot", "Quni", "Gowan", "Geeceind", "Srekloa", "Smorthue", "Absu", "Oimnere", "Lizul", "Thelzahue", "Qolush", "Vlesruom", "Twakten", "Vantoh", "Qefill", "Druzguo"};
@@ -2535,6 +2643,7 @@ void Spaceship::planet_interaction(){
     <<"\n"
     "\n"<<std::endl;
     for(int j = 0; j < planets_number; j++){
+        counter += 1;
         adjustment1 = adjustment + 2 * j;
         adjustment2 = adjustment1 + 4 * j;
         planetname = define_planets_name();
@@ -2555,19 +2664,35 @@ void Spaceship::planet_interaction(){
             resources.push_back(planets[j].getmetal());
             type = "Lava planet";
             atmosphere = "Carbon dioxide"; 
+            generate_solar_data_base(planetname, atmosphere, distancefromstar, type, planets[j].gettemperature(), resources, planets[j].getmagneticfieldvsradiation(), planets[j].gethabitability(), planets[j].getdefeat(), planets[j].getpotentialhabitability(), planets[j].getbreathableatmosphere(), counter);
         }
         else if(planets[j].getplanettype() == 2){
             resources.push_back(planets[j].getdiamonds());
             type = "Diamond planet";
             atmosphere = "Kriptonite";
+            generate_solar_data_base(planetname, atmosphere, distancefromstar, type, planets[j].gettemperature(), resources, planets[j].getmagneticfieldvsradiation(), planets[j].gethabitability(), planets[j].getdefeat(), planets[j].getpotentialhabitability(), planets[j].getbreathableatmosphere(), counter);
         }
        else if(planets[j].getplanettype() == 3){
           resources.push_back(planets[j].getmercury());
           type = "Mercury planet";
-          atmosphere = "Cyanide"; 
+          atmosphere = "Cyanide";
+          generate_solar_data_base(planetname, atmosphere, distancefromstar, type, planets[j].gettemperature(), resources, planets[j].getmagneticfieldvsradiation(), planets[j].gethabitability(), planets[j].getdefeat(), planets[j].getpotentialhabitability(), planets[j].getbreathableatmosphere(), counter);
        }
-        else if(planets[j].getplanettype() == 4){
-           resources.push_back(randRange(100000, 750000));   
+       else if(planets[j].getplanettype() == 4){
+           if(planets[j].getpotentialhabitability()){
+              planettype = "Potentially habitable";
+              generate_solar_data_base(planetname, atmosphere, distancefromstar, type, planets[j].gettemperature(), resources, planets[j].getmagneticfieldvsradiation(), planets[j].gethabitability(), planets[j].getdefeat(), planets[j].getpotentialhabitability(), planets[j].getbreathableatmosphere(), counter);
+           }
+           else if(planets[j].gethabitability()){
+              planettype = "Fully habitable planet";
+              resources.push_back(randRange(100000, 750000));
+              generate_solar_data_base(planetname, atmosphere, distancefromstar, type, planets[j].gettemperature(), resources, planets[j].getmagneticfieldvsradiation(), planets[j].gethabitability(), planets[j].getdefeat(), planets[j].getpotentialhabitability(), planets[j].getbreathableatmosphere(), counter);
+           }
+           else{
+             resources.push_back(randRange(100000, 750000));  
+             generate_solar_data_base(planetname, atmosphere, distancefromstar, type, planets[j].gettemperature(), resources, planets[j].getmagneticfieldvsradiation(), planets[j].gethabitability(), planets[j].getdefeat(), planets[j].getpotentialhabitability(), planets[j].getbreathableatmosphere(), counter);
+           }
+           
         }
         else if(planets[j].getplanettype() == 5){
             resources.push_back(planets[j].getprotozoo());
@@ -2575,16 +2700,16 @@ void Spaceship::planet_interaction(){
             resources.push_back(planets[j].getpseudomona());
             type = "Frozen planet";
             atmosphere = "Cosmic rays";
+            generate_solar_data_base(planetname, atmosphere, distancefromstar, type, planets[j].gettemperature(), resources, planets[j].getmagneticfieldvsradiation(), planets[j].gethabitability(), planets[j].getdefeat(), planets[j].getpotentialhabitability(), planets[j].getbreathableatmosphere(), counter);
         }  
         else if(planets[j].getplanettype() == 6){
             resources.push_back(planets[j].getgas());
             type = "Gas giant";
             atmosphere = "Nitrogen";
+            generate_solar_data_base(planetname, atmosphere, distancefromstar, type, planets[j].gettemperature(), resources, planets[j].getmagneticfieldvsradiation(), planets[j].gethabitability(), planets[j].getdefeat(), planets[j].getpotentialhabitability(), planets[j].getbreathableatmosphere(), counter);
         }
-        generate_solar_data_base(planetname, atmosphere, distancefromstar, type, planets[j].gettemperature(), resources, planets[j].getmagneticfieldvsradiation(), planets[j].gethabitability(), planets[j].getdefeat(), planets[j].getpotentialhabitability(), planets[j].getbreathableatmosphere(), counter);
-    }
-    for(int i : resources){
-            std::cout<<i<<std::endl;
+        resources.clear();
+        
     }
     std::cout<<std::endl;
     std::cout<<"Do you want to make this solar system a colony?"<<std::endl;
@@ -2617,8 +2742,26 @@ void Spaceship::planet_interaction(){
                 std::string colony_name;
                 std::cout<<"This solar system can be colonised"<<"\n"
                 <<"Since all of its planets are dead\n"<<std::endl;
-                std::cout<<"Give a name to your colony"<<std::endl;
-                
+                while(1){
+                    std::cout<<"Give a name to your colony"<<std::endl;
+                    std::cin>>colony_name;
+                    sqlite3* db;
+                    int rc = sqlite3_open("ASCIIdatabase.db", &db);
+                    sqlite3_stmt* stmt;
+                    rc = sqlite3_prepare(db, "SELECT * FROM COLONIES WHERE REALM = ?;", -1, &stmt, NULL);
+                    rc = sqlite3_step(stmt);
+                    if(rc == SQLITE_DONE){
+                        rc = sqlite3_prepare(db, "INSERT INTO COLONIES (REALM) VALUES (?);", -1, &stmt, NULL);
+                        rc = sqlite3_bind_text(stmt, 1, colony_name.c_str(), colony_name.length(), SQLITE_STATIC);
+                        rc = sqlite3_step(stmt);
+                        sqlite3_finalize(stmt);
+                        sqlite3_close(db);
+                        break;
+                    }
+                    else
+                        std::cout<<"That name is already in our database my lord"<<std::endl;
+                        continue;
+                }   
             }
             else if(!dead_solar_system)  //Planettype can still be four but potentially habitable
                 std::cout<<"There might be one or more potentially habitable planets in this solar system"<<std::endl;
@@ -2801,8 +2944,8 @@ void Spaceship::planet_interaction(){
                                     <<"The amount by which we must adjust it is "<<"\n"
                                     <<planets[choice-1].getmagneticfieldvsradiation()<<std::endl;
                                     std::cin>>variableadjustment; //WAIT FUNCTION HERE
+                                    break;
                                 }
-
                               }
 
                             while(!done){
@@ -2817,8 +2960,6 @@ void Spaceship::planet_interaction(){
                                     //Wait function here
                                     check_bacteriae_deposits(done, done2, true);
                                     _evolutionexpressaccelerator += randRange(3, 5);
-                                    break;
-
                                 }
                                 planets[choice - 1].turn_into_habitable();
                                 std::cout<<"It is time to accelerate the evolution process on this planet..."<<std::endl;
@@ -2827,6 +2968,7 @@ void Spaceship::planet_interaction(){
                                 <<"Shall the gods worship this soul, for no other than thee can defy their magnanimous and ubiquitous power!"<<std::endl;
                                 _evolutionexpressaccelerator -= 1;
                                 done = true;
+                                break;
                             }
 
                         }
@@ -3009,10 +3151,16 @@ void Spaceship::interstellar_travel()
             to_solar_system();
             break;
         }
-        else if(solarsystemchoice ==2)
-            break;
-
-
+        else if(solarsystemchoice == 2){
+            sqlite3* db;
+            int rc = sqlite3_open("ASCIIdatabase.db", &db);
+            sqlite3_stmt* stmt;
+            rc = sqlite3_prepare(db, "DELETE FROM PLANETS WHERE REALM = 'Solar system';", -1, &stmt, NULL);
+            rc = sqlite3_step(stmt);
+            sqlite3_finalize(stmt);
+            sqlite3_close(db);
+            break;    
+        }
     }
 
 }
